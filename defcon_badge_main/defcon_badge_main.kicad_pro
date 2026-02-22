@@ -412,6 +412,30 @@
     [
       "b497f1e3-23b9-4176-bc4d-bc3995ba532c",
       "Root"
+    ],
+    [
+      "bb0e0c14-b0f1-4acf-914c-b4e72da1ff4a",
+      "3v3_power"
+    ],
+    [
+      "5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222",
+      "5v_power"
+    ],
+    [
+      "61f32e17-01fb-42bf-aeae-eb5372520753",
+      "esp32"
+    ],
+    [
+      "fa42b96d-02fc-4c50-9821-483af63ffede",
+      "motor_driver"
+    ],
+    [
+      "c0b9f135-7457-46a3-ba59-e1dcc8eab596",
+      "motor_driver1"
+    ],
+    [
+      "80ac077f-60b7-46ed-9cae-89df459cc96b",
+      "motor_driver2"
     ]
   ],
   "text_variables": {}

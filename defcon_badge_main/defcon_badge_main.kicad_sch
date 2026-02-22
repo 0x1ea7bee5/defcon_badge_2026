@@ -5,309 +5,7 @@
 	(uuid "b497f1e3-23b9-4176-bc4d-bc3995ba532c")
 	(paper "A4")
 	(lib_symbols
-		(symbol "TPS61023DRLR:TPS61023DRLR"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Value" "TPS61023DRLR"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Footprint" "TPS61023DRLR:SOT563-ORI"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "MF" "Texas Instruments"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Description_1" "3.7-A boost converter with 0.5-V ultra-low input voltage"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Package" "SOT-5X3-6 Texas Instruments"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Price" "None"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "SnapEDA_Link" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=snap"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MP" "TPS61023DRLR"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Availability" "In Stock"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Check_prices" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=eda"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(symbol "TPS61023DRLR_0_0"
-				(rectangle
-					(start -10.16 -7.62)
-					(end 10.16 21.336)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(text "TPS61023"
-					(at 0 17.78 0)
-					(effects
-						(font
-							(size 2.54 2.54)
-						)
-						(justify bottom)
-					)
-				)
-				(text "Boost"
-					(at 0 14.732 0)
-					(effects
-						(font
-							(size 1.778 1.778)
-						)
-						(justify bottom)
-					)
-				)
-				(text "Vin 0.5V-5.5V"
-					(at 0 10.414 0)
-					(effects
-						(font
-							(size 1.778 1.778)
-						)
-						(justify bottom)
-					)
-				)
-				(text "Vout 2.2V-5.5V"
-					(at 0 6.096 0)
-					(effects
-						(font
-							(size 1.778 1.778)
-						)
-						(justify bottom)
-					)
-				)
-				(text "FB: 0.6V"
-					(at 0 1.778 0)
-					(effects
-						(font
-							(size 1.778 1.778)
-						)
-						(justify bottom)
-					)
-				)
-				(pin bidirectional line
-					(at -15.24 5.08 0)
-					(length 5.08)
-					(name "VIN"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -15.24 0 0)
-					(length 5.08)
-					(name "EN"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -15.24 -5.08 0)
-					(length 5.08)
-					(name "GND"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 5.08 180)
-					(length 5.08)
-					(name "SW"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 0 180)
-					(length 5.08)
-					(name "VOUT"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 -5.08 180)
-					(length 5.08)
-					(name "FB"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "power:+BATT"
-			(power)
+		(symbol "Device:Battery"
 			(pin_numbers
 				(hide yes)
 			)
@@ -318,8 +16,26 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -3.81 0)
+			(property "Reference" "BT"
+				(at 2.54 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Battery"
+				(at 2.54 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 1.524 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -327,8 +43,523 @@
 					(hide yes)
 				)
 			)
-			(property "Value" "+BATT"
-				(at 0 3.556 0)
+			(property "Datasheet" "~"
+				(at 0 1.524 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Multiple-cell battery"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "batt voltage-source cell"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Battery_0_1"
+				(rectangle
+					(start -2.286 1.778)
+					(end 2.286 1.524)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -2.286 -1.27)
+					(end 2.286 -1.524)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -1.524 1.016)
+					(end 1.524 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -1.524 -2.032)
+					(end 1.524 -2.54)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.778) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -0.508) (xy 0 -0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.016) (xy 0 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 3.048) (xy 1.778 3.048)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 3.556) (xy 1.27 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Battery_1_1"
+				(pin passive line
+					(at 0 5.08 270)
+					(length 2.54)
+					(name "+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -5.08 90)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Motor:Stepper_Motor_bipolar"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "M"
+				(at 3.81 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Stepper_Motor_bipolar"
+				(at 3.81 1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.254 -0.254 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.infineon.com/dgdl/Application-Note-TLE8110EE_driving_UniPolarStepperMotor_V1.1.pdf?fileId=db3a30431be39b97011be5d0aa0a00b0"
+				(at 0.254 -0.254 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "4-wire bipolar stepper motor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "bipolar stepper motor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "PinHeader*P2.54mm*Vertical* TerminalBlock* Motor*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Stepper_Motor_bipolar_0_0"
+				(polyline
+					(pts
+						(xy -1.27 -1.778) (xy -1.27 2.032) (xy 0 -0.508) (xy 1.27 2.032) (xy 1.27 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Stepper_Motor_bipolar_0_1"
+				(polyline
+					(pts
+						(xy -5.08 2.54) (xy -4.445 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 -2.54) (xy -4.445 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.445 2.54)
+					(mid -3.8127 1.905)
+					(end -4.445 1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.445 1.27)
+					(mid -3.8127 0.635)
+					(end -4.445 0)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.445 0)
+					(mid -3.8127 -0.635)
+					(end -4.445 -1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.445 -1.27)
+					(mid -3.8127 -1.905)
+					(end -4.445 -2.54)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 5.08) (xy -2.54 4.445)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -1.27 4.445)
+					(mid -1.905 3.8127)
+					(end -2.54 4.445)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 4.445)
+					(mid -0.635 3.8127)
+					(end -1.27 4.445)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 3.2512)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 1.27 4.445)
+					(mid 0.635 3.8127)
+					(end 0 4.445)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 2.54 4.445)
+					(mid 1.905 3.8127)
+					(end 1.27 4.445)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 5.08) (xy 2.54 4.445)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Stepper_Motor_bipolar_1_1"
+				(pin passive line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -2.54 7.62 270)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 7.62 270)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "joystick:joystick"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 11.43 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -353,7 +584,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(property "Description" ""
 				(at 0 0 0)
 				(effects
 					(font
@@ -362,44 +593,10 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "global power battery"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "+BATT_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54) (xy 0.762 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 2.54)
-					)
+			(symbol "joystick_0_1"
+				(rectangle
+					(start -8.89 8.89)
+					(end 8.89 -8.89)
 					(stroke
 						(width 0)
 						(type default)
@@ -409,11 +606,11 @@
 					)
 				)
 			)
-			(symbol "+BATT_1_1"
-				(pin power_in line
-					(at 0 0 90)
-					(length 0)
-					(name "~"
+			(symbol "joystick_1_1"
+				(pin bidirectional line
+					(at -3.81 -12.7 90)
+					(length 3.81)
+					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -421,6 +618,96 @@
 						)
 					)
 					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 0 -12.7 90)
+					(length 3.81)
+					(name "Y"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 3.81 -12.7 90)
+					(length 3.81)
+					(name "VIN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 12.7 3.81 180)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 12.7 0 180)
+					(length 3.81)
+					(name "X"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 12.7 -3.81 180)
+					(length 3.81)
+					(name "VIN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -533,44 +820,895 @@
 			(embedded_fonts no)
 		)
 	)
+	(junction
+		(at 198.12 81.28)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0353683e-e102-4d84-9d59-7d7549deaa77")
+	)
+	(junction
+		(at 205.74 76.2)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "26a62e87-bda0-45a1-9ac5-8426abbd4517")
+	)
+	(junction
+		(at 201.93 78.74)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "521da672-a4db-4945-bdb6-f3ec59e8731f")
+	)
+	(junction
+		(at 205.74 101.6)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6a868f73-ff9e-4ec7-b3ca-3095e60bff74")
+	)
+	(junction
+		(at 201.93 104.14)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7d25f683-646f-482c-ae94-f6a744e3f037")
+	)
+	(junction
+		(at 198.12 106.68)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "accc81f6-31cc-4bbc-80d2-d82f9794b97b")
+	)
+	(junction
+		(at 35.56 34.29)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f8dcebe1-f5d1-4e63-a454-873a6726b76a")
+	)
+	(wire
+		(pts
+			(xy 252.73 90.17) (xy 259.08 90.17)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05abd316-031c-4787-af55-322a21210ca5")
+	)
+	(wire
+		(pts
+			(xy 269.24 43.18) (xy 252.73 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05c36974-c59e-45d5-bde9-4a568da97836")
+	)
+	(wire
+		(pts
+			(xy 205.74 101.6) (xy 205.74 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0690aa02-590d-4756-9c5f-e914d079cbd5")
+	)
+	(wire
+		(pts
+			(xy 228.6 110.49) (xy 205.74 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08ed3a44-79d0-4ad5-b222-1b9f0aaec8d0")
+	)
+	(wire
+		(pts
+			(xy 186.69 106.68) (xy 198.12 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d13bfd1-633c-4417-af33-1ebcdde6622d")
+	)
+	(wire
+		(pts
+			(xy 21.59 34.29) (xy 35.56 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "14bc20a3-d69c-4d77-a164-9f1c2a915086")
+	)
+	(wire
+		(pts
+			(xy 205.74 76.2) (xy 228.6 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "193999ae-69ab-468a-87ed-4082971b0038")
+	)
+	(wire
+		(pts
+			(xy 201.93 78.74) (xy 201.93 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c6d9b6c-1c27-433e-83e5-f19079a2e47f")
+	)
+	(wire
+		(pts
+			(xy 252.73 86.36) (xy 257.81 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "21548817-8058-441c-a7d7-80cc99235518")
+	)
+	(wire
+		(pts
+			(xy 257.81 85.09) (xy 259.08 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "22b04f75-b6da-4175-a55e-896691b058d1")
+	)
+	(wire
+		(pts
+			(xy 269.24 80.01) (xy 269.24 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "24fbf587-a820-477c-b0ff-d83018ce4444")
+	)
+	(wire
+		(pts
+			(xy 252.73 53.34) (xy 257.81 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "25bb34b0-df0a-4071-9966-01e1fd447f3a")
+	)
+	(wire
+		(pts
+			(xy 205.74 110.49) (xy 205.74 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2f5a6571-0894-43e3-b949-299399f53864")
+	)
+	(wire
+		(pts
+			(xy 52.07 50.8) (xy 57.15 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3489d037-5698-4437-afb1-72b49b01b54f")
+	)
+	(wire
+		(pts
+			(xy 252.73 120.65) (xy 257.81 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "361eb548-c31d-4158-b52e-a40f84a0659b")
+	)
+	(wire
+		(pts
+			(xy 186.69 101.6) (xy 205.74 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "371c6940-615a-480d-9c96-156b591d6cc9")
+	)
+	(wire
+		(pts
+			(xy 224.79 58.42) (xy 228.6 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3b005c57-58e1-4b7d-9f1d-9f295bec941c")
+	)
+	(wire
+		(pts
+			(xy 224.79 105.41) (xy 224.79 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3b5d928a-54f6-4cbf-9291-0b1caf6a8070")
+	)
+	(wire
+		(pts
+			(xy 201.93 45.72) (xy 228.6 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "40d5be1b-eac1-4806-9166-6ebc0262f8f3")
+	)
+	(wire
+		(pts
+			(xy 198.12 48.26) (xy 198.12 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "445b6b3f-130f-4c6d-a78e-4658acf48c9e")
+	)
+	(wire
+		(pts
+			(xy 252.73 80.01) (xy 264.16 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ed00fd6-36e9-4877-a10a-99bc7e89a327")
+	)
+	(wire
+		(pts
+			(xy 224.79 91.44) (xy 228.6 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ef10634-8f5e-4b3f-beec-07b170c35d15")
+	)
+	(wire
+		(pts
+			(xy 228.6 48.26) (xy 198.12 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5122395b-cffb-4b8c-b0c7-8e7c93dc570e")
+	)
+	(wire
+		(pts
+			(xy 205.74 43.18) (xy 205.74 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "51611168-d83d-43e0-868f-b72ba7fab353")
+	)
+	(wire
+		(pts
+			(xy 224.79 60.96) (xy 228.6 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "52220c85-fc3c-4776-8678-8568cad6abf2")
+	)
+	(wire
+		(pts
+			(xy 269.24 46.99) (xy 269.24 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "53f57203-51b2-42ef-895c-d3dcc41f5d68")
+	)
+	(wire
+		(pts
+			(xy 198.12 106.68) (xy 198.12 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b2440d7-83a8-48a9-8891-995c50b3f623")
+	)
+	(wire
+		(pts
+			(xy 35.56 34.29) (xy 39.37 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "626b77df-51fa-4fd5-87c2-4525f37105d4")
+	)
+	(wire
+		(pts
+			(xy 186.69 104.14) (xy 201.93 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6350e8f6-f35f-450f-b54d-c285b3f9838e")
+	)
+	(wire
+		(pts
+			(xy 252.73 114.3) (xy 264.16 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "65a10d6d-4a0c-4177-8f71-67bc700535cc")
+	)
+	(wire
+		(pts
+			(xy 228.6 43.18) (xy 205.74 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "673502c3-a0c4-4eaf-ac3d-d2b49fc819a5")
+	)
+	(wire
+		(pts
+			(xy 39.37 50.8) (xy 35.56 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e6c717a-7e2a-4e81-a3a4-9f0880c42ac7")
+	)
+	(wire
+		(pts
+			(xy 269.24 114.3) (xy 269.24 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ba21bac-2043-4a9a-af80-c7cbf17b47f7")
+	)
+	(wire
+		(pts
+			(xy 228.6 73.66) (xy 224.79 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7bf3f25d-d5e7-4573-92bb-f2f552f302fd")
+	)
+	(wire
+		(pts
+			(xy 257.81 120.65) (xy 257.81 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7c7e1fd3-867d-4468-a75e-33621b595b15")
+	)
+	(wire
+		(pts
+			(xy 224.79 125.73) (xy 228.6 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7d781b35-e7c0-41d6-941e-0c728fba5534")
+	)
+	(wire
+		(pts
+			(xy 228.6 40.64) (xy 224.79 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82e51b5b-1eb9-4014-8ae6-a8c61376bfbf")
+	)
+	(wire
+		(pts
+			(xy 21.59 39.37) (xy 21.59 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8539e8f8-d46c-4d03-8575-1f2f26aab200")
+	)
+	(wire
+		(pts
+			(xy 224.79 88.9) (xy 228.6 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "89076428-6379-4145-b8eb-8597d74e66f3")
+	)
+	(wire
+		(pts
+			(xy 257.81 119.38) (xy 259.08 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a117009-5b56-4357-948f-218b19d09895")
+	)
+	(wire
+		(pts
+			(xy 257.81 86.36) (xy 257.81 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8be86605-2568-4480-ad4f-9f176a1c3a9e")
+	)
+	(wire
+		(pts
+			(xy 257.81 53.34) (xy 257.81 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "914fff24-ed22-4688-a5ef-43c2dd5aad00")
+	)
+	(wire
+		(pts
+			(xy 228.6 107.95) (xy 224.79 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9777fb5c-4bfa-4617-a1c9-9ca6e69ee1b9")
+	)
+	(wire
+		(pts
+			(xy 224.79 128.27) (xy 228.6 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d1facc0-4bd3-4ae8-a16c-abaeda4516d8")
+	)
+	(wire
+		(pts
+			(xy 252.73 57.15) (xy 259.08 57.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9e9f88e5-2dbb-4b84-97c4-3e6989453dc9")
+	)
+	(wire
+		(pts
+			(xy 228.6 78.74) (xy 201.93 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a2842db8-bf1a-4c98-b828-f93df0b51c05")
+	)
+	(wire
+		(pts
+			(xy 269.24 110.49) (xy 252.73 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7f494eb-9364-4504-8363-74ff30c772de")
+	)
+	(wire
+		(pts
+			(xy 269.24 76.2) (xy 252.73 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a9a5349d-0c48-4330-bf80-12b45fa2df02")
+	)
+	(wire
+		(pts
+			(xy 201.93 104.14) (xy 201.93 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b3bde04f-053d-442c-b06d-8312bdee8413")
+	)
+	(wire
+		(pts
+			(xy 224.79 93.98) (xy 228.6 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b9aa68c8-cb6e-4beb-ba52-4493fc037b76")
+	)
+	(wire
+		(pts
+			(xy 224.79 55.88) (xy 228.6 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bb0154c2-563b-4922-b17f-e9dc2d1a09d7")
+	)
+	(wire
+		(pts
+			(xy 224.79 71.12) (xy 224.79 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bdc28e7a-8b8e-42d2-87f4-7d13bc30f187")
+	)
+	(wire
+		(pts
+			(xy 257.81 52.07) (xy 259.08 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c436c378-32a6-4946-9f0f-bf5e17e2168e")
+	)
+	(wire
+		(pts
+			(xy 201.93 113.03) (xy 201.93 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c9bfd134-2423-4324-a0d8-ef42653bf733")
+	)
+	(wire
+		(pts
+			(xy 35.56 50.8) (xy 35.56 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ca25748f-bb04-4464-aee5-4f08949975da")
+	)
+	(wire
+		(pts
+			(xy 228.6 113.03) (xy 201.93 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cde79d9d-6b81-4aa3-96c2-8cb4237eb6b4")
+	)
+	(wire
+		(pts
+			(xy 252.73 124.46) (xy 259.08 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d085178c-a13d-4a7a-b12b-af4901b4617a")
+	)
+	(wire
+		(pts
+			(xy 224.79 123.19) (xy 228.6 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d2ec5484-ebd3-4df1-897a-e9dd033d1b20")
+	)
+	(wire
+		(pts
+			(xy 52.07 34.29) (xy 58.42 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e37a8368-5c50-4177-b439-f4c12dc4bd41")
+	)
+	(wire
+		(pts
+			(xy 198.12 115.57) (xy 198.12 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e58131e8-f81d-4587-bd3b-f638c8d27e5e")
+	)
+	(wire
+		(pts
+			(xy 224.79 38.1) (xy 224.79 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ebbf0a82-95de-4549-b0dc-d5e8f4931185")
+	)
+	(wire
+		(pts
+			(xy 198.12 81.28) (xy 228.6 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ed3eeab0-8b88-4be5-bee1-27f2a0878260")
+	)
+	(wire
+		(pts
+			(xy 228.6 115.57) (xy 198.12 115.57)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ef62ec12-f73d-4f29-a9f2-de7b22a17090")
+	)
+	(wire
+		(pts
+			(xy 252.73 46.99) (xy 264.16 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f8a05c25-cba8-49e3-ac59-88a4e0eb4eb0")
+	)
+	(label "5v"
+		(at 57.15 50.8 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "118516e0-ea66-4a41-aedb-261224efa703")
+	)
+	(label "STEPPER_2_STEP"
+		(at 224.79 91.44 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2d357c47-232f-4bc1-aecc-a9231c04ae37")
+	)
+	(label "3v3"
+		(at 58.42 34.29 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "36a9555b-7a6d-47ca-aa04-3c43aacc1c5a")
+	)
+	(label "5v"
+		(at 224.79 38.1 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "61b32851-6947-4d9b-9bcc-880dff7c925d")
+	)
+	(label "STEPPER_MS2"
+		(at 186.69 104.14 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7d0890a5-7f00-42e3-bfd0-c6e383f7a570")
+	)
+	(label "STEPPER_MS3"
+		(at 186.69 106.68 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "9018fd4a-1678-4b47-bb9c-3e0caa7e0cc0")
+	)
+	(label "STEPPER_2_VREF"
+		(at 224.79 88.9 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "93cfa03e-f5c2-462a-8de6-8373934f4959")
+	)
+	(label "5v"
+		(at 224.79 105.41 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "9d121005-d27d-4d12-ba6e-ff0751e0dc5f")
+	)
+	(label "5v"
+		(at 224.79 71.12 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "afa83699-e319-48fa-9db0-26f3c193f1d9")
+	)
+	(label "STEPPER_MS1"
+		(at 186.69 101.6 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bc3d4f73-5f1d-43ef-a619-b64c11ff604e")
+	)
+	(label "STEPPER_1_STEP"
+		(at 224.79 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "beaccf08-bd25-4cd0-8289-848d839b632a")
+	)
+	(label "STEPPER_1_VREF"
+		(at 224.79 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c9d997d9-16ef-4793-86f2-0a8db117fdba")
+	)
+	(label "STEPPER_2_DIR"
+		(at 224.79 93.98 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d8bce338-8f4a-4a5d-95a6-ba8c84d411b1")
+	)
+	(label "STEPPER_3_DIR"
+		(at 224.79 128.27 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d9ec3ce2-8e88-4f4d-81e9-c7c5964f48c0")
+	)
+	(label "STEPPER_1_DIR"
+		(at 224.79 60.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "daa48c32-6418-4d27-a7ff-5248384c8986")
+	)
+	(label "STEPPER_3_VREF"
+		(at 224.79 123.19 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "dd2799f9-1a0e-4f8f-9069-56540430ec63")
+	)
+	(label "STEPPER_3_STEP"
+		(at 224.79 125.73 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f1b7f7db-13f4-4cf1-b497-f3b62630fb55")
+	)
 	(symbol
-		(lib_id "TPS61023DRLR:TPS61023DRLR")
-		(at 52.07 49.53 0)
+		(lib_id "joystick:joystick")
+		(at 49.53 93.98 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "30f08aba-168e-4de2-b83d-f20e65d31ce3")
-		(property "Reference" "U1"
-			(at 52.07 22.86 0)
+		(uuid "244984e5-e773-4578-a976-6a13e64c8d5a")
+		(property "Reference" "J2"
+			(at 49.53 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "TPS61023DRLR"
-			(at 52.07 25.4 0)
+		(property "Value" "~"
+			(at 49.53 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "TPS61023DRLR:SOT563-ORI"
-			(at 52.07 49.53 0)
+		(property "Footprint" "joystick:joystick"
+			(at 49.53 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify bottom)
 				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
-			(at 52.07 49.53 0)
+			(at 49.53 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -579,116 +1717,331 @@
 			)
 		)
 		(property "Description" ""
-			(at 52.07 49.53 0)
+			(at 49.53 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
-			)
-		)
-		(property "MF" "Texas Instruments"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "3.7-A boost converter with 0.5-V ultra-low input voltage"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Package" "SOT-5X3-6 Texas Instruments"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Price" "None"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SnapEDA_Link" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=snap"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MP" "TPS61023DRLR"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Availability" "In Stock"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Check_prices" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=eda"
-			(at 52.07 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
 				(hide yes)
 			)
 		)
 		(pin "4"
-			(uuid "40373d55-7707-4c1a-a433-489f41a85ee6")
-		)
-		(pin "5"
-			(uuid "81194edc-4980-437c-91b3-574daa0b3f8b")
-		)
-		(pin "6"
-			(uuid "df301960-1e02-400b-a96a-f8fc7d297a07")
+			(uuid "32abb2f8-a6aa-4fa0-982f-63492a15a682")
 		)
 		(pin "2"
-			(uuid "25befc61-22a7-4100-a614-849873823840")
+			(uuid "d161ebf8-3383-444b-87d6-ba0cbab66199")
 		)
-		(pin "1"
-			(uuid "1c219817-fdf4-423a-b438-0b576c7bb506")
+		(pin "5"
+			(uuid "b6c001be-58be-4638-948f-4ad8f25a6a9b")
+		)
+		(pin "0"
+			(uuid "396cc394-ad06-4c21-acb3-64b4b3d70c01")
 		)
 		(pin "3"
-			(uuid "1afc00c9-204c-4632-904f-84a3997a927d")
+			(uuid "6902d0e2-b58d-4222-9fba-d4e0c0a6cb55")
+		)
+		(pin "1"
+			(uuid "e5fa6e9f-3470-4761-8e86-dee664b9a18c")
 		)
 		(instances
 			(project ""
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
-					(reference "U1")
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Motor:Stepper_Motor_bipolar")
+		(at 266.7 121.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2de3e497-418f-453c-ab61-001370accd9f")
+		(property "Reference" "M3"
+			(at 271.78 119.799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Stepper_Motor_bipolar"
+			(at 259.842 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 266.954 122.174 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.infineon.com/dgdl/Application-Note-TLE8110EE_driving_UniPolarStepperMotor_V1.1.pdf?fileId=db3a30431be39b97011be5d0aa0a00b0"
+			(at 266.954 122.174 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "4-wire bipolar stepper motor"
+			(at 266.7 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d254781b-c533-49af-a1af-88f971e97708")
+		)
+		(pin "2"
+			(uuid "cd5593d0-a780-4e6a-954a-04a1fa233261")
+		)
+		(pin "3"
+			(uuid "713b16dd-3d05-448d-8cd4-597b8fd251b4")
+		)
+		(pin "4"
+			(uuid "502b41ef-5ad4-49e5-97d3-5c8a7783a24d")
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(reference "M3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Motor:Stepper_Motor_bipolar")
+		(at 266.7 87.63 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3cff3a33-fbbd-4304-b2a9-bcceee43f86b")
+		(property "Reference" "M2"
+			(at 271.78 85.509 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Stepper_Motor_bipolar"
+			(at 260.604 93.472 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 266.954 87.884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.infineon.com/dgdl/Application-Note-TLE8110EE_driving_UniPolarStepperMotor_V1.1.pdf?fileId=db3a30431be39b97011be5d0aa0a00b0"
+			(at 266.954 87.884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "4-wire bipolar stepper motor"
+			(at 266.7 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9918e088-52cb-4143-a114-609bad306073")
+		)
+		(pin "2"
+			(uuid "ecf91620-a199-4aae-9416-8a716b670232")
+		)
+		(pin "3"
+			(uuid "f21265fa-ab48-4962-b13e-8bba2a588206")
+		)
+		(pin "4"
+			(uuid "c506c200-428b-43e4-a7a2-3f9506805116")
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(reference "M2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Battery")
+		(at 21.59 44.45 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "601c030c-073c-4172-be01-7240d204c986")
+		(property "Reference" "BT1"
+			(at 25.4 42.6084 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Battery"
+			(at 25.4 45.1484 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 21.59 42.926 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 21.59 42.926 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Multiple-cell battery"
+			(at 21.59 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "47186096-e2a0-42c0-9cee-a3aa769cfeec")
+		)
+		(pin "2"
+			(uuid "ea78568d-82c9-4a85-ae68-876ffcdb07c8")
+		)
+		(instances
+			(project ""
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(reference "BT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Motor:Stepper_Motor_bipolar")
+		(at 266.7 54.61 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a5e20b3e-9d45-445d-888e-98d25b469df6")
+		(property "Reference" "M1"
+			(at 271.78 52.489 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Stepper_Motor_bipolar"
+			(at 259.842 60.452 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 266.954 54.864 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.infineon.com/dgdl/Application-Note-TLE8110EE_driving_UniPolarStepperMotor_V1.1.pdf?fileId=db3a30431be39b97011be5d0aa0a00b0"
+			(at 266.954 54.864 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "4-wire bipolar stepper motor"
+			(at 266.7 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e0a24d30-e474-4301-b9fe-44135415d626")
+		)
+		(pin "2"
+			(uuid "5be2763a-a99c-49c9-99b9-5975e43565df")
+		)
+		(pin "3"
+			(uuid "9c5f1481-e89d-4260-a0ec-503ff30f665d")
+		)
+		(pin "4"
+			(uuid "ebf105df-c708-4e4c-82bd-19ed6bd3151b")
+		)
+		(instances
+			(project ""
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(reference "M1")
 					(unit 1)
 				)
 			)
@@ -696,16 +2049,16 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 21.59 57.15 0)
+		(at 21.59 49.53 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "548997e6-965f-4d5d-bb1f-46c7ffdcf316")
-		(property "Reference" "#PWR01"
-			(at 21.59 63.5 0)
+		(uuid "c28b9a97-9504-4c78-a71d-8eeabfa17d2d")
+		(property "Reference" "#PWR046"
+			(at 21.59 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -714,7 +2067,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 21.59 62.23 0)
+			(at 21.59 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -722,7 +2075,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 21.59 57.15 0)
+			(at 21.59 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -731,7 +2084,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 21.59 57.15 0)
+			(at 21.59 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -740,7 +2093,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 21.59 57.15 0)
+			(at 21.59 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -749,240 +2102,805 @@
 			)
 		)
 		(pin "1"
-			(uuid "050afef2-d9b5-4de4-b417-d5e565a1da64")
+			(uuid "006d97b4-b478-49c6-bda3-a1e067c727f7")
 		)
 		(instances
 			(project ""
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
-					(reference "#PWR01")
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(symbol
-		(lib_id "TPS61023DRLR:TPS61023DRLR")
-		(at 41.91 115.57 0)
-		(unit 1)
+	(sheet
+		(at 39.37 46.99)
+		(size 12.7 7.62)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "a3960c5a-a19b-4954-b80a-247bb985b9a3")
-		(property "Reference" "U2"
-			(at 41.91 88.9 0)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222")
+		(property "Sheetname" "5v_power"
+			(at 39.37 46.2784 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left bottom)
 			)
 		)
-		(property "Value" "TPS61023DRLR"
-			(at 41.91 91.44 0)
+		(property "Sheetfile" "power_reg_5v.kicad_sch"
+			(at 39.37 55.1946 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 			)
 		)
-		(property "Footprint" "TPS61023DRLR:SOT563-ORI"
-			(at 41.91 115.57 0)
+		(pin "5v" output
+			(at 52.07 50.8 0)
+			(uuid "7cfb835b-d98d-4b12-af47-f448c03f674b")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify bottom)
-				(hide yes)
+				(justify right)
 			)
 		)
-		(property "Datasheet" ""
-			(at 41.91 115.57 0)
+		(pin "VBAT" input
+			(at 39.37 50.8 180)
+			(uuid "4c3684a3-5bb3-483b-ae75-e14dcda5e89e")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify left)
 			)
-		)
-		(property "Description" ""
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MF" "Texas Instruments"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "3.7-A boost converter with 0.5-V ultra-low input voltage"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Package" "SOT-5X3-6 Texas Instruments"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Price" "None"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SnapEDA_Link" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=snap"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MP" "TPS61023DRLR"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Availability" "In Stock"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Check_prices" "https://www.snapeda.com/parts/TPS61023DRLR/Texas+Instruments/view-part/?ref=eda"
-			(at 41.91 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(pin "4"
-			(uuid "cfecf975-0e75-4c8d-ba12-1056dfd640e3")
-		)
-		(pin "5"
-			(uuid "f512e56f-faa8-4785-b400-d2f3a0899703")
-		)
-		(pin "6"
-			(uuid "25ef6774-9254-4c7f-bae8-b795f0abf558")
-		)
-		(pin "2"
-			(uuid "5e01829d-990c-4cd3-bc1c-936b55fdf738")
-		)
-		(pin "1"
-			(uuid "440f5cdc-e1f4-4750-abb1-cb0b0e8db416")
-		)
-		(pin "3"
-			(uuid "00ec0720-bcc5-44cb-9897-0e72e27ae747")
 		)
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
-					(reference "U2")
-					(unit 1)
+					(page "3")
 				)
 			)
 		)
 	)
-	(symbol
-		(lib_id "power:+BATT")
-		(at 25.4 38.1 0)
-		(unit 1)
+	(sheet
+		(at 95.25 30.48)
+		(size 34.29 66.04)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "c91bd7c5-14bc-4496-abf4-7a85aafcd454")
-		(property "Reference" "#PWR02"
-			(at 25.4 41.91 0)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "61f32e17-01fb-42bf-aeae-eb5372520753")
+		(property "Sheetname" "esp32"
+			(at 95.25 29.7684 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify left bottom)
 			)
 		)
-		(property "Value" "+BATT"
-			(at 25.4 33.02 0)
+		(property "Sheetfile" "esp32.kicad_sch"
+			(at 95.25 97.1046 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left top)
 			)
 		)
-		(property "Footprint" ""
-			(at 25.4 38.1 0)
+		(pin "3v3" input
+			(at 95.25 34.29 180)
+			(uuid "2f1af563-1a8f-43d3-8093-ed4a64d4a3b1")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify left)
 			)
 		)
-		(property "Datasheet" ""
-			(at 25.4 38.1 0)
+		(pin "I2C_SCL" output
+			(at 129.54 68.58 0)
+			(uuid "dac7120e-ed5a-4706-90a8-6655b211aee1")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify right)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 25.4 38.1 0)
+		(pin "I2C_SDA" output
+			(at 129.54 64.77 0)
+			(uuid "d3819983-357e-424a-a863-86f7bc107565")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify right)
 			)
 		)
-		(pin "1"
-			(uuid "fef0686c-99b5-4b11-a509-eeddc193fc5f")
+		(pin "JOY_X" input
+			(at 95.25 90.17 180)
+			(uuid "eaf51b96-b3bb-4942-aa3a-9a6287abfb3e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "JOY_Y" input
+			(at 95.25 82.55 180)
+			(uuid "2cc3e06e-2302-4df8-9320-9c18dfbc33d3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LED_B" output
+			(at 129.54 49.53 0)
+			(uuid "7120a6db-45e1-4598-9a12-2cba253c9ea8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LED_G" output
+			(at 129.54 52.07 0)
+			(uuid "a9522d4a-ffa1-4ce9-81eb-3be25d9a78f6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LED_R" output
+			(at 129.54 54.61 0)
+			(uuid "120f9d44-cc8a-45b7-8894-056f3bb85e5f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LIMIT_SWITCHES" input
+			(at 95.25 50.8 180)
+			(uuid "13620980-c23c-4ba3-9356-9b9e822024e4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MENU_SEL" input
+			(at 95.25 57.15 180)
+			(uuid "b0626571-f962-4d53-8c38-b222ecac73bc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "STEPPER_1_DIR" output
+			(at 129.54 33.02 0)
+			(uuid "7f43e4f7-1603-47b3-b425-61cb5224c793")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_1_STEP" output
+			(at 129.54 35.56 0)
+			(uuid "822e5d3e-13db-43f8-a98b-c4d1d10ad842")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_2_DIR" output
+			(at 129.54 38.1 0)
+			(uuid "b2440cc1-6e48-4bd0-811a-023abc1478f6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_2_STEP" output
+			(at 129.54 40.64 0)
+			(uuid "04f65336-791a-43ae-877b-b73351fd3ba2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_3_STEP" output
+			(at 129.54 43.18 0)
+			(uuid "f38113d8-1011-4149-8dad-d2903df1e9e6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_MS1" output
+			(at 129.54 80.01 0)
+			(uuid "f9ceaecc-f141-40cb-bbe7-406a4c5eccee")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_MS2" output
+			(at 129.54 85.09 0)
+			(uuid "dc40752d-861e-46a3-9be9-541d2637e020")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_MS3" output
+			(at 129.54 91.44 0)
+			(uuid "e0a6c16a-8c8d-46c5-b68a-bed5f3a4b4dd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_SLEEP" output
+			(at 129.54 59.69 0)
+			(uuid "1e7737cf-0bc7-4fef-995b-e1e9ffc03615")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEPPER_3_DIR" output
+			(at 129.54 45.72 0)
+			(uuid "7b98d183-dca5-4b98-989c-4f38d610fad4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
 		(instances
-			(project ""
+			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
-					(reference "#PWR02")
-					(unit 1)
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 228.6 105.41)
+		(size 24.13 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "80ac077f-60b7-46ed-9cae-89df459cc96b")
+		(property "Sheetname" "motor_driver2"
+			(at 228.6 104.6984 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "motor_drivers.kicad_sch"
+			(at 228.6 131.3946 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "5v" input
+			(at 228.6 107.95 180)
+			(uuid "ef308d35-2728-4ec3-949e-19a816b03c1f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIR" input
+			(at 228.6 128.27 180)
+			(uuid "098ae7bd-ffdb-4fd3-bd7a-c5276762033b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS1" input
+			(at 228.6 110.49 180)
+			(uuid "7478e40b-02f1-4061-801e-39effe9c443e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS2" input
+			(at 228.6 113.03 180)
+			(uuid "3bdea10b-c435-4cf3-85a6-94bced940289")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS3" input
+			(at 228.6 115.57 180)
+			(uuid "ed589d65-808a-45a9-9edd-b74984c91b86")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "OUT1A" output
+			(at 252.73 110.49 0)
+			(uuid "cf5f7f7f-3c79-449d-a958-6f55b47dae26")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT1B" output
+			(at 252.73 114.3 0)
+			(uuid "32c7b22e-e124-4be5-bd55-d38806fa12c9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2A" output
+			(at 252.73 120.65 0)
+			(uuid "b9b6ff8c-6ac5-414a-b614-7fcbeaa42d00")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2B" output
+			(at 252.73 124.46 0)
+			(uuid "81312fa3-a544-4413-8db5-e69dedf8ae63")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEP" input
+			(at 228.6 125.73 180)
+			(uuid "a330d806-712d-4f98-b069-13c14810b61c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(page "7")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 39.37 30.48)
+		(size 12.7 7.62)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "bb0e0c14-b0f1-4acf-914c-b4e72da1ff4a")
+		(property "Sheetname" "3v3_power"
+			(at 39.37 29.7684 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power_regulator.kicad_sch"
+			(at 39.37 38.6846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "3v3" output
+			(at 52.07 34.29 0)
+			(uuid "9e5fffc5-d31c-4bc1-9786-5975fc9c2437")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VBAT" input
+			(at 39.37 34.29 180)
+			(uuid "0bae41f9-c068-442a-8a9c-f60f29593d04")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 228.6 71.12)
+		(size 24.13 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "c0b9f135-7457-46a3-ba59-e1dcc8eab596")
+		(property "Sheetname" "motor_driver1"
+			(at 228.6 70.4084 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "motor_drivers.kicad_sch"
+			(at 228.6 97.1046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "5v" input
+			(at 228.6 73.66 180)
+			(uuid "38264473-e611-488e-bcb1-86477597ec35")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIR" input
+			(at 228.6 93.98 180)
+			(uuid "7d91904b-b30e-4309-9e19-12c4fb4ea970")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS1" input
+			(at 228.6 76.2 180)
+			(uuid "30aa8776-f1bf-46c0-835d-877b0780b6be")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS2" input
+			(at 228.6 78.74 180)
+			(uuid "3bd3b3eb-cb5c-4cf3-b945-105615a329f9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS3" input
+			(at 228.6 81.28 180)
+			(uuid "158911d9-f7b3-4a67-bb18-f47f19af41b0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "OUT1A" output
+			(at 252.73 76.2 0)
+			(uuid "e3e2fd7e-8c9f-4a80-98d7-7d8b7fe84fb9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT1B" output
+			(at 252.73 80.01 0)
+			(uuid "22cf2299-f6af-45cb-9ff3-61b5f5ac3c7d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2A" output
+			(at 252.73 86.36 0)
+			(uuid "215da8a0-fd79-4ee1-87fd-5a7d1f854a55")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2B" output
+			(at 252.73 90.17 0)
+			(uuid "f03899ec-a1a6-4af5-9f0a-d104baebfdfd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEP" input
+			(at 228.6 91.44 180)
+			(uuid "00a34095-bd6c-47c1-bcf0-b0ac4e7187e6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 228.6 38.1)
+		(size 24.13 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "fa42b96d-02fc-4c50-9821-483af63ffede")
+		(property "Sheetname" "motor_driver"
+			(at 228.6 37.3884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "motor_drivers.kicad_sch"
+			(at 228.6 64.0846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "5v" input
+			(at 228.6 40.64 180)
+			(uuid "0eaf7439-f547-4a58-8214-d316bd1a4f0a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIR" input
+			(at 228.6 60.96 180)
+			(uuid "04629bc8-b4a9-430f-97d8-0bbe5e371a07")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS1" input
+			(at 228.6 43.18 180)
+			(uuid "c506d16a-c520-4667-ba9f-a67b138889a0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS2" input
+			(at 228.6 45.72 180)
+			(uuid "727de7b9-a6c7-47a2-9db7-24e77940712b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MS3" input
+			(at 228.6 48.26 180)
+			(uuid "b0141248-1000-4fb2-bf20-39c9cd844eca")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "OUT1A" output
+			(at 252.73 43.18 0)
+			(uuid "895f3648-4439-435b-8021-dd0418852cd8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT1B" output
+			(at 252.73 46.99 0)
+			(uuid "8f5a78d1-9cdc-453f-b262-da58339577d3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2A" output
+			(at 252.73 53.34 0)
+			(uuid "f2ef3c47-f8ee-49a5-8689-442131112b45")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "OUT2B" output
+			(at 252.73 57.15 0)
+			(uuid "711066d2-32b8-479a-ac8e-9026e6e4cabd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "STEP" input
+			(at 228.6 58.42 180)
+			(uuid "d6b59f7a-8115-4161-b32e-e7e5e1c986cf")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c"
+					(page "5")
 				)
 			)
 		)
