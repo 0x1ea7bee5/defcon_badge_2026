@@ -882,6 +882,38 @@
 			(embedded_fonts no)
 		)
 	)
+	(rectangle
+		(start 46.99 29.21)
+		(end 186.69 129.54)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid cb67aafa-16dc-41fc-8d68-60f5d5327310)
+	)
+	(text "Max current limit: 1 Amp"
+		(exclude_from_sim no)
+		(at 68.072 41.656 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "4614b6f5-51f4-468a-a864-afb86e3e10f5")
+	)
+	(text "5v Regulator"
+		(exclude_from_sim no)
+		(at 67.818 35.814 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "a267a222-0748-467e-b11b-81ab74047831")
+	)
 	(junction
 		(at 97.79 81.28)
 		(diameter 0)
@@ -1230,7 +1262,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "359e27e0-2f7d-4b21-99ab-335eee2ff350")
-		(property "Reference" "C3"
+		(property "Reference" "C1_V5"
 			(at 77.47 86.3599 0)
 			(effects
 				(font
@@ -1239,7 +1271,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "22 uF"
 			(at 77.47 88.8999 0)
 			(effects
 				(font
@@ -1248,7 +1280,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 74.6252 91.44 0)
 			(effects
 				(font
@@ -1284,7 +1316,7 @@
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "C3")
+					(reference "C1_V5")
 					(unit 1)
 				)
 			)
@@ -1300,7 +1332,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "46bfa84e-3cfb-4c6d-a261-09d6308f0f87")
-		(property "Reference" "C4"
+		(property "Reference" "C2_V5"
 			(at 173.99 97.7899 0)
 			(effects
 				(font
@@ -1309,7 +1341,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "10 uF"
 			(at 173.99 100.3299 0)
 			(effects
 				(font
@@ -1318,7 +1350,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 171.1452 102.87 0)
 			(effects
 				(font
@@ -1354,7 +1386,7 @@
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "C4")
+					(reference "C2_V5")
 					(unit 1)
 				)
 			)
@@ -1368,9 +1400,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "621c5fed-d6b4-4c9f-b9e5-3bd5811bc3ec")
-		(property "Reference" "L2"
+		(uuid "49fa0d92-1ebc-400c-8b54-51cd5f6a0d18")
+		(property "Reference" "L_V5"
 			(at 116.84 44.45 90)
 			(effects
 				(font
@@ -1378,7 +1409,7 @@
 				)
 			)
 		)
-		(property "Value" "L"
+		(property "Value" "470 nH"
 			(at 116.84 46.99 90)
 			(effects
 				(font
@@ -1386,7 +1417,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_Neosid_SMS-ME3010"
 			(at 116.84 49.53 0)
 			(effects
 				(font
@@ -1413,16 +1444,34 @@
 				(hide yes)
 			)
 		)
+		(property "PN" "74479288147"
+			(at 116.84 49.53 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "20%"
+			(at 116.84 51.562 90)
+			(show_name yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
-			(uuid "5d7c834b-beec-4563-b145-eba62668a0ac")
+			(uuid "3d70071a-2c0f-4fd4-945f-67779dcac458")
 		)
 		(pin "2"
-			(uuid "84d69a48-e83a-4631-a307-fe2e67432c5d")
+			(uuid "5f980776-240a-4ff0-b14b-46ddccd68a46")
 		)
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "L2")
+					(reference "L_V5")
 					(unit 1)
 				)
 			)
@@ -1438,7 +1487,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "702df2f5-0a0c-47a6-a89c-a443248c8cb3")
-		(property "Reference" "R4"
+		(property "Reference" "R2_V5"
 			(at 156.21 105.4099 0)
 			(effects
 				(font
@@ -1447,7 +1496,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R_US"
+		(property "Value" "100 kOhm"
 			(at 156.21 107.9499 0)
 			(effects
 				(font
@@ -1456,7 +1505,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "PCM_SparkFun-Fuse:1206"
 			(at 154.686 106.934 90)
 			(effects
 				(font
@@ -1492,7 +1541,7 @@
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "R4")
+					(reference "R2_V5")
 					(unit 1)
 				)
 			)
@@ -1574,7 +1623,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b215c231-9484-4cf8-bfe6-0af314bed4e8")
-		(property "Reference" "R3"
+		(property "Reference" "R1_V5"
 			(at 156.21 90.1699 0)
 			(effects
 				(font
@@ -1583,7 +1632,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R_US"
+		(property "Value" "732 kOhm"
 			(at 156.21 92.7099 0)
 			(effects
 				(font
@@ -1592,7 +1641,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "PCM_SparkFun-Fuse:1206"
 			(at 154.686 91.694 90)
 			(effects
 				(font
@@ -1628,7 +1677,7 @@
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "R3")
+					(reference "R1_V5")
 					(unit 1)
 				)
 			)
@@ -1709,8 +1758,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "d28f3837-29c2-450e-9360-37b153005601")
-		(property "Reference" "U2"
+		(uuid "ca174bd6-8bcc-4496-a9d5-c7522f16140e")
+		(property "Reference" "U_5V1"
 			(at 118.11 59.69 0)
 			(effects
 				(font
@@ -1834,28 +1883,28 @@
 				(hide yes)
 			)
 		)
-		(pin "4"
-			(uuid "2bad2dcb-12d9-498e-9246-df10113d5e78")
+		(pin "2"
+			(uuid "d2e5f34f-1390-475b-a79e-8f940ee245e7")
 		)
 		(pin "5"
-			(uuid "966b682b-5e4d-4388-a20e-e25abc833c76")
+			(uuid "814d7a2c-cb2e-4943-8012-cac52f33cdd7")
+		)
+		(pin "4"
+			(uuid "347ca89a-9ccd-4e61-b8c8-425466eefa30")
 		)
 		(pin "6"
-			(uuid "f3af3a73-baf2-40dd-be5e-4da8b3434600")
-		)
-		(pin "2"
-			(uuid "c16f04e4-c2b9-4911-a59f-9fcc014a0b15")
+			(uuid "02c6ec88-216f-407b-a675-9b419115f882")
 		)
 		(pin "1"
-			(uuid "c35404fd-d3b3-4fec-9adb-a44d3e7f684e")
+			(uuid "d3a1ebca-6559-4a71-95ea-d1b0b3b6664b")
 		)
 		(pin "3"
-			(uuid "04b3bc96-a642-4781-949a-e6719223df7e")
+			(uuid "8cc25472-227c-4222-8ee5-98a382012ccb")
 		)
 		(instances
-			(project "defcon_badge_main"
+			(project ""
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/5a5d7d00-ae35-4e4f-8d3e-dea7a6dc9222"
-					(reference "U2")
+					(reference "U_5V1")
 					(unit 1)
 				)
 			)

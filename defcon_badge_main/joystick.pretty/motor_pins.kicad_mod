@@ -1,0 +1,103 @@
+(footprint "motor_pins"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 4.9 3.2 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "52b8ca99-f66c-4705-8ff5-dbcb6dac3dc3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "motor_pins"
+		(at 0 5.6 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0d89fd2f-d484-42b4-b63a-5b8aaa2a5f32")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "64185091-e203-46be-a574-21c821e44c2c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d7c637c0-42f6-4aff-9ab3-32356e9fc6bc")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_text user "${REFERENCE}"
+		(at 4.9 5.7 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "a70bdbfc-4d58-43bc-bd71-8f70a877321f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at 0 0)
+		(size 2 2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.125)
+		(zone_connect 1)
+		(uuid "b4349152-19a2-46fb-bff4-3c891f05ac1d")
+	)
+	(pad "2" smd roundrect
+		(at 3.5 0)
+		(size 2 2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.125)
+		(zone_connect 1)
+		(uuid "eda4bb24-7f16-4385-871f-ee47bd5848f1")
+	)
+	(pad "3" smd roundrect
+		(at 7 0)
+		(size 2 2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.125)
+		(zone_connect 1)
+		(uuid "76709cd5-38b8-491a-a4e1-12f3b4a463ec")
+	)
+	(pad "4" smd roundrect
+		(at 10.5 0)
+		(size 2 2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.125)
+		(zone_connect 1)
+		(uuid "135533aa-6c5a-4744-9f08-dd01550612f4")
+	)
+	(embedded_fonts no)
+)

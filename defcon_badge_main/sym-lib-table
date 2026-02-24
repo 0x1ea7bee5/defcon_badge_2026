@@ -1,4 +1,6 @@
 (sym_lib_table
   (version 7)
   (lib (name "joystick")(type "KiCad")(uri "${KIPRJMOD}/joystick.kicad_sym")(options "")(descr ""))
+  (lib (name "display")(type "KiCad")(uri "${KIPRJMOD}/display.kicad_sym")(options "")(descr ""))
+  (lib (name "WCAP-ASLI_6.3X5.5")(type "KiCad")(uri "/home/da-hive/Documents/defcon_badge_2026/external_footprints/WCAP-ASLI_6.3X5.5/WCAP-ASLI_6.3X5.5.kicad_sym")(options "")(descr ""))
 )
