@@ -1546,7 +1546,7 @@
 	)
 	(wire
 		(pts
-			(xy 74.93 80.01) (xy 81.28 80.01)
+			(xy 73.66 80.01) (xy 81.28 80.01)
 		)
 		(stroke
 			(width 0)
@@ -1606,7 +1606,7 @@
 	)
 	(wire
 		(pts
-			(xy 104.14 62.23) (xy 104.14 67.31)
+			(xy 104.14 59.69) (xy 104.14 67.31)
 		)
 		(stroke
 			(width 0)
@@ -1746,7 +1746,7 @@
 	)
 	(wire
 		(pts
-			(xy 99.06 62.23) (xy 99.06 67.31)
+			(xy 99.06 59.69) (xy 99.06 67.31)
 		)
 		(stroke
 			(width 0)
@@ -2004,6 +2004,16 @@
 		)
 		(uuid "ff967232-76ed-4aa9-bb8b-b689c7e4283a")
 	)
+	(label "OUT1A"
+		(at 104.14 66.04 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "095057bf-5797-437e-be07-7f69a3fa3d92")
+	)
 	(label "VBB2"
 		(at 184.15 58.42 180)
 		(effects
@@ -2023,6 +2033,26 @@
 			(justify right bottom)
 		)
 		(uuid "4d692cf9-2ee9-4bd4-8e35-551dc61f02b8")
+	)
+	(label "OUT2B"
+		(at 74.93 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7f03d7a5-6ed3-49ed-a7f0-a775886bafbd")
+	)
+	(label "OUT1B"
+		(at 130.81 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "81f28dfa-d40b-4243-8be5-774a4d7c337d")
 	)
 	(label "VCP"
 		(at 72.39 100.33 180)
@@ -2084,6 +2114,16 @@
 		)
 		(uuid "de6e6594-b950-41c6-8819-3a425d85af12")
 	)
+	(label "OUT2A"
+		(at 99.06 66.04 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f7dc03f8-43af-450c-9c2a-981d6555c9a2")
+	)
 	(hierarchical_label "8v"
 		(shape input)
 		(at 208.28 58.42 0)
@@ -2130,7 +2170,7 @@
 	)
 	(hierarchical_label "OUT2B"
 		(shape output)
-		(at 74.93 80.01 180)
+		(at 73.66 80.01 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2141,7 +2181,7 @@
 	)
 	(hierarchical_label "OUT1A"
 		(shape output)
-		(at 104.14 62.23 90)
+		(at 104.14 59.69 90)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2185,7 +2225,7 @@
 	)
 	(hierarchical_label "OUT2A"
 		(shape output)
-		(at 99.06 62.23 90)
+		(at 99.06 59.69 90)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2255,7 +2295,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 191.516 117.094 90)
 			(effects
 				(font
@@ -2407,7 +2447,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 191.516 109.474 90)
 			(effects
 				(font
@@ -2711,7 +2751,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 125.476 104.394 90)
 			(effects
 				(font
@@ -2788,7 +2828,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 95.504 48.006 90)
 			(effects
 				(font
@@ -3187,7 +3227,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 105.664 48.006 90)
 			(effects
 				(font
@@ -3875,7 +3915,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 105.156 118.364 90)
 			(effects
 				(font
@@ -3952,7 +3992,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 51.816 90.424 90)
 			(effects
 				(font
@@ -4105,7 +4145,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "PCM_SparkFun-Coil:0805"
 			(at 115.316 120.904 90)
 			(effects
 				(font
