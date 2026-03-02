@@ -2295,7 +2295,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 191.516 117.094 90)
 			(effects
 				(font
@@ -2447,7 +2447,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 191.516 109.474 90)
 			(effects
 				(font
@@ -2525,7 +2525,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 139.3952 105.41 0)
 			(effects
 				(font
@@ -2751,7 +2751,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 125.476 104.394 90)
 			(effects
 				(font
@@ -2828,7 +2828,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 95.504 48.006 90)
 			(effects
 				(font
@@ -3227,7 +3227,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 105.664 48.006 90)
 			(effects
 				(font
@@ -3612,7 +3612,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 93.0148 118.11 0)
 			(effects
 				(font
@@ -3837,7 +3837,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 63.8048 87.63 0)
 			(effects
 				(font
@@ -3915,7 +3915,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 105.156 118.364 90)
 			(effects
 				(font
@@ -3992,7 +3992,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 51.816 90.424 90)
 			(effects
 				(font
@@ -4127,7 +4127,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d540b51e-afc8-40d8-b334-e8b3d5b7f276")
-		(property "Reference" "R_SLP_M1"
+		(property "Reference" "R_OSC_M1"
 			(at 116.84 119.3799 0)
 			(effects
 				(font
@@ -4145,7 +4145,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 115.316 120.904 90)
 			(effects
 				(font
@@ -4181,15 +4181,15 @@
 		(instances
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/80ac077f-60b7-46ed-9cae-89df459cc96b"
-					(reference "R_SLP_M3")
+					(reference "R_OSC_M3")
 					(unit 1)
 				)
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/c0b9f135-7457-46a3-ba59-e1dcc8eab596"
-					(reference "R_SLP_M2")
+					(reference "R_OSC_M2")
 					(unit 1)
 				)
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/fa42b96d-02fc-4c50-9821-483af63ffede"
-					(reference "R_SLP_M1")
+					(reference "R_OSC_M1")
 					(unit 1)
 				)
 			)
@@ -4296,7 +4296,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 191.4652 53.34 0)
 			(effects
 				(font

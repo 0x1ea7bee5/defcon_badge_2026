@@ -123,21 +123,21 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.1,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.5,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
         "min_hole_to_hole": 0.25,
-        "min_microvia_diameter": 0.2,
-        "min_microvia_drill": 0.1,
+        "min_microvia_diameter": 0.5,
+        "min_microvia_drill": 0.3,
         "min_resolved_spokes": 2,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.0,
-        "min_via_annular_width": 0.1,
+        "min_track_width": 0.1,
+        "min_via_annular_width": 0.2,
         "min_via_diameter": 0.5,
         "solder_mask_to_copper_clearance": 0.0,
         "use_height_for_length_calcs": true
@@ -488,20 +488,83 @@
         "wire_width": 6
       },
       {
-        "clearance": 0.254,
-        "name": "diff_pair",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "name": "3v3",
+        "pcb_color": "rgb(255, 175, 254)",
+        "priority": 4,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "name": "5v",
+        "pcb_color": "rgb(150, 120, 221)",
+        "priority": 2,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "name": "8v",
+        "pcb_color": "rgb(114, 227, 255)",
+        "priority": 1,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "name": "GND",
+        "pcb_color": "rgb(0, 132, 0)",
+        "priority": 3,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "name": "VBAT",
+        "pcb_color": "rgb(255, 245, 112)",
         "priority": 0,
-        "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 1.27
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "diff_pair_gap": 0.45,
+        "diff_pair_width": 0.24,
+        "name": "diff_pair",
+        "pcb_color": "rgb(255, 217, 21)",
+        "priority": 5,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
       }
     ],
     "meta": {
       "version": 4
     },
     "net_colors": null,
-    "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_assignments": {
+      "/3v3": [
+        "3v3"
+      ],
+      "/5v": [
+        "5v"
+      ],
+      "/8v": [
+        "8v"
+      ],
+      "/VBAT": [
+        "VBAT"
+      ],
+      "/esp32/ESP_D_N": [
+        "diff_pair"
+      ],
+      "/esp32/ESP_D_P": [
+        "diff_pair"
+      ],
+      "/esp32/USB_D_N": [
+        "diff_pair"
+      ],
+      "/esp32/USB_D_P": [
+        "diff_pair"
+      ],
+      "GND": [
+        "GND"
+      ]
+    },
+    "netclass_patterns": [
+      {
+        "netclass": "diff_pair",
+        "pattern": ""
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
@@ -752,26 +815,6 @@
     [
       "601275ec-e94e-417a-b10e-be3d02320ef3",
       "limit_switch"
-    ],
-    [
-      "cd67848e-ca3b-47ee-8600-590ff4076ac1",
-      "limit_switch1"
-    ],
-    [
-      "5cee4d1a-3abf-40ad-aa44-8eea5960086d",
-      "limit_switch2"
-    ],
-    [
-      "7560928c-9ca5-4b70-b523-b7f2805d7ac5",
-      "limit_switch3"
-    ],
-    [
-      "cf9df09b-dd4c-4c4a-9e2a-27c7d340b704",
-      "limit_switch4"
-    ],
-    [
-      "2373328b-cadc-4681-862e-07e8091b2c5e",
-      "limit_switch5"
     ],
     [
       "6a77c56e-3668-482f-aae0-f4a5bfd6d108",

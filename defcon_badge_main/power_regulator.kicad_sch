@@ -1230,6 +1230,26 @@
 		)
 		(uuid "ffd9595f-bcc9-4dfa-ba11-83eb13616bd3")
 	)
+	(label "3v3_FB"
+		(at 156.21 109.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "43b726db-8ecd-4463-afb1-cdd4e332a88c")
+	)
+	(label "3v3_SW"
+		(at 153.67 59.69 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "52f8d20d-d08d-46a2-8976-7add58975747")
+	)
 	(hierarchical_label "VBAT"
 		(shape input)
 		(at 77.47 86.36 180)
@@ -1346,7 +1366,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 88.5952 101.6 0)
 			(effects
 				(font
@@ -1416,7 +1436,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
 			(at 168.656 101.854 90)
 			(effects
 				(font
@@ -1552,7 +1572,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
 			(at 168.656 117.094 90)
 			(effects
 				(font
@@ -1622,7 +1642,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 185.1152 113.03 0)
 			(effects
 				(font

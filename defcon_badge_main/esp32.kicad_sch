@@ -2282,16 +2282,6 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 132.08) (xy 77.47 132.08)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "05ca4b61-7f0d-4330-8be5-3b597e6ae2f1")
-	)
-	(wire
-		(pts
 			(xy 55.88 52.07) (xy 62.23 52.07)
 		)
 		(stroke
@@ -2299,6 +2289,16 @@
 			(type default)
 		)
 		(uuid "086bf144-df48-40fc-9414-e91cb8586b4a")
+	)
+	(wire
+		(pts
+			(xy 71.12 127) (xy 77.47 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d4910d9-2f1d-4d70-b9b6-2c77cf81cd73")
 	)
 	(wire
 		(pts
@@ -2339,6 +2339,16 @@
 			(type default)
 		)
 		(uuid "1b762a08-12d7-4b74-ba72-4c4fc6b4ea33")
+	)
+	(wire
+		(pts
+			(xy 71.12 137.16) (xy 77.47 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c705d65-4ecf-49b6-8efb-6e31cf51f55b")
 	)
 	(wire
 		(pts
@@ -2402,16 +2412,6 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 129.54) (xy 77.47 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "29e96334-d153-45ed-98a4-0e0e6c99087c")
-	)
-	(wire
-		(pts
 			(xy 71.12 121.92) (xy 77.47 121.92)
 		)
 		(stroke
@@ -2469,16 +2469,6 @@
 			(type default)
 		)
 		(uuid "3218367c-cce2-4b0b-acf5-7f9531cb7ef5")
-	)
-	(wire
-		(pts
-			(xy 71.12 124.46) (xy 77.47 124.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "327b88b9-ddff-422e-b66f-32b428fd9eb4")
 	)
 	(wire
 		(pts
@@ -2582,6 +2572,16 @@
 	)
 	(wire
 		(pts
+			(xy 71.12 124.46) (xy 77.47 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4e29aeed-2df3-43dd-9158-f040b3f04146")
+	)
+	(wire
+		(pts
 			(xy 62.23 33.02) (xy 57.15 33.02)
 		)
 		(stroke
@@ -2622,7 +2622,7 @@
 	)
 	(wire
 		(pts
-			(xy 212.09 137.16) (xy 212.09 140.97)
+			(xy 212.09 138.43) (xy 212.09 140.97)
 		)
 		(stroke
 			(width 0)
@@ -2682,16 +2682,6 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 134.62) (xy 77.47 134.62)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6923a6b6-5b4b-402e-98d4-9ecebbd28043")
-	)
-	(wire
-		(pts
 			(xy 133.35 88.9) (xy 133.35 90.17)
 		)
 		(stroke
@@ -2709,6 +2699,16 @@
 			(type default)
 		)
 		(uuid "6f9072a8-f8a6-4fe3-89a4-a70358b7385d")
+	)
+	(wire
+		(pts
+			(xy 71.12 142.24) (xy 77.47 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "739a7015-bb72-489c-8d2d-ea1544dfa93f")
 	)
 	(wire
 		(pts
@@ -2812,16 +2812,6 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 137.16) (xy 77.47 137.16)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "95702a1d-f971-48c3-8994-0f868a53897d")
-	)
-	(wire
-		(pts
 			(xy 198.12 116.84) (xy 212.09 116.84)
 		)
 		(stroke
@@ -2882,6 +2872,16 @@
 	)
 	(wire
 		(pts
+			(xy 71.12 129.54) (xy 77.47 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b120b838-45fd-437f-a758-26be05faabd8")
+	)
+	(wire
+		(pts
 			(xy 41.91 52.07) (xy 39.37 52.07)
 		)
 		(stroke
@@ -2889,16 +2889,6 @@
 			(type default)
 		)
 		(uuid "b459ebc6-bdba-4970-be03-9282fd99d122")
-	)
-	(wire
-		(pts
-			(xy 71.12 127) (xy 77.47 127)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b602b8c8-c9e0-4a3f-a410-8ecf05fac201")
 	)
 	(wire
 		(pts
@@ -2942,6 +2932,16 @@
 	)
 	(wire
 		(pts
+			(xy 212.09 128.27) (xy 212.09 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "caefbb2b-b08e-4ac4-bc34-61dc42dac740")
+	)
+	(wire
+		(pts
 			(xy 219.71 72.39) (xy 219.71 74.93)
 		)
 		(stroke
@@ -2972,13 +2972,13 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 142.24) (xy 77.47 142.24)
+			(xy 71.12 132.08) (xy 77.47 132.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d57dadec-68ee-42d0-8116-f729c7611250")
+		(uuid "da494742-fb1d-464f-b455-aa5f4c6279a1")
 	)
 	(wire
 		(pts
@@ -2989,6 +2989,16 @@
 			(type default)
 		)
 		(uuid "da4cfb7e-709d-41d3-91d5-859bac31bfac")
+	)
+	(wire
+		(pts
+			(xy 71.12 134.62) (xy 77.47 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "db02c19f-91d8-4ac5-ad1f-91ff02112060")
 	)
 	(wire
 		(pts
@@ -3180,7 +3190,17 @@
 		)
 		(uuid "1a5b5ade-fcb5-4041-9aab-5b675b81226e")
 	)
-	(label "ESP_D-"
+	(label "EN"
+		(at 71.12 52.07 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1fcd19c7-065b-49cc-9567-1d169cfc1696")
+	)
+	(label "ESP_D_N"
 		(at 148.59 119.38 0)
 		(effects
 			(font
@@ -3189,6 +3209,16 @@
 			(justify left bottom)
 		)
 		(uuid "4d8cdf4f-b294-4ef8-b866-d4c179b3d034")
+	)
+	(label "boot2_sw"
+		(at 212.09 128.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "60860c1e-5093-4a0f-9083-55a8f4739077")
 	)
 	(label "boot2"
 		(at 198.12 116.84 0)
@@ -3200,7 +3230,7 @@
 		)
 		(uuid "757c614e-ad8b-4ca9-ac30-0dcab6fbbb93")
 	)
-	(label "ESP_D+"
+	(label "ESP_D_P"
 		(at 148.59 121.92 0)
 		(effects
 			(font
@@ -3210,7 +3240,7 @@
 		)
 		(uuid "935423ae-1017-4aeb-83bf-b3df7f23ae65")
 	)
-	(label "USB_D+"
+	(label "USB_D_P"
 		(at 196.85 63.5 0)
 		(effects
 			(font
@@ -3220,7 +3250,7 @@
 		)
 		(uuid "9c12c4a9-dca7-4165-a984-172de6954166")
 	)
-	(label "USB_D-"
+	(label "USB_D_N"
 		(at 196.85 60.96 0)
 		(effects
 			(font
@@ -3239,6 +3269,16 @@
 			(justify left bottom)
 		)
 		(uuid "a36d186b-8438-4026-a121-658ded1d484b")
+	)
+	(label "SW_EN"
+		(at 41.91 52.07 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a3848721-4230-4de2-8ec7-fba13f50925c")
 	)
 	(label "boot0"
 		(at 146.05 142.24 180)
@@ -3263,7 +3303,7 @@
 	)
 	(hierarchical_label "JOY_Y"
 		(shape input)
-		(at 71.12 124.46 180)
+		(at 71.12 127 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3274,7 +3314,7 @@
 	)
 	(hierarchical_label "LIMIT_SWITCHES"
 		(shape input)
-		(at 71.12 142.24 180)
+		(at 71.12 129.54 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3373,7 +3413,7 @@
 	)
 	(hierarchical_label "STEPPER_2_DIR"
 		(shape output)
-		(at 71.12 132.08 180)
+		(at 71.12 137.16 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3384,7 +3424,7 @@
 	)
 	(hierarchical_label "STEPPER_2_STEP"
 		(shape output)
-		(at 71.12 129.54 180)
+		(at 71.12 142.24 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3415,20 +3455,9 @@
 		)
 		(uuid "8ae92edb-185b-4f3f-b630-93f72d760350")
 	)
-	(hierarchical_label "STEPPER_1_STEP"
-		(shape output)
-		(at 146.05 111.76 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "8d6afbcb-ba40-45a3-b05e-9b35b5eade78")
-	)
 	(hierarchical_label "STEPPER_3_DIR"
 		(shape output)
-		(at 71.12 137.16 180)
+		(at 71.12 132.08 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3447,6 +3476,17 @@
 			(justify left)
 		)
 		(uuid "a9b18e0b-c141-40bc-80e8-ad0ac163dd33")
+	)
+	(hierarchical_label "STEPPER_1_STEP"
+		(shape output)
+		(at 146.05 114.3 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b805e0e8-5957-4960-b8e6-782b2462260c")
 	)
 	(hierarchical_label "FREE"
 		(shape output)
@@ -3469,17 +3509,6 @@
 			(justify left)
 		)
 		(uuid "d58ebefd-c395-49dd-96a7-bfe365d96b55")
-	)
-	(hierarchical_label "STEPPER_1_DIR"
-		(shape output)
-		(at 146.05 114.3 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "d7d210d0-a7e6-412c-8802-9b0b28a876a3")
 	)
 	(hierarchical_label "LED_R"
 		(shape output)
@@ -3505,7 +3534,7 @@
 	)
 	(hierarchical_label "JOY_X"
 		(shape input)
-		(at 71.12 127 180)
+		(at 71.12 124.46 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3513,6 +3542,141 @@
 			(justify right)
 		)
 		(uuid "fc4ee5ad-5b11-40f3-839f-285cca41336c")
+	)
+	(hierarchical_label "STEPPER_1_DIR"
+		(shape output)
+		(at 146.05 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ffac5ff6-957f-427b-be01-d53925f41fc1")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 168.91 121.92 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3de2ee8a-8abd-4c9a-b827-14bd3fbb4503")
+		(property "Netclass" "diff_pair"
+			(at 169.6085 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at 5.08 -2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 229.87 63.5 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bbaedd77-4bf8-42e2-9e1f-4662dcec6561")
+		(property "Netclass" "diff_pair"
+			(at 230.5685 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 161.29 119.38 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cd89e74d-9c94-47c0-ac88-176f9cbf11cd")
+		(property "Netclass" "diff_pair"
+			(at 161.9885 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at -107.95 17.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 223.52 60.96 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "debf7ed9-16d6-44e2-b2af-9a1e38d6172b")
+		(property "Netclass" "diff_pair"
+			(at 224.2185 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at -57.15 2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "Device:R_US")
@@ -3542,7 +3706,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 61.214 44.196 90)
 			(effects
 				(font
@@ -3858,7 +4022,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 189.484 54.356 90)
 			(effects
 				(font
@@ -3929,7 +4093,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Capacitor:C_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 250.19 69.85 0)
 			(effects
 				(font
@@ -4018,7 +4182,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 207.264 54.356 90)
 			(effects
 				(font
@@ -4087,7 +4251,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 213.0552 72.39 0)
 			(effects
 				(font
@@ -4155,7 +4319,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 52.324 51.054 90)
 			(effects
 				(font
@@ -4288,7 +4452,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 30.48 59.3852 0)
 			(effects
 				(font
@@ -4490,7 +4654,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 119.0752 97.79 0)
 			(effects
 				(font
@@ -4623,7 +4787,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 180.086 67.056 90)
 			(effects
 				(font
@@ -4758,7 +4922,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 220.726 44.704 90)
 			(effects
 				(font
@@ -4894,7 +5058,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 199.0852 134.62 0)
 			(effects
 				(font
@@ -5030,7 +5194,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 134.3152 97.79 0)
 			(effects
 				(font
@@ -5140,7 +5304,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Devices:Push_Button")
-		(at 212.09 132.08 270)
+		(at 212.09 133.35 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5149,7 +5313,7 @@
 		(fields_autoplaced yes)
 		(uuid "c091e18b-876b-475c-bbc0-091b1d9bd52b")
 		(property "Reference" "SW_BOOT1"
-			(at 215.9 130.8099 90)
+			(at 215.9 132.0799 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5158,7 +5322,7 @@
 			)
 		)
 		(property "Value" "Push_Button"
-			(at 215.9 133.3499 90)
+			(at 215.9 134.6199 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5167,7 +5331,7 @@
 			)
 		)
 		(property "Footprint" "Button_Switch_SMD:SW_SPST_PTS810"
-			(at 208.915 131.953 0)
+			(at 208.915 133.223 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5176,7 +5340,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 212.09 132.08 0)
+			(at 212.09 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5185,7 +5349,7 @@
 			)
 		)
 		(property "Description" "Common 6mmx6mm Push Button"
-			(at 212.09 132.08 0)
+			(at 212.09 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5302,7 +5466,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Capacitor:C_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 243.84 69.85 0)
 			(effects
 				(font
@@ -5391,7 +5555,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 225.044 44.196 90)
 			(effects
 				(font
@@ -5524,7 +5688,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 63.1952 62.23 0)
 			(effects
 				(font
@@ -5792,7 +5956,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 180.594 59.944 90)
 			(effects
 				(font
@@ -6087,7 +6251,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 220.6752 72.39 0)
 			(effects
 				(font
@@ -6157,7 +6321,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 211.074 122.936 90)
 			(effects
 				(font

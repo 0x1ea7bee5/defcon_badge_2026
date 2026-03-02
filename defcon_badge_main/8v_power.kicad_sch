@@ -1188,6 +1188,12 @@
 		(color 0 0 0 0)
 		(uuid "e72efd4a-0021-430a-aded-07bce7cf0ab7")
 	)
+	(junction
+		(at 143.51 97.79)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ee390307-9724-4d1b-8fd9-97d6223bf484")
+	)
 	(wire
 		(pts
 			(xy 153.67 72.39) (xy 153.67 87.63)
@@ -1207,6 +1213,16 @@
 			(type default)
 		)
 		(uuid "0ab6a116-b346-4025-a7e6-f19fea7fe459")
+	)
+	(wire
+		(pts
+			(xy 143.51 97.79) (xy 146.05 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "240c8d41-5ecd-4199-b660-437eda1d6601")
 	)
 	(wire
 		(pts
@@ -1390,6 +1406,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 97.79) (xy 143.51 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a09fa661-a56c-40d4-b40b-cd517bfd9873")
+	)
+	(wire
+		(pts
 			(xy 116.84 87.63) (xy 129.54 87.63)
 		)
 		(stroke
@@ -1430,6 +1456,16 @@
 	)
 	(wire
 		(pts
+			(xy 140.97 97.79) (xy 143.51 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee598053-e626-4914-9a24-c1ea94e447eb")
+	)
+	(wire
+		(pts
 			(xy 175.26 87.63) (xy 181.61 87.63)
 		)
 		(stroke
@@ -1457,6 +1493,46 @@
 			(type default)
 		)
 		(uuid "f66a8a8d-e18d-450e-b471-aba6c807ec31")
+	)
+	(label "8v_VIN"
+		(at 119.38 87.63 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "12bc8f77-94c1-4e68-b063-d7a26cc4da75")
+	)
+	(label "8v_EN"
+		(at 128.27 92.71 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a71d59f-39b7-49f5-b400-d7698f7b2afd")
+	)
+	(label "8v_FB"
+		(at 154.94 92.71 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b7c4f5ac-8c84-4c01-9a25-6cdafae458b7")
+	)
+	(label "8v_SW"
+		(at 153.67 81.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e273df37-259b-495b-8dee-235747f9daed")
 	)
 	(hierarchical_label "VBAT"
 		(shape input)
@@ -1593,7 +1669,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
 			(at 157.734 110.236 90)
 			(effects
 				(font
@@ -1663,7 +1739,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 107.6452 95.25 0)
 			(effects
 				(font
@@ -1733,7 +1809,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Coil:0805"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 176.2252 113.03 0)
 			(effects
 				(font
@@ -2206,7 +2282,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
 			(at 168.656 93.726 90)
 			(effects
 				(font
@@ -2339,7 +2415,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 172.72 101.9048 0)
 			(effects
 				(font
@@ -2406,7 +2482,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_SparkFun-Fuse:1206"
+		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
 			(at 124.206 93.726 90)
 			(effects
 				(font
@@ -2443,6 +2519,72 @@
 			(project ""
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/78645551-29a0-445b-ace5-a898bf317411"
 					(reference "R1_V8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 143.51 100.33 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ef1be306-3a18-4fd8-b141-6e8c0b5a80f6")
+		(property "Reference" "#PWR059"
+			(at 143.51 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 143.51 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 143.51 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 143.51 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 143.51 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f9bf838c-abca-4fc8-b422-e159b507e96c")
+		)
+		(instances
+			(project "defcon_badge_main"
+				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/78645551-29a0-445b-ace5-a898bf317411"
+					(reference "#PWR059")
 					(unit 1)
 				)
 			)
