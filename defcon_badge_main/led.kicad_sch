@@ -1763,6 +1763,66 @@
 		)
 		(uuid "fb676821-27c7-4c91-b110-1e3c7f2aeff6")
 	)
+	(label "LED_B_POW"
+		(at 228.6 142.24 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0e9fcb99-777e-463c-b7fa-ed68b0d5269a")
+	)
+	(label "LED_B_SIG"
+		(at 209.55 147.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "76fe73e9-33e4-440b-b65d-9f0f3285cac2")
+	)
+	(label "LED_G_SIG"
+		(at 127 147.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8ac49750-e13b-4f85-9e78-6d30b5d6893f")
+	)
+	(label "LED_R_POW"
+		(at 63.5 140.97 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a0aa81d0-47df-4915-b5cc-2e3f86c96214")
+	)
+	(label "LED_R_SIG"
+		(at 49.53 147.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a76845c7-1219-4fea-97f8-baac9890bbfc")
+	)
+	(label "LED_G_POW"
+		(at 146.05 142.24 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "af8556f2-cdee-4292-bc8d-c41c5918cc0f")
+	)
 	(hierarchical_label "5v"
 		(shape input)
 		(at 140.97 82.55 90)
@@ -1857,7 +1917,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 64.516 136.144 90)
 			(effects
 				(font
@@ -2273,7 +2333,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 147.066 136.144 90)
 			(effects
 				(font
@@ -2481,7 +2541,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 204.724 146.304 90)
 			(effects
 				(font
@@ -3207,7 +3267,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 229.616 136.144 90)
 			(effects
 				(font
@@ -3345,7 +3405,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 122.174 146.304 90)
 			(effects
 				(font
@@ -3579,7 +3639,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
 			(at 44.704 146.304 90)
 			(effects
 				(font

@@ -2765,6 +2765,16 @@
 	)
 	(wire
 		(pts
+			(xy 100.33 44.45) (xy 113.03 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "da5b990c-3d30-4e96-aa96-21a4e867e96c")
+	)
+	(wire
+		(pts
 			(xy 147.32 77.47) (xy 187.96 77.47)
 		)
 		(stroke
@@ -3214,6 +3224,16 @@
 		(uuid "a3bb540a-8ce4-4c99-873c-d5e943956d6b")
 	)
 	(label "5v"
+		(at 100.33 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a4c49ee4-b284-46c7-9082-771cf566024a")
+	)
+	(label "5v"
 		(at 223.52 58.42 180)
 		(effects
 			(font
@@ -3418,6 +3438,37 @@
 		)
 		(property "Component Class" ""
 			(at -12.7 -11.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 105.41 44.45 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cc81cf0c-a83d-46d0-adf4-4fcb6a7aa843")
+		(property "Netclass" "5v"
+			(at 106.1085 41.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at 39.37 -19.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5034,6 +5085,16 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+			)
+		)
+		(pin "5v" input
+			(at 113.03 44.45 180)
+			(uuid "1c7fd472-b989-4079-bfaa-b55a6876288d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
 		)
 		(instances
