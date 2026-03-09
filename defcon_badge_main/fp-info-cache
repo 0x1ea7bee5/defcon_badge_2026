@@ -1,4 +1,4 @@
-26974267366330381
+26983133641988298
 1043P
 BAT_1043P
 
@@ -6,6 +6,20 @@ BAT_1043P
 0
 2
 2
+10164359-00011LF
+AMPHENOL_10164359-00011LF
+
+
+0
+10
+10
+10164359-00011LF
+Untitled
+
+
+0
+0
+0
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -20,6 +34,13 @@ audio belton reverb
 0
 7
 7
+BK-18650-PC2
+BAT_BK-18650-PC2
+
+
+0
+2
+2
 Battery
 BatteryClip_Keystone_54_D16-19mm
 Battery clip for batteries with a diameter between 16-19 mm: https://www.keyelco.com/product.cfm/product_id/826
@@ -108017,6 +108038,13 @@ joystick
 6
 6
 joystick
+limit_switch_mount
+
+
+0
+3
+0
+joystick
 motor_pins
 
 
@@ -108037,3 +108065,10 @@ pad_limit_switch
 0
 2
 2
+joystick
+usb_typea_boardedge
+
+
+0
+4
+4
