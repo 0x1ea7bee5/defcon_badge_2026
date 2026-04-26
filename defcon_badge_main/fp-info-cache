@@ -1,4 +1,4 @@
-26983133641988298
+26984928430332266
 1043P
 BAT_1043P
 
@@ -108016,6 +108016,13 @@ resistor handsolder
 0
 2
 2
+joystick
+SOT-23-3
+SOT, 3 Pin (JEDEC MO-178 inferred 3-pin variant https://www.jedec.org/document_search?search_api_views_fulltext=MO-178), generated with kicad-footprint-generator ipc_gullwing_generator.py
+SOT TO_SOT_SMD
+0
+3
+3
 joystick
 Untitled
 

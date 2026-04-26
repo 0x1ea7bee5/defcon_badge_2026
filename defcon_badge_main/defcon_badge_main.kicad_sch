@@ -3611,7 +3611,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "2223f2b7-c410-4340-9ac2-f2b8ac7c4652")
 		(property "Reference" "BT2"
 			(at 26.67 47.6249 90)
@@ -3814,7 +3814,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10k Ohm"
+		(property "Value" "10 kOhm"
 			(at 34.29 110.4899 0)
 			(effects
 				(font
@@ -3832,7 +3832,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 31.75 109.22 0)
 			(effects
 				(font
@@ -3842,6 +3842,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 31.75 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1002CT"
+			(at 31.75 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 31.75 109.22 0)
 			(effects
 				(font
@@ -3872,7 +3890,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "244984e5-e773-4578-a976-6a13e64c8d5a")
 		(property "Reference" "J2"
 			(at 68.58 92.202 0)
@@ -4105,7 +4123,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
 			(at 24.4348 105.41 0)
 			(effects
 				(font
@@ -4114,7 +4132,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 25.4 109.22 0)
 			(effects
 				(font
@@ -4124,6 +4142,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 25.4 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R104M16NTD"
+			(at 25.4 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 25.4 109.22 0)
 			(effects
 				(font
@@ -4295,7 +4331,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "904201a2-5d37-4734-8cc6-cde09f120333")
 		(property "Reference" "U4"
@@ -4571,7 +4607,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "d36261f2-8870-47bf-bf60-957464f4d352")
 		(property "Reference" "SW_MENU1"

@@ -865,18 +865,6 @@
 		(uuid "f1d279e8-6f41-4a59-a9d7-5216de5aa1c1")
 	)
 	(junction
-		(at 151.13 62.23)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0921509a-ebf7-4f10-af2a-d5d1f7aa7648")
-	)
-	(junction
-		(at 168.91 62.23)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "499c765f-8025-46a0-aa66-00d4c73ef368")
-	)
-	(junction
 		(at 118.11 53.34)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -895,28 +883,10 @@
 		(uuid "5c4285ae-2923-4e46-bfcf-b626f87596eb")
 	)
 	(junction
-		(at 184.15 62.23)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "6520e4f2-09c3-4249-8338-86674fe575ac")
-	)
-	(junction
-		(at 168.91 73.66)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "72ab2bc0-bb66-4f4c-9e65-f7d21ebd731d")
-	)
-	(junction
 		(at 118.11 62.23)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a4f1ff57-e2f3-458b-9ee2-f3db37cdce5e")
-	)
-	(junction
-		(at 151.13 73.66)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "a55cbbb1-7ea2-4da5-aeb2-0383eab32a76")
 	)
 	(junction
 		(at 96.52 53.34)
@@ -935,12 +905,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f28ff886-5726-41e8-8037-8689324a3fb5")
-	)
-	(junction
-		(at 184.15 73.66)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f9624a83-a585-430e-af05-16bd19d6dcec")
 	)
 	(wire
 		(pts
@@ -971,16 +935,6 @@
 			(type default)
 		)
 		(uuid "0b5eed53-d46b-4f50-9c9c-d20654db9d7a")
-	)
-	(wire
-		(pts
-			(xy 151.13 73.66) (xy 168.91 73.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0ebb6c37-9451-4645-85b3-0f083652ba35")
 	)
 	(polyline
 		(pts
@@ -1014,16 +968,6 @@
 	)
 	(wire
 		(pts
-			(xy 168.91 62.23) (xy 168.91 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "24ae4f42-ff5a-461c-a9d2-b29723891146")
-	)
-	(wire
-		(pts
 			(xy 106.68 53.34) (xy 118.11 53.34)
 		)
 		(stroke
@@ -1044,26 +988,6 @@
 	)
 	(wire
 		(pts
-			(xy 184.15 73.66) (xy 200.66 73.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "34ec9297-5ea8-406c-85d5-8af3b2d4749d")
-	)
-	(wire
-		(pts
-			(xy 168.91 73.66) (xy 168.91 68.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "370476df-c9e3-4dd3-88db-ec62000ae308")
-	)
-	(wire
-		(pts
 			(xy 91.44 53.34) (xy 96.52 53.34)
 		)
 		(stroke
@@ -1081,16 +1005,6 @@
 			(type default)
 		)
 		(uuid "613c7559-0c96-4d6c-9b15-8d96ea1c45ed")
-	)
-	(wire
-		(pts
-			(xy 184.15 62.23) (xy 200.66 62.23)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62309b18-e3cb-4cc1-8c09-83c2a0771458")
 	)
 	(wire
 		(pts
@@ -1134,16 +1048,6 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 62.23) (xy 200.66 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "961aba2f-89b6-4745-936f-d9d829d98d87")
-	)
-	(wire
-		(pts
 			(xy 118.11 62.23) (xy 133.35 62.23)
 		)
 		(stroke
@@ -1151,16 +1055,6 @@
 			(type default)
 		)
 		(uuid "9ab1aae9-2db6-42e2-8859-58b685302e72")
-	)
-	(wire
-		(pts
-			(xy 151.13 62.23) (xy 168.91 62.23)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ac38a99e-4093-4f17-aa36-c3c044130c90")
 	)
 	(wire
 		(pts
@@ -1204,16 +1098,6 @@
 	)
 	(wire
 		(pts
-			(xy 168.91 73.66) (xy 184.15 73.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d9fb4191-5f83-4ae6-a610-3cafbd1e36f5")
-	)
-	(wire
-		(pts
 			(xy 96.52 66.04) (xy 96.52 71.12)
 		)
 		(stroke
@@ -1254,16 +1138,6 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 73.66) (xy 200.66 68.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e6fca0a5-dfff-494f-86ee-433e801e28da")
-	)
-	(wire
-		(pts
 			(xy 106.68 66.04) (xy 106.68 71.12)
 		)
 		(stroke
@@ -1271,26 +1145,6 @@
 			(type default)
 		)
 		(uuid "ef574e47-56be-410c-8404-ffb519a59f8a")
-	)
-	(wire
-		(pts
-			(xy 184.15 62.23) (xy 184.15 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f0f252dc-d76c-4476-aedc-220009a8c141")
-	)
-	(wire
-		(pts
-			(xy 168.91 62.23) (xy 184.15 62.23)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f11936fb-a2fa-4b38-bda4-3824693ca70b")
 	)
 	(polyline
 		(pts
@@ -1301,16 +1155,6 @@
 			(type default)
 		)
 		(uuid "f1d6c003-3be2-4e7c-a452-c56b440e82b2")
-	)
-	(wire
-		(pts
-			(xy 184.15 73.66) (xy 184.15 68.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f459a3a3-56d7-4bb9-9713-4033b3297bcf")
 	)
 	(wire
 		(pts
@@ -1373,7 +1217,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10  kOhm"
+		(property "Value" "10 kOhm"
 			(at 120.65 46.9899 0)
 			(effects
 				(font
@@ -1382,7 +1226,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
 			(at 119.126 45.974 90)
 			(effects
 				(font
@@ -1391,7 +1235,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 118.11 45.72 0)
 			(effects
 				(font
@@ -1401,6 +1245,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 118.11 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1002CT"
+			(at 118.11 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 118.11 45.72 0)
 			(effects
 				(font
@@ -1419,75 +1281,6 @@
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/601275ec-e94e-417a-b10e-be3d02320ef3"
 					(reference "R1_LIM1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Conn_01x02_Pin")
-		(at 189.23 68.58 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "3b7bd201-9d51-4a68-bf65-974fddebcb5c")
-		(property "Reference" "J_LIM5"
-			(at 190.5 66.0399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "Conn_01x02_Pin"
-			(at 183.642 71.628 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "joystick:pad_limit_switch"
-			(at 189.23 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 189.23 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 189.23 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "aa27e643-f6de-420c-a1e6-101a0502c562")
-		)
-		(pin "1"
-			(uuid "84dc69d2-f2d2-4cdf-8c5d-5519b7aab4ac")
-		)
-		(instances
-			(project "defcon_badge_main"
-				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/601275ec-e94e-417a-b10e-be3d02320ef3"
-					(reference "J_LIM5")
 					(unit 1)
 				)
 			)
@@ -1566,7 +1359,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "5e84228f-41fe-4b52-b855-e244c14070d2")
 		(property "Reference" "J_LIM2"
 			(at 139.7 66.0399 0)
@@ -1635,7 +1428,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "63cd0fd9-2821-46f9-966f-b9d994cc7606")
 		(property "Reference" "J_LIM1"
 			(at 124.46 66.0399 0)
@@ -1724,7 +1517,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 105.7148 58.42 0)
 			(effects
 				(font
@@ -1733,7 +1526,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 106.68 62.23 0)
 			(effects
 				(font
@@ -1743,6 +1536,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 106.68 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R104M16NTD"
+			(at 106.68 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 106.68 62.23 0)
 			(effects
 				(font
@@ -1768,81 +1579,12 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Pin")
-		(at 173.99 68.58 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "75368ad4-dacd-4720-ba3d-10ac2ca716ff")
-		(property "Reference" "J_LIM4"
-			(at 175.26 66.0399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "Conn_01x02_Pin"
-			(at 168.402 71.628 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "joystick:pad_limit_switch"
-			(at 173.99 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 173.99 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 173.99 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "8f235ec9-eaf7-4f23-8413-6530803164ab")
-		)
-		(pin "1"
-			(uuid "ff20c85c-c129-45e6-9ba2-d7b46d843832")
-		)
-		(instances
-			(project "defcon_badge_main"
-				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/601275ec-e94e-417a-b10e-be3d02320ef3"
-					(reference "J_LIM4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Conn_01x02_Pin")
 		(at 156.21 68.58 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "8962aa0f-8e6b-46b5-b7a2-e721206b0108")
 		(property "Reference" "J_LIM3"
 			(at 157.48 66.0399 0)
@@ -1941,7 +1683,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.seielect.com/catalog/SEI-RMCS.pdf"
 			(at 118.11 57.15 0)
 			(effects
 				(font
@@ -1951,6 +1693,15 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 118.11 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RMCS1206JT1K00"
 			(at 118.11 57.15 0)
 			(effects
 				(font
@@ -2077,7 +1828,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.mccsemi.com/pdf/Products/1N4148W(SOD-123).pdf"
 			(at 96.52 62.23 0)
 			(effects
 				(font
@@ -2106,6 +1857,15 @@
 		)
 		(property "Sim.Pins" "1=K 2=A"
 			(at 96.52 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "1N4148W-TP"
+			(at 96.52 62.23 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2189,75 +1949,6 @@
 			(project "defcon_badge_main"
 				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/601275ec-e94e-417a-b10e-be3d02320ef3"
 					(reference "#PWR074")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Conn_01x02_Pin")
-		(at 205.74 68.58 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e4be052f-7dc4-4eb8-8c6f-22a021346c00")
-		(property "Reference" "J_LIM6"
-			(at 207.01 66.0399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "Conn_01x02_Pin"
-			(at 200.152 71.628 0)
-			(effects
-				(font
-					(size 1.016 1.016)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "joystick:pad_limit_switch"
-			(at 205.74 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 205.74 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 205.74 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "39cfe753-e8e4-4b12-8406-0b3a0e6f7a59")
-		)
-		(pin "1"
-			(uuid "b76b5b41-5be7-4ba2-b19a-bb3468b85ba4")
-		)
-		(instances
-			(project "defcon_badge_main"
-				(path "/b497f1e3-23b9-4176-bc4d-bc3995ba532c/601275ec-e94e-417a-b10e-be3d02320ef3"
-					(reference "J_LIM6")
 					(unit 1)
 				)
 			)

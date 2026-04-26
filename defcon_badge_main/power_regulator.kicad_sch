@@ -1375,7 +1375,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 87.63 97.79 0)
 			(effects
 				(font
@@ -1385,6 +1385,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 87.63 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R106K16NT"
+			(at 87.63 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 87.63 97.79 0)
 			(effects
 				(font
@@ -1445,7 +1463,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 167.64 101.6 0)
 			(effects
 				(font
@@ -1455,6 +1473,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 167.64 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F4533CT"
+			(at 167.64 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 167.64 101.6 0)
 			(effects
 				(font
@@ -1581,7 +1617,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 167.64 116.84 0)
 			(effects
 				(font
@@ -1591,6 +1627,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 167.64 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F1003CT"
+			(at 167.64 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 167.64 116.84 0)
 			(effects
 				(font
@@ -1651,7 +1705,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 184.15 109.22 0)
 			(effects
 				(font
@@ -1661,6 +1715,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 184.15 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10Y5V475Z6R3NT"
+			(at 184.15 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 184.15 109.22 0)
 			(effects
 				(font
@@ -1784,7 +1856,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.we-online.com/components/products/datasheet/74479288147.pdf"
 			(at 130.81 59.69 0)
 			(effects
 				(font
@@ -1818,6 +1890,15 @@
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "MPN" "74479288147"
+			(at 130.81 59.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
 		)
 		(pin "1"
@@ -1937,7 +2018,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps61023.pdf?HQS=dis-dk-null-digikeymode-dsf-pf-null-wwe&ts=1777151769302&ref_url=https%253A%252F%252Fwww.ti.com%252Fgeneral%252Fdocs%252Fsuppproductinfo.tsp%253FdistId%253D10%2526gotoUrl%253Dhttps%253A%252F%252Fwww.ti.com%252Flit%252Fgpn%252Ftps61023"
 			(at 132.08 96.52 0)
 			(effects
 				(font
@@ -2032,6 +2113,15 @@
 					(size 1.27 1.27)
 				)
 				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MPN" "TPS61023DRLR"
+			(at 132.08 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)

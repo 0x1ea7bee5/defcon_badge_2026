@@ -1638,7 +1638,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "~https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 73.66 87.63 0)
 			(effects
 				(font
@@ -1648,6 +1648,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 73.66 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R226K16NT"
+			(at 73.66 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 73.66 87.63 0)
 			(effects
 				(font
@@ -1708,7 +1726,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 170.18 99.06 0)
 			(effects
 				(font
@@ -1718,6 +1736,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 170.18 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R106K16NT"
+			(at 170.18 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 170.18 99.06 0)
 			(effects
 				(font
@@ -1775,7 +1811,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.we-online.com/components/products/datasheet/74479288147.pdf"
 			(at 116.84 49.53 0)
 			(effects
 				(font
@@ -1809,6 +1845,15 @@
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "MPN" "74479288147"
+			(at 116.84 49.53 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
 		)
 		(pin "1"
@@ -1863,7 +1908,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 153.67 106.68 0)
 			(effects
 				(font
@@ -1873,6 +1918,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 153.67 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F1003CT"
+			(at 153.67 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 153.67 106.68 0)
 			(effects
 				(font
@@ -1999,7 +2062,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 153.67 91.44 0)
 			(effects
 				(font
@@ -2009,6 +2072,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 153.67 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F7323CT"
+			(at 153.67 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 153.67 91.44 0)
 			(effects
 				(font
@@ -2134,7 +2215,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps61023.pdf?HQS=dis-dk-null-digikeymode-dsf-pf-null-wwe&ts=1777151769302&ref_url=https%253A%252F%252Fwww.ti.com%252Fgeneral%252Fdocs%252Fsuppproductinfo.tsp%253FdistId%253D10%2526gotoUrl%253Dhttps%253A%252F%252Fwww.ti.com%252Flit%252Fgpn%252Ftps61023"
 			(at 118.11 86.36 0)
 			(effects
 				(font
@@ -2229,6 +2310,15 @@
 					(size 1.27 1.27)
 				)
 				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MPN" "TPS61023DRLR"
+			(at 118.11 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)
@@ -2361,7 +2451,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/ss26fl-d.pdf"
 			(at 181.61 86.36 0)
 			(effects
 				(font
@@ -2496,6 +2586,15 @@
 					(size 1.27 1.27)
 				)
 				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SS24FL"
+			(at 181.61 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)

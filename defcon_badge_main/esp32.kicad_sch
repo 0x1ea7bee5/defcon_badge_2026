@@ -3210,7 +3210,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 62.23 44.45 0)
 			(effects
 				(font
@@ -3220,6 +3220,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 62.23 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1002CT"
+			(at 62.23 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 62.23 44.45 0)
 			(effects
 				(font
@@ -3346,7 +3364,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 190.5 54.61 0)
 			(effects
 				(font
@@ -3356,6 +3374,15 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 190.5 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM04J152CT"
 			(at 190.5 54.61 0)
 			(effects
 				(font
@@ -3417,7 +3444,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.littelfuse.com/~/media/electronics/product_specifications/polymer_esd_suppressors/littelfuse_polymer_esd_suppressor_pesd0402_140_product_specification.pdf.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3661/CESDG_Series.pdf"
 			(at 255.27 69.85 0)
 			(effects
 				(font
@@ -3451,6 +3478,15 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+		(property "MPN" "CES10402V05B0DG"
+			(at 242.57 69.85 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)
@@ -3506,7 +3542,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 208.28 54.61 0)
 			(effects
 				(font
@@ -3516,6 +3552,15 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 208.28 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM04J152CT"
 			(at 208.28 54.61 0)
 			(effects
 				(font
@@ -3575,7 +3620,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 212.09 68.58 0)
 			(effects
 				(font
@@ -3585,6 +3630,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 212.09 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC04CG0R5C50NT"
+			(at 212.09 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 212.09 68.58 0)
 			(effects
 				(font
@@ -3634,7 +3697,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 52.324 51.054 90)
 			(effects
 				(font
@@ -3643,7 +3706,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 52.07 52.07 0)
 			(effects
 				(font
@@ -3654,6 +3717,15 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 52.07 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM06J000CT"
+			(at 52.07 52.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3767,7 +3839,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 30.48 59.3852 0)
 			(effects
 				(font
@@ -3776,7 +3848,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 34.29 58.42 0)
 			(effects
 				(font
@@ -3787,6 +3859,24 @@
 		)
 		(property "Description" "Unpolarized capacitor"
 			(at 34.29 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R104M16NTD"
+			(at 34.29 58.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
+			(at 34.29 58.42 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3903,7 +3993,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 119.0752 97.79 0)
 			(effects
 				(font
@@ -3912,7 +4002,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 118.11 93.98 0)
 			(effects
 				(font
@@ -3922,6 +4012,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 118.11 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R104M16NTD"
+			(at 118.11 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 118.11 93.98 0)
 			(effects
 				(font
@@ -3952,7 +4060,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "3a159fc0-c0ac-4a1d-9e59-d50f2ecb3019")
 		(property "Reference" "U1"
@@ -4121,7 +4229,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 180.34 66.04 0)
 			(effects
 				(font
@@ -4132,6 +4240,15 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 180.34 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM04J000CT"
+			(at 180.34 66.04 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4314,7 +4431,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 199.0852 134.62 0)
 			(effects
 				(font
@@ -4323,7 +4440,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 198.12 130.81 0)
 			(effects
 				(font
@@ -4333,6 +4450,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 198.12 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R104M16NTD"
+			(at 198.12 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 198.12 130.81 0)
 			(effects
 				(font
@@ -4459,7 +4594,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 133.35 93.98 0)
 			(effects
 				(font
@@ -4469,6 +4604,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 133.35 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X5R224K25NT"
+			(at 133.35 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 133.35 93.98 0)
 			(effects
 				(font
@@ -4565,7 +4718,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "c091e18b-876b-475c-bbc0-091b1d9bd52b")
 		(property "Reference" "SW_BOOT1"
@@ -4731,7 +4884,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.littelfuse.com/~/media/electronics/product_specifications/polymer_esd_suppressors/littelfuse_polymer_esd_suppressor_pesd0402_140_product_specification.pdf.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3661/CESDG_Series.pdf"
 			(at 248.92 69.85 0)
 			(effects
 				(font
@@ -4765,6 +4918,15 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+		(property "MPN" "CES10402V05B0DG"
+			(at 236.22 69.85 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)
@@ -4817,7 +4979,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 62.23 58.42 0)
 			(effects
 				(font
@@ -4827,6 +4989,15 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 62.23 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R105K16NT"
 			(at 62.23 58.42 0)
 			(effects
 				(font
@@ -4989,7 +5160,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "e4f36d4b-1bee-4342-879c-06168ecc0190")
 		(property "Reference" "SW_EN1"
@@ -5085,7 +5256,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 180.34 60.96 0)
 			(effects
 				(font
@@ -5096,6 +5267,15 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 180.34 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM04J000CT"
+			(at 180.34 60.96 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5221,7 +5401,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://documentation.espressif.com/esp32-c5-wroom-1_wroom-1u_datasheet_en.pdf"
 			(at 107.95 180.34 0)
 			(effects
 				(font
@@ -5232,6 +5412,15 @@
 		)
 		(property "Description" "ESP32-C5-WROOM-1U"
 			(at 107.95 137.414 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "ESP32-C5-WROOM-1U-N8R8"
+			(at 107.95 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5380,7 +5569,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 219.71 68.58 0)
 			(effects
 				(font
@@ -5390,6 +5579,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 219.71 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC04CG0R5C50NT"
+			(at 219.71 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 219.71 68.58 0)
 			(effects
 				(font
@@ -5450,7 +5657,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 212.09 123.19 0)
 			(effects
 				(font
@@ -5460,6 +5667,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 212.09 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1002CT"
+			(at 212.09 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 212.09 123.19 0)
 			(effects
 				(font

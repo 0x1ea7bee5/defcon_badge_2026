@@ -1590,7 +1590,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.we-online.com/components/products/datasheet/74438357100.pdf"
 			(at 139.7 72.39 0)
 			(effects
 				(font
@@ -1624,6 +1624,15 @@
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "MPN" "74438357100 "
+			(at 139.7 72.39 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
 		)
 		(pin "1"
@@ -1678,7 +1687,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 158.75 110.49 0)
 			(effects
 				(font
@@ -1688,6 +1697,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 158.75 110.49 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F1002CT"
+			(at 158.75 110.49 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 158.75 110.49 0)
 			(effects
 				(font
@@ -1748,7 +1775,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 106.68 91.44 0)
 			(effects
 				(font
@@ -1758,6 +1785,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 106.68 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R106K16NT"
+			(at 106.68 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 106.68 91.44 0)
 			(effects
 				(font
@@ -1818,7 +1863,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 175.26 109.22 0)
 			(effects
 				(font
@@ -1828,6 +1873,24 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 175.26 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC21X5R106K16NT"
+			(at 175.26 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Rating" "16V"
 			(at 175.26 109.22 0)
 			(effects
 				(font
@@ -1953,7 +2016,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/ss26fl-d.pdf"
 			(at 163.83 87.63 0)
 			(effects
 				(font
@@ -2088,6 +2151,15 @@
 					(size 1.27 1.27)
 				)
 				(justify bottom)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SS24FL"
+			(at 163.83 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 				(hide yes)
 			)
 		)
@@ -2227,6 +2299,15 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "LMR62421XSD/NOPB"
+			(at 143.51 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "5"
 			(uuid "0d90a987-49bf-41ed-a27d-a7f1799362be")
 		)
@@ -2291,7 +2372,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 168.91 92.71 0)
 			(effects
 				(font
@@ -2302,6 +2383,24 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 168.91 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F5362CT"
+			(at 168.91 92.71 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
+			(at 168.91 92.71 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2415,7 +2514,7 @@
 				)
 			)
 		)
-		(property "Footprint" "joystick:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder_MINE"
+		(property "Footprint" "joystick:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder_MINE"
 			(at 172.72 101.9048 0)
 			(effects
 				(font
@@ -2424,7 +2523,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/GMC-Series-3.pdf"
 			(at 168.91 102.87 0)
 			(effects
 				(font
@@ -2435,6 +2534,15 @@
 		)
 		(property "Description" "Unpolarized capacitor"
 			(at 168.91 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "GMC10X7R102K16NT"
+			(at 168.91 102.87 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2491,7 +2599,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 124.46 92.71 0)
 			(effects
 				(font
@@ -2502,6 +2610,24 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 124.46 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM12F1003CT"
+			(at 124.46 92.71 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
+			(at 124.46 92.71 90)
 			(effects
 				(font
 					(size 1.27 1.27)

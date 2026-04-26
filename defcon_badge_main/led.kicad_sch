@@ -1926,7 +1926,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 63.5 135.89 0)
 			(effects
 				(font
@@ -1936,6 +1936,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 63.5 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F2200CT"
+			(at 63.5 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 63.5 135.89 0)
 			(effects
 				(font
@@ -1966,7 +1984,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "10cac358-1f4e-4b82-ab78-da8b8d2c0c1c")
 		(property "Reference" "RED_2"
@@ -2036,7 +2054,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "1264e036-f375-4de3-b569-714863536ec1")
 		(property "Reference" "RED_3"
@@ -2106,7 +2124,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "1449c433-9961-4b41-9d66-28283e708698")
 		(property "Reference" "GREEN_2"
@@ -2176,7 +2194,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "2210e21e-89b4-45da-a9d5-b63698ed3c67")
 		(property "Reference" "GREEN_6"
@@ -2342,7 +2360,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 146.05 135.89 0)
 			(effects
 				(font
@@ -2352,6 +2370,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 146.05 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F2200CT"
+			(at 146.05 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 146.05 135.89 0)
 			(effects
 				(font
@@ -2382,7 +2418,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "2bd2c4a6-96bc-4c0b-902b-5a0985defdfc")
 		(property "Reference" "GREEN_5"
@@ -2452,7 +2488,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "41f073d8-53b0-4c89-88fd-805b78b82d64")
 		(property "Reference" "BLUE_4"
@@ -2550,7 +2586,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 204.47 147.32 0)
 			(effects
 				(font
@@ -2561,6 +2597,24 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 204.47 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1501CT"
+			(at 204.47 147.32 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
+			(at 204.47 147.32 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2611,7 +2665,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:npn"
+		(property "Footprint" "joystick:SOT-23-3"
 			(at 124.46 147.32 0)
 			(effects
 				(font
@@ -2665,6 +2719,15 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "MMUN2211LT1G"
+			(at 60.96 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "e9369ca0-f317-4720-8c4a-3fd9de47ca51")
 		)
@@ -2690,7 +2753,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "6b93e587-8182-4cbc-afb8-2c7db9de82b7")
 		(property "Reference" "GREEN_4"
@@ -2760,7 +2823,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "7ef5d3fd-bb22-4e21-8b01-a130299ccba5")
 		(property "Reference" "RED_5"
@@ -2830,7 +2893,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "7f614fc9-b39a-49a1-9b11-96669d518a71")
 		(property "Reference" "RED_1"
@@ -2966,7 +3029,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "918b1c71-dac6-4557-b076-29893a673e42")
 		(property "Reference" "BLUE_2"
@@ -3036,7 +3099,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "94c0dc31-464d-474f-bbcb-581e57251956")
 		(property "Reference" "RED_6"
@@ -3106,7 +3169,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "983183bd-0216-4102-855f-cffccf387859")
 		(property "Reference" "BLUE_6"
@@ -3176,7 +3239,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "9ea64407-0f0d-4e52-9d56-0641273a93f8")
 		(property "Reference" "BLUE_3"
@@ -3276,7 +3339,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 228.6 135.89 0)
 			(effects
 				(font
@@ -3286,6 +3349,24 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
+			(at 228.6 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F2200CT"
+			(at 228.6 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
 			(at 228.6 135.89 0)
 			(effects
 				(font
@@ -3316,7 +3397,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "b6d51f45-24ee-46da-85a0-cc11e8ad93e7")
 		(property "Reference" "RED_4"
@@ -3414,7 +3495,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 121.92 147.32 0)
 			(effects
 				(font
@@ -3425,6 +3506,24 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 121.92 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1501CT"
+			(at 121.92 147.32 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
+			(at 121.92 147.32 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3541,7 +3640,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:npn"
+		(property "Footprint" "joystick:SOT-23-3"
 			(at 207.01 147.32 0)
 			(effects
 				(font
@@ -3587,6 +3686,15 @@
 			)
 		)
 		(property "Sim.Pins" "1=C 2=B 3=E"
+			(at 143.51 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "MMUN2211LT1G"
 			(at 143.51 147.32 0)
 			(effects
 				(font
@@ -3648,7 +3756,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://calchip.com/wp-content/uploads/2025/05/RMSERIES-052225.pdf"
 			(at 44.45 147.32 0)
 			(effects
 				(font
@@ -3659,6 +3767,24 @@
 		)
 		(property "Description" "Resistor, US symbol"
 			(at 44.45 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "RM10F1501CT"
+			(at 44.45 147.32 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "TOL" "1%"
+			(at 44.45 147.32 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3688,7 +3814,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "d7696dc8-fb41-4d01-9508-ac44076ad00f")
 		(property "Reference" "BLUE_1"
@@ -3758,7 +3884,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "d9b4a123-4153-4949-b0c8-63144fc645c4")
 		(property "Reference" "GREEN_1"
@@ -3828,7 +3954,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "f0c7780f-5467-4b04-aeee-cfd79f9b8ff0")
 		(property "Reference" "BLUE_5"
@@ -3898,7 +4024,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "ff45ed9c-e43b-4865-8abd-fed303bc6fcb")
 		(property "Reference" "GREEN_3"
@@ -3989,7 +4115,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "joystick:npn"
+		(property "Footprint" "joystick:SOT-23-3"
 			(at 289.56 147.32 0)
 			(effects
 				(font
@@ -4035,6 +4161,15 @@
 			)
 		)
 		(property "Sim.Pins" "1=C 2=B 3=E"
+			(at 226.06 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "MMUN2211LT1G"
 			(at 226.06 147.32 0)
 			(effects
 				(font
