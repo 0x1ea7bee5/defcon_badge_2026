@@ -5,7 +5,7 @@ This file has definitions and requirements for the apps subdirectory
 ## Structure
 I plan on using FreeRTOS to handle scheduling. All tasks are going to be defined in this folder. These tasks will communicate with queues and semaphores. There are going to be the following tasks:
 
-Radio Manager Task - This will handle switching between bluetooth, wifi client control, and wifi packet sniffing control. 
+Radio Manager Task - This will handle switching between bluetooth, wifi client control, and wifi packet sniffing control. It will share a queue with the sniffer Task, the Wifi Client task, and the bluetooth task. Data from these three tasks will be dumped to this queue, will be consumed by the Radio Manager Task, and 
 
 Sniffer Task - Will handle sniffing data collection. Will pass sniffing data to the DSP task. 
 

@@ -120,3 +120,31 @@ Populated by the scan and delivered to `scan_done_cb_t`.
 - The module cannot be used simultaneously with `packet_scanner` monitor
   mode. Monitor mode must be stopped (`stop_monitor`) before calling
   `wifi_client_init`, and vice versa.
+
+
+### Example for sending HTTP requests
+
+// 1. Register ip_ready callback
+void on_ip(uint32_t ip, uint32_t gw) {
+    // IP is live — safe to make HTTP requests now
+    do_http_request();
+}
+
+wifi_client_init(on_scan, on_assoc, on_disassoc, on_ip);
+wifi_client_connect("MySSID", "password");
+
+// 2. In do_http_request():
+void do_http_request(void) {
+    esp_http_client_config_t cfg = {
+        .url = "http://example.com/api",
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&cfg);
+    esp_http_client_perform(client);
+    esp_http_client_cleanup(client);
+}
+
+
+
+
+idf_component_register(SRCS ...
+    PRIV_REQUIRES esp_wifi nvs_flash esp_http_client)

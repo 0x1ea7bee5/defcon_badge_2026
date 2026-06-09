@@ -17,6 +17,11 @@ All other wifi files include this header.
 | `FC_SUBTYPE_ACTION` | `0xD0` | Action management subtype |
 | `FC_SUBTYPE_ACTION_NOACK` | `0xE0` | Action No Ack management subtype |
 | `FC_SUBTYPE_NDPA` | `0x50` | NDP Announcement control subtype |
+| `FC_ORDER_MASK` | `0x80` | FC byte 1 bit 7: HT Control (+HTC) field present |
+
+When `FC_ORDER_MASK` is set in FC byte 1, a 4-byte HT Control field is
+inserted between the MAC header and the frame body (body offset becomes 28
+instead of 24). 802.11ax (HE) devices commonly use this in action frames.
 
 ### Action Frame Categories and Codes
 
@@ -38,16 +43,40 @@ Naming scheme: `{STD}_NSC_{BW}_{NG}` where NG is the grouping factor.
 | 80 MHz | 234 | 117 | 59 |
 | 160 MHz | 468 | 234 | 117 |
 
-HE uses the same table (`HE_NSC_*`). EHT 320 MHz is not yet tabled; the
-subcarrier count lookup currently caps at 160 MHz.
+HE uses the same table (`HE_NSC_*`). The subcarrier count lookup caps at
+160 MHz.
 
 ### Angle Bit Widths
 
-| Standard | Bits per phi | Bits per psi |
+From 802.11ax Table 9-98e. The HE Feedback Type (SU vs MU) is bit 3 of
+MIMO control byte 1 (`HE_MIMO_FB_TYPE_MASK`). The Codebook bit is bit 2
+(`HE_MIMO_CODEBOOK_MASK`).
+
+| Standard / Mode | Codebook | Bφ | Bψ | Constants |
+|---|---|---|---|---|
+| VHT | — | 7 | 5 | `VHT_BPHI`, `VHT_BPSI` |
+| HE SU | 0 | 4 | 2 | `HE_SU_BPHI_CB0`, `HE_SU_BPSI_CB0` |
+| HE SU | 1 | 6 | 4 | `HE_SU_BPHI_CB1`, `HE_SU_BPSI_CB1` |
+| HE MU | 0 | 7 | 5 | `HE_MU_BPHI_CB0`, `HE_MU_BPSI_CB0` |
+| HE MU | 1 | 9 | 7 | `HE_MU_BPHI_CB1`, `HE_MU_BPSI_CB1` |
+
+### HE MIMO Control Field
+
+The HE MIMO Control field is **4 bytes** (32 bits):
+
+| Byte | Bits | Field |
 |---|---|---|
-| VHT (`VHT_BPHI` / `VHT_BPSI`) | 7 | 5 |
-| HE codebook size 4 (`HE_BPHI_CB4` / `HE_BPSI_CB4`) | 4 | 2 |
-| HE codebook size 7 (`HE_BPHI_CB7` / `HE_BPSI_CB7`) | 7 | 5 |
+| 0 | [2:0] | Nc Index (streams − 1) |
+| 0 | [5:3] | Nr Index (rows − 1) |
+| 0 | [7:6] | Channel Width (0=20, 1=40, 2=80, 3=160) |
+| 1 | [1:0] | Grouping (Ng index: 0=Ng1, 1=Ng2, 2=Ng4) |
+| 1 | [2] | Codebook Information |
+| 1 | [3] | Feedback Type (0=SU, 1=MU) |
+| 1 | [7:4] | Remaining/First Feedback Segment |
+| 2 | [6:0] | RU End Tone Index |
+| 2 | [7] | Disambiguation |
+| 3 | [5:0] | Sounding Dialog Token Number |
+| 3 | [7:6] | Reserved |
 
 ---
 
@@ -97,16 +126,17 @@ phi[subcarrier * phi_count + angle_idx]
 psi[subcarrier * psi_count + angle_idx]
 ```
 
-Counts per subcarrier are derived from the stream dimensions:
+Counts per subcarrier are derived from the stream dimensions (both VHT and HE):
 
 ```
 phi_count = Nc * Nr - Nc * (Nc + 1) / 2
-psi_count = Nc * (Nc - 1) / 2
+psi_count = phi_count   (one complex psi per real phi rotation pair)
 ```
 
-The angle ordering within a subcarrier matches 802.11-2020:
-- phi_{l,m} for l = 0..Nc-1, m = l+1..Nr-1 (phi angles)
-- psi_{l,m} for l = 0..Nc-1, m = l+1..Nc-1 (psi angles)
+**Angle ordering** within a subcarrier (802.11-2020 Table 9-33, 802.11ax):
+for l=0..Nc-1, m=l+1..Nr-1: phi_{m,l} is immediately followed by psi_{m,l}
+(interleaved). Each Givens rotation has one real angle (phi) and one complex
+phase (psi), so the counts are always equal.
 
 **Pitfall:** `phi` and `psi` are dynamically allocated. Always call
 `wifi_cbf_result_free()` after processing a result.
@@ -126,7 +156,8 @@ The angle ordering within a subcarrier matches 802.11-2020:
 | `num_subcarriers` | `uint16_t` | Subcarriers in the report |
 | `phi_count` | `uint8_t` | Phi angles per subcarrier |
 | `psi_count` | `uint8_t` | Psi angles per subcarrier |
-| `phy_type` | `wifi_phy_type_t` | VHT / HE / EHT |
+| `is_mu` | `bool` | True if MU-MIMO feedback (HE Feedback Type = 1) |
+| `phy_type` | `wifi_phy_type_t` | VHT or HE |
 | `bandwidth` | `wifi_bw_t` | Channel bandwidth |
 | `phi` | `int16_t *` | Dynamically allocated phi angle array |
 | `psi` | `int16_t *` | Dynamically allocated psi angle array |

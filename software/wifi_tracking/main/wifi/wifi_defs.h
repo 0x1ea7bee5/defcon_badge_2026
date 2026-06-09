@@ -1,6 +1,7 @@
 #ifndef WIFI_DEFS_H
 #define WIFI_DEFS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /* MAC address length in bytes */
@@ -24,6 +25,9 @@
 
 /* Control frame subtypes (in FC byte 0) */
 #define FC_SUBTYPE_NDPA         0x50
+
+/* Frame Control byte 1: set when 4-byte HT Control field is present */
+#define FC_ORDER_MASK           0x80
 
 /* ---------- 802.11 Management Frame Header Offsets ---------- */
 #define MGMT_HDR_FC_OFFSET      0
@@ -55,7 +59,7 @@
 #define VHT_ACTION_CBF          0   /* Compressed Beamforming */
 
 /* HE Action Codes */
-#define HE_ACTION_CBF_CQI       2   /* HE Compressed BF and CQI */
+#define HE_ACTION_CBF_CQI       0   /* HE Compressed BF and CQI. Actually isn't 2, its 0 */
 
 /* ---------- Information Element IDs ---------- */
 #define IE_ID_SSID              0
@@ -92,7 +96,13 @@
 #define VHT_BPHI                7   /* bits per phi angle */
 #define VHT_BPSI                5   /* bits per psi angle */
 
-/* ---------- HE MIMO Control field (6 bytes) ---------- */
+/* ---------- HE MIMO Control field (4 bytes = 32 bits) ----------
+ * Byte 0: Nc[2:0] | Nr[2:0] | BW[1:0]
+ * Byte 1: Ng[1:0] | Codebook | FBType | RemFBSeg[2:0] | FirstFBSeg
+ * Byte 2: RUEndTone[6:0] | Disambiguation
+ * Byte 3: SoundingToken[5:0] | Reserved[1:0]
+ */
+#define HE_MIMO_CTRL_LEN        4
 /* Byte 0 */
 #define HE_MIMO_NC_MASK         0x07
 #define HE_MIMO_NR_MASK         0x38
@@ -102,15 +112,22 @@
 /* Byte 1 */
 #define HE_MIMO_GROUPING_MASK   0x03
 #define HE_MIMO_CODEBOOK_MASK   0x04
-#define HE_MIMO_FB_TYPE_MASK    0x08
-/* Dialog token is in byte 4 of the HE MIMO Control field */
-#define HE_MIMO_TOKEN_BYTE_IDX  4
+#define HE_MIMO_FB_TYPE_MASK    0x08   /* 0 = SU, 1 = MU */
+/* Byte 3: dialog token at bits [5:0] */
+#define HE_MIMO_TOKEN_BYTE_IDX  3
+#define HE_MIMO_TOKEN_MASK      0x3F
 
-/* HE angle bit widths (802.11ax Table 9-98e) */
-#define HE_BPHI_CB4             4   /* codebook size phi bits */
-#define HE_BPSI_CB4             2
-#define HE_BPHI_CB7             7
-#define HE_BPSI_CB7             5
+/* HE SU angle bit widths (802.11ax Table 9-98e, Feedback Type = SU) */
+#define HE_SU_BPHI_CB0          4   /* Codebook=0: phi bits */
+#define HE_SU_BPSI_CB0          2   /* Codebook=0: psi bits */
+#define HE_SU_BPHI_CB1          6   /* Codebook=1: phi bits */
+#define HE_SU_BPSI_CB1          4   /* Codebook=1: psi bits */
+
+/* HE MU angle bit widths (802.11ax Table 9-98e, Feedback Type = MU) */
+#define HE_MU_BPHI_CB0          7   /* Codebook=0: phi bits */
+#define HE_MU_BPSI_CB0          5   /* Codebook=0: psi bits */
+#define HE_MU_BPHI_CB1          9   /* Codebook=1: phi bits */
+#define HE_MU_BPSI_CB1          7   /* Codebook=1: psi bits */
 
 /* ---------- Subcarrier counts per bandwidth ---------- */
 /* VHT subcarriers for Ng=1, Ng=2, Ng=4 */
@@ -180,9 +197,9 @@ typedef enum {
  * psi is indexed as psi[subcarrier * psi_count + angle_idx].
  *
  * Angle counts per subcarrier obey the Givens rotation decomposition
- * of an Nr x Nc steering matrix:
+ * of an Nr x Nc steering matrix (both VHT and HE):
  *   phi_count = Nc * Nr - Nc * (Nc + 1) / 2
- *   psi_count = Nc * (Nc - 1) / 2
+ *   psi_count = phi_count  (one complex psi per real phi rotation pair)
  *
  * SNR values are in units of 0.25 dB (signed 8-bit).
  */
@@ -198,6 +215,8 @@ typedef struct {
     uint16_t        num_subcarriers;
     uint8_t         phi_count;          /* phi angles per subcarrier */
     uint8_t         psi_count;          /* psi angles per subcarrier */
+    bool            is_mu;              /* true if MU-MIMO feedback */
+    bool            codebook;           /* HE codebook selection bit */
     wifi_phy_type_t phy_type;
     wifi_bw_t       bandwidth;
     int16_t        *phi;

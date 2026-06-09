@@ -68,6 +68,25 @@ static inline bool is_ndpa_frame(const uint8_t *fc)
            (FC_TYPE_CTRL | FC_SUBTYPE_NDPA);
 }
 
+/*
+ * mgmt_body_offset - Return byte offset of the management frame body.
+ *
+ * 802.11ax devices commonly set FC byte 1 bit 7 (+HTC), inserting a
+ * 4-byte HT Control field between the MAC header and the frame body.
+ * Without this adjustment the category byte for HTC frames reads from
+ * the HT Control field, the type check fails, and the frame is dropped.
+ *
+ * fc : (in) uint8_t* pointer to the 2-byte Frame Control field
+ *
+ * Returns uint16_t byte offset of the frame body.
+ */
+static uint16_t mgmt_body_offset(const uint8_t *fc)
+{
+    const bool has_htc = (fc[1] & FC_ORDER_MASK) != 0;
+    return has_htc ? (uint16_t)(MGMT_HDR_BODY_OFFSET + 4)
+                   : (uint16_t)MGMT_HDR_BODY_OFFSET;
+}
+
 /* ---------- Angle count helpers ---------- */
 
 /*
@@ -81,18 +100,6 @@ static inline bool is_ndpa_frame(const uint8_t *fc)
 static uint8_t phi_count(uint8_t nc, uint8_t nr)
 {
     return (uint8_t)(nc * nr - nc * (nc + 1) / 2);
-}
-
-/*
- * psi_count - Number of psi Givens rotation angles per subcarrier.
- *
- * nc : (in) uint8_t number of transmit columns
- *
- * Returns uint8_t angle count. Formula: Nc*(Nc-1)/2.
- */
-static uint8_t psi_count(uint8_t nc)
-{
-    return (uint8_t)(nc * (nc - 1) / 2);
 }
 
 /* ---------- Subcarrier count lookup ---------- */
@@ -153,7 +160,7 @@ static bool alloc_angles(wifi_cbf_result_t *result)
 }
 
 /*
- * parse_angles - Extract phi and psi Givens angles from packed report data.
+ * parse_angles - Extract phi and psi Givens angles from a CBF report.
  *
  * report     : (in)  uint8_t* start of the beamforming report field
  * report_len : (in)  uint16_t bytes available in report
@@ -165,17 +172,17 @@ static bool alloc_angles(wifi_cbf_result_t *result)
  *
  * Returns true on success, false if report is too short.
  *
- * Angle ordering per subcarrier matches 802.11-2020:
- *   phi_{l,m} for l=0..Nc-1, m=l+1..Nr-1  (Nr-l-1 phi per column l)
- *   psi_{l,m} for l=0..Nc-1, m=l+1..Nc-1  (Nc-l-1 psi per column l)
+ * Angle ordering per subcarrier (802.11-2020 Table 9-33, 802.11ax):
+ * for l=0..Nc-1, m=l+1..Nr-1: phi_{m,l} immediately followed by
+ * psi_{m,l} (interleaved). phi_count == psi_count.
  */
 static bool parse_angles(const uint8_t *report, uint16_t report_len,
                           uint8_t nc, uint8_t nr,
                           uint8_t bphi, uint8_t bpsi,
                           wifi_cbf_result_t *result)
 {
-    uint32_t bits_per_sc = (uint32_t)result->phi_count * bphi +
-                           (uint32_t)result->psi_count * bpsi;
+    uint32_t bits_per_sc = (uint32_t)result->phi_count *
+                           ((uint32_t)bphi + bpsi);
     uint32_t total_bits  = bits_per_sc * result->num_subcarriers;
 
     if ((total_bits + 7) / 8 > report_len)
@@ -185,25 +192,20 @@ static bool parse_angles(const uint8_t *report, uint16_t report_len,
     uint16_t sc;
 
     for (sc = 0; sc < result->num_subcarriers; sc++) {
-        uint8_t phi_idx = 0;
+        uint8_t idx = 0;
         uint8_t l, m;
 
         for (l = 0; l < nc; l++) {
             for (m = l + 1; m < nr; m++) {
-                result->phi[sc * result->phi_count + phi_idx] =
+                result->phi[sc * result->phi_count + idx] =
                     (int16_t)extract_bits(report, bit_pos, bphi);
-                phi_idx++;
                 bit_pos += bphi;
-            }
-        }
 
-        uint8_t psi_idx = 0;
-        for (l = 0; l < nc; l++) {
-            for (m = l + 1; m < nc; m++) {
-                result->psi[sc * result->psi_count + psi_idx] =
+                result->psi[sc * result->psi_count + idx] =
                     (int16_t)extract_bits(report, bit_pos, bpsi);
-                psi_idx++;
                 bit_pos += bpsi;
+
+                idx++;
             }
         }
     }
@@ -262,7 +264,7 @@ static bool parse_vht_cbf(const uint8_t *body, uint16_t body_len,
     result->num_streams     = nc;
     result->num_rows        = nr;
     result->phi_count       = phi_count(nc, nr);
-    result->psi_count       = psi_count(nc);
+    result->psi_count       = phi_count(nc, nr);
     result->num_subcarriers = subcarrier_count((wifi_bw_t)bw, ng);
 
     if (result->num_subcarriers == 0 || result->phi_count == 0)
@@ -281,8 +283,8 @@ static bool parse_vht_cbf(const uint8_t *body, uint16_t body_len,
     }
 
     uint32_t angle_bits = (uint32_t)result->num_subcarriers *
-                          (result->phi_count * VHT_BPHI +
-                           result->psi_count * VHT_BPSI);
+                          result->phi_count *
+                          (VHT_BPHI + VHT_BPSI);
     uint32_t snr_off = 5 + (angle_bits + 7) / 8;
 
     if (snr_off < body_len)
@@ -305,28 +307,39 @@ static bool parse_vht_cbf(const uint8_t *body, uint16_t body_len,
 static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
                            wifi_cbf_result_t *result)
 {
-    /* body: category(1) action(1) MIMO_ctrl(6) report(...) */
-    if (body_len < 8)
+    /* body: category(1) action(1) MIMO_ctrl(4) report(...) */
+    if (body_len < (uint16_t)(2 + HE_MIMO_CTRL_LEN))
         return false;
 
-    const uint8_t *mimo = body + 2;
-    uint8_t nc   = (mimo[0] & HE_MIMO_NC_MASK) + 1;
-    uint8_t nr   = ((mimo[0] & HE_MIMO_NR_MASK) >> HE_MIMO_NR_SHIFT) + 1;
-    uint8_t bw   = (mimo[0] & HE_MIMO_BW_MASK) >> HE_MIMO_BW_SHIFT;
-    uint8_t ng   = mimo[1] & HE_MIMO_GROUPING_MASK;
-    bool    cb4  = (mimo[1] & HE_MIMO_CODEBOOK_MASK) != 0;
-    uint8_t tok  = mimo[HE_MIMO_TOKEN_BYTE_IDX];
+    const uint8_t *mimo  = body + 2;
+    uint8_t nc    = (mimo[0] & HE_MIMO_NC_MASK) + 1;
+    uint8_t nr    = ((mimo[0] & HE_MIMO_NR_MASK) >> HE_MIMO_NR_SHIFT) + 1;
+    uint8_t bw    = (mimo[0] & HE_MIMO_BW_MASK) >> HE_MIMO_BW_SHIFT;
+    uint8_t ng    = mimo[1] & HE_MIMO_GROUPING_MASK;
+    bool codebook = (mimo[1] & HE_MIMO_CODEBOOK_MASK) != 0;
+    bool is_mu    = (mimo[1] & HE_MIMO_FB_TYPE_MASK) != 0;
+    /* Token occupies bits [5:0] of MIMO ctrl byte 3 */
+    uint8_t tok   = mimo[HE_MIMO_TOKEN_BYTE_IDX] & HE_MIMO_TOKEN_MASK;
 
-    uint8_t bphi = cb4 ? HE_BPHI_CB4 : HE_BPHI_CB7;
-    uint8_t bpsi = cb4 ? HE_BPSI_CB4 : HE_BPSI_CB7;
+    uint8_t bphi, bpsi;
+    if (!is_mu) {
+        bphi = codebook ? HE_SU_BPHI_CB1 : HE_SU_BPHI_CB0;
+        bpsi = codebook ? HE_SU_BPSI_CB1 : HE_SU_BPSI_CB0;
+    } else {
+        bphi = codebook ? HE_MU_BPHI_CB1 : HE_MU_BPHI_CB0;
+        bpsi = codebook ? HE_MU_BPSI_CB1 : HE_MU_BPSI_CB0;
+    }
 
     result->phy_type        = WIFI_PHY_HE;
+    result->is_mu           = is_mu;
+    result->codebook        = codebook;
     result->bandwidth       = (wifi_bw_t)bw;
     result->dialog_token    = tok;
     result->num_streams     = nc;
     result->num_rows        = nr;
     result->phi_count       = phi_count(nc, nr);
-    result->psi_count       = psi_count(nc);
+    /* HE interleaves one psi per phi pair, so counts are equal */
+    result->psi_count       = phi_count(nc, nr);
     result->num_subcarriers = subcarrier_count((wifi_bw_t)bw, ng);
 
     if (result->num_subcarriers == 0 || result->phi_count == 0)
@@ -335,22 +348,28 @@ static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
     if (!alloc_angles(result))
         return false;
 
-    const uint8_t *report = body + 8;
-    uint16_t report_len   = body_len - 8;
+    /*
+     * HE report field layout (802.11ax): SNR (Nc bytes) precedes the
+     * compressed angle matrix. This differs from VHT where angles come first.
+     */
+    const uint16_t snr_start   = 2 + HE_MIMO_CTRL_LEN;
+    const uint16_t angle_start = snr_start + nc;
+
+    if (body_len <= angle_start) {
+        wifi_cbf_result_free(result);
+        return false;
+    }
+
+    parse_snr(body + snr_start, nc, result);
+
+    const uint8_t *report = body + angle_start;
+    uint16_t report_len   = body_len - angle_start;
 
     if (!parse_angles(report, report_len, nc, nr,
                        bphi, bpsi, result)) {
         wifi_cbf_result_free(result);
         return false;
     }
-
-    uint32_t angle_bits = (uint32_t)result->num_subcarriers *
-                          (result->phi_count * bphi +
-                           result->psi_count * bpsi);
-    uint32_t snr_off = 8 + (angle_bits + 7) / 8;
-
-    if (snr_off < body_len)
-        parse_snr(body + snr_off, (uint16_t)(body_len - snr_off), result);
 
     return true;
 }
@@ -361,17 +380,20 @@ bool scan_for_cbf(const uint8_t *frame, uint16_t len,
                   const wifi_pkt_rx_ctrl_t *rx_ctrl,
                   wifi_cbf_result_t *out)
 {
-    const uint16_t min_len = MGMT_HDR_BODY_OFFSET + 2;
-
-    if (!frame || !rx_ctrl || !out || len < min_len)
+    if (!frame || !rx_ctrl || !out || len < (MGMT_HDR_BODY_OFFSET + 2))
         return false;
 
     const uint8_t *fc = frame + MGMT_HDR_FC_OFFSET;
     if (!is_action_frame(fc) && !is_action_noack_frame(fc))
         return false;
 
-    const uint8_t *body     = frame + MGMT_HDR_BODY_OFFSET;
-    uint16_t       body_len = len - MGMT_HDR_BODY_OFFSET;
+    /* Account for optional 4-byte HT Control field (+HTC frames) */
+    uint16_t       body_off = mgmt_body_offset(fc);
+    if (len < (uint16_t)(body_off + 2))
+        return false;
+
+    const uint8_t *body     = frame + body_off;
+    uint16_t       body_len = len - body_off;
     uint8_t        cat      = body[0];
     uint8_t        act      = body[1];
 
