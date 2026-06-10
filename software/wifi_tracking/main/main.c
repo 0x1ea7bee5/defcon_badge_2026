@@ -8,11 +8,85 @@
 #include "nvs_flash.h"
 #include "wifi/packet_scanner.h"
 #include "wifi/wifi_defs.h"
+#include "state_estimation/get_matrices.h"
 
 static const char *TAG = "main";
 
 /* Default channel to monitor; change as needed */
-#define MONITOR_CHANNEL 40
+#define MONITOR_CHANNEL 100
+
+/*
+ * print_v_matrix - Print the reconstructed V matrix for every subcarrier.
+ *
+ * result : (in) const wifi_cbf_result_t* parsed frame data
+ */
+static void print_v_matrix(const wifi_cbf_result_t *result)
+{
+    const uint8_t  nr = result->num_rows;
+    const uint8_t  nc = result->num_streams;
+    float v_real[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+    float v_imag[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+
+    for (uint16_t sc = 0; sc < result->num_subcarriers; sc++) {
+        if (!reconstruct_v(result, sc, v_real, v_imag)) {
+            printf("  V[sc%u]: reconstruct failed\n", sc);
+            continue;
+        }
+        printf("  V[sc%u]:\n", sc);
+        for (uint8_t r = 0; r < nr; r++) {
+            printf("    row%u:", r);
+            for (uint8_t c = 0; c < nc; c++) {
+                uint16_t idx = (uint16_t)r * nc + c;
+                printf("  %6.3f%+6.3fj",
+                       v_real[idx], v_imag[idx]);
+            }
+            printf("\n");
+        }
+    }
+}
+
+/*
+ * print_eigen - Print eigenvalues and eigenvectors of V*V^H per subcarrier.
+ *
+ * result : (in) const wifi_cbf_result_t* parsed frame data
+ */
+static void print_eigen(const wifi_cbf_result_t *result)
+{
+    const uint8_t nr = result->num_rows;
+    const uint8_t nc = result->num_streams;
+    float v_real[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+    float v_imag[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+    float eigenvals[WIFI_MAX_STREAMS];
+    float evec_real[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+    float evec_imag[WIFI_MAX_STREAMS * WIFI_MAX_STREAMS];
+
+    for (uint16_t sc = 0; sc < result->num_subcarriers; sc++) {
+        if (!reconstruct_v(result, sc, v_real, v_imag)) {
+            printf("  eigen[sc%u]: reconstruct failed\n", sc);
+            continue;
+        }
+        if (!get_eigendecomp(v_real, v_imag, nr, nc,
+                             eigenvals, evec_real, evec_imag)) {
+            printf("  eigen[sc%u]: eigendecomp failed\n", sc);
+            continue;
+        }
+        printf("  eigen[sc%u]:\n", sc);
+
+        printf("    eigenvalues:");
+        for (uint8_t k = 0; k < nr; k++)
+            printf("  %8.4f", eigenvals[k]);
+        printf("\n");
+
+        for (uint8_t k = 0; k < nr; k++) {
+            printf("    evec[%u] (lam=%8.4f):", k, eigenvals[k]);
+            for (uint8_t r = 0; r < nr; r++)
+                printf("  %6.3f%+6.3fj",
+                       evec_real[r * nr + k],
+                       evec_imag[r * nr + k]);
+            printf("\n");
+        }
+    }
+}
 
 /*
  * on_cbf - Print a beamforming feedback result to the console.
@@ -64,6 +138,14 @@ static void on_cbf(const wifi_cbf_result_t *result)
             printf("\n");
         }
     }
+
+    /* Reconstructed steering matrix V */
+    //printf("  --- V matrix ---\n");
+    //print_v_matrix(result);
+
+    /* Eigenvalues and eigenvectors of V*V^H */
+    printf("  --- eigendecomp ---\n");
+    print_eigen(result);
 }
 
 void app_main(void)
