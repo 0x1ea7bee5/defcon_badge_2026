@@ -12,6 +12,7 @@ static struct {
     cbf_cb_t  on_cbf;
     ndpa_cb_t on_ndpa;
     ssid_cb_t on_ssid;
+    csi_cb_t  on_csi;
     bool      active;
 } s_scanner;
 
@@ -21,11 +22,11 @@ static struct {
  * extract_bits - Extract up to 16 bits LSB-first from a byte array.
  *
  * buf        : (in) uint8_t* source buffer
- * bit_offset : (in) uint32_t starting bit position (bit 0 = LSB of buf[0])
+ * bit_offset : (in) uint32_t starting bit position (LSB of buf[0] = 0)
  * nbits      : (in) uint8_t number of bits to extract (1-16)
  *
- * Returns uint16_t extracted value. Caller must ensure buf has at least
- * (bit_offset + nbits + 7) / 8 bytes available.
+ * Returns uint16_t extracted value. Caller must ensure buf holds at
+ * least (bit_offset + nbits + 7) / 8 bytes.
  */
 static uint16_t extract_bits(const uint8_t *buf, uint32_t bit_offset,
                               uint8_t nbits)
@@ -71,10 +72,9 @@ static inline bool is_ndpa_frame(const uint8_t *fc)
 /*
  * mgmt_body_offset - Return byte offset of the management frame body.
  *
- * 802.11ax devices commonly set FC byte 1 bit 7 (+HTC), inserting a
- * 4-byte HT Control field between the MAC header and the frame body.
- * Without this adjustment the category byte for HTC frames reads from
- * the HT Control field, the type check fails, and the frame is dropped.
+ * 802.11ax devices may set FC byte 1 bit 7 (+HTC), inserting a 4-byte
+ * HT Control field between the MAC header and the frame body. Without
+ * this adjustment the category byte reads from the HT Control field.
  *
  * fc : (in) uint8_t* pointer to the 2-byte Frame Control field
  *
@@ -92,8 +92,8 @@ static uint16_t mgmt_body_offset(const uint8_t *fc)
 /*
  * phi_count - Number of phi Givens rotation angles per subcarrier.
  *
- * nc : (in) uint8_t number of transmit columns (streams sounded)
- * nr : (in) uint8_t number of receive rows
+ * nc : (in) uint8_t transmit columns (streams sounded)
+ * nr : (in) uint8_t receive rows
  *
  * Returns uint8_t angle count. Formula: Nc*Nr - Nc*(Nc+1)/2.
  */
@@ -105,20 +105,19 @@ static uint8_t phi_count(uint8_t nc, uint8_t nr)
 /* ---------- Subcarrier count lookup ---------- */
 
 /*
- * subcarrier_count - Return subcarrier count for a given bandwidth and
- *                   grouping index.
+ * subcarrier_count - Return subcarrier count for bandwidth and grouping.
  *
- * bw  : (in) wifi_bw_t bandwidth enum
- * ng  : (in) uint8_t grouping index (0=Ng1, 1=Ng2, 2=Ng4)
+ * bw : (in) wifi_bw_t bandwidth enum
+ * ng : (in) uint8_t grouping index (0=Ng1, 1=Ng2, 2=Ng4)
  *
  * Returns uint16_t subcarrier count, or 0 for unsupported combination.
  */
 static uint16_t subcarrier_count(wifi_bw_t bw, uint8_t ng)
 {
     static const uint16_t tbl[4][3] = {
-        { VHT_NSC_20_NG1, VHT_NSC_20_NG2, VHT_NSC_20_NG4 },
-        { VHT_NSC_40_NG1, VHT_NSC_40_NG2, VHT_NSC_40_NG4 },
-        { VHT_NSC_80_NG1, VHT_NSC_80_NG2, VHT_NSC_80_NG4 },
+        { VHT_NSC_20_NG1,  VHT_NSC_20_NG2,  VHT_NSC_20_NG4  },
+        { VHT_NSC_40_NG1,  VHT_NSC_40_NG2,  VHT_NSC_40_NG4  },
+        { VHT_NSC_80_NG1,  VHT_NSC_80_NG2,  VHT_NSC_80_NG4  },
         { VHT_NSC_160_NG1, VHT_NSC_160_NG2, VHT_NSC_160_NG4 },
     };
 
@@ -132,10 +131,11 @@ static uint16_t subcarrier_count(wifi_bw_t bw, uint8_t ng)
 /*
  * alloc_angles - Allocate phi and psi arrays in a wifi_cbf_result_t.
  *
- * result : (in/out) result with phi_count, psi_count, num_subcarriers set
+ * result : (in/out) result with phi_count, psi_count, and
+ *                   num_subcarriers already set
  *
  * Returns true on success, false on allocation failure.
- * On failure, phi and psi are both NULL.
+ * On failure both phi and psi are NULL.
  */
 static bool alloc_angles(wifi_cbf_result_t *result)
 {
@@ -172,9 +172,8 @@ static bool alloc_angles(wifi_cbf_result_t *result)
  *
  * Returns true on success, false if report is too short.
  *
- * Angle ordering per subcarrier (802.11-2020 Table 9-33, 802.11ax):
- * for l=0..Nc-1, m=l+1..Nr-1: phi_{m,l} immediately followed by
- * psi_{m,l} (interleaved). phi_count == psi_count.
+ * Angle ordering per subcarrier (802.11-2020 Table 9-33 / 802.11ax):
+ * for l=0..Nc-1, m=l+1..Nr-1: phi_{m,l} then psi_{m,l} interleaved.
  */
 static bool parse_angles(const uint8_t *report, uint16_t report_len,
                           uint8_t nc, uint8_t nr,
@@ -183,7 +182,7 @@ static bool parse_angles(const uint8_t *report, uint16_t report_len,
 {
     uint32_t bits_per_sc = (uint32_t)result->phi_count *
                            ((uint32_t)bphi + bpsi);
-    uint32_t total_bits  = bits_per_sc * result->num_subcarriers;
+    uint64_t total_bits  = bits_per_sc * result->num_subcarriers;
 
     if ((total_bits + 7) / 8 > report_len)
         return false;
@@ -213,9 +212,9 @@ static bool parse_angles(const uint8_t *report, uint16_t report_len,
 }
 
 /*
- * parse_snr - Extract per-stream SNR bytes following the angle report.
+ * parse_snr - Extract per-stream SNR bytes from a CBF report.
  *
- * buf    : (in)  uint8_t* pointer to start of SNR bytes
+ * buf    : (in)  uint8_t* pointer to the first SNR byte
  * avail  : (in)  uint16_t available bytes
  * result : (out) snr[] populated up to num_streams entries
  *
@@ -234,80 +233,91 @@ static void parse_snr(const uint8_t *buf, uint16_t avail,
 /*
  * parse_vht_cbf - Parse a VHT Compressed Beamforming action frame body.
  *
- * body     : (in)  uint8_t* frame body (after category and action bytes)
+ * body     : (in)  uint8_t* frame body starting at category byte
  * body_len : (in)  uint16_t available bytes in body
  * result   : (out) populated on success
  *
+ * Body layout: category(1) action(1) MIMO_ctrl(3) SNR(Nc) angles(...)
  * Returns true on success.
  */
 static bool parse_vht_cbf(const uint8_t *body, uint16_t body_len,
                             wifi_cbf_result_t *result)
 {
-    /* body: category(1) action(1) MIMO_ctrl(3) report(...) SNR(...) */
     if (body_len < 5)
         return false;
 
     const uint8_t *mimo = body + 2;
-    uint8_t nc  = (mimo[0] & VHT_MIMO_NC_MASK) + 1;
-    uint8_t nr  = ((mimo[0] & VHT_MIMO_NR_MASK) >> VHT_MIMO_NR_SHIFT) + 1;
-    uint8_t bw  = (mimo[0] & VHT_MIMO_BW_MASK) >> VHT_MIMO_BW_SHIFT;
-    uint8_t ng  = mimo[1] & VHT_MIMO_GROUPING_MASK;
+    uint8_t nc = (mimo[0] & VHT_MIMO_NC_MASK) + 1;
+    uint8_t nr = ((mimo[0] & VHT_MIMO_NR_MASK) >> VHT_MIMO_NR_SHIFT) + 1;
+    uint8_t bw = (mimo[0] & VHT_MIMO_BW_MASK) >> VHT_MIMO_BW_SHIFT;
+    uint8_t ng = mimo[1] & VHT_MIMO_GROUPING_MASK;
 
-    /* Token spans byte[1] bits[7:5] (low 3) and byte[2] bits[1:0] (high 2) */
+    /* Token: byte[1] bits[7:5] (low 3) | byte[2] bits[1:0] (high 2) */
     uint8_t tok = (uint8_t)(
         ((mimo[1] & VHT_MIMO_TOKEN_LOW_MASK) >> VHT_MIMO_TOKEN_LOW_SHIFT) |
         ((mimo[2] & VHT_MIMO_TOKEN_HI_MASK)  << VHT_MIMO_TOKEN_HI_SHIFT));
 
-    result->phy_type        = WIFI_PHY_VHT;
-    result->bandwidth       = (wifi_bw_t)bw;
-    result->dialog_token    = tok;
-    result->num_streams     = nc;
-    result->num_rows        = nr;
-    result->phi_count       = phi_count(nc, nr);
-    result->psi_count       = phi_count(nc, nr);
-    result->num_subcarriers = subcarrier_count((wifi_bw_t)bw, ng);
+    result->phy_type     = WIFI_PHY_VHT;
+    result->bandwidth    = (wifi_bw_t)bw;
+    result->dialog_token = tok;
+    result->num_streams  = nc;
+    result->num_rows     = nr;
+    result->phi_count    = phi_count(nc, nr);
+    result->psi_count    = phi_count(nc, nr);
 
-    if (result->num_subcarriers == 0 || result->phi_count == 0)
+    if (result->phi_count == 0)
         return false;
+
+    if (body_len < (uint16_t)(5u + nc))
+        return false;
+
+    result->num_subcarriers = subcarrier_count((wifi_bw_t)bw, ng);
+    if (result->num_subcarriers == 0)
+        return false;
+
+    {
+        const uint32_t bpsc     = (uint32_t)result->phi_count *
+                                   (VHT_BPHI + VHT_BPSI);
+        const uint32_t avail    = ((uint32_t)(body_len - 5u) - nc) * 8u;
+        const uint16_t avail_ns = bpsc ? (uint16_t)(avail / bpsc) : 0u;
+        if (avail_ns < result->num_subcarriers) {
+            ESP_LOGW(TAG, "VHT: spec=%u avail=%u sc; dropping",
+                     result->num_subcarriers, avail_ns);
+            return false;
+        }
+    }
 
     if (!alloc_angles(result))
         return false;
 
-    const uint8_t *report = body + 5;
-    uint16_t report_len   = body_len - 5;
+    parse_snr(body + 5, nc, result);
+
+    const uint8_t  *report     = body + 5 + nc;
+    const uint16_t  report_len = (uint16_t)(body_len - 5u - nc);
 
     if (!parse_angles(report, report_len, nc, nr,
                        VHT_BPHI, VHT_BPSI, result)) {
         wifi_cbf_result_free(result);
         return false;
     }
-
-    uint32_t angle_bits = (uint32_t)result->num_subcarriers *
-                          result->phi_count *
-                          (VHT_BPHI + VHT_BPSI);
-    uint32_t snr_off = 5 + (angle_bits + 7) / 8;
-
-    if (snr_off < body_len)
-        parse_snr(body + snr_off, (uint16_t)(body_len - snr_off), result);
-
     return true;
 }
 
 /* ---------- HE CBF parsing ---------- */
 
 /*
- * parse_he_cbf - Parse an HE Compressed Beamforming action body.
+ * parse_he_cbf - Parse an HE Compressed Beamforming action frame body.
  *
  * body     : (in)  uint8_t* frame body starting at category byte
  * body_len : (in)  uint16_t available bytes
  * result   : (out) populated on success
  *
+ * Body layout: category(1) action(1) MIMO_ctrl(4) SNR(Nc) angles(...)
  * Returns true on success.
  */
 static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
                            wifi_cbf_result_t *result)
 {
-    /* body: category(1) action(1) MIMO_ctrl(4) report(...) */
     if (body_len < (uint16_t)(2 + HE_MIMO_CTRL_LEN))
         return false;
 
@@ -317,8 +327,7 @@ static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
     uint8_t bw    = (mimo[0] & HE_MIMO_BW_MASK) >> HE_MIMO_BW_SHIFT;
     uint8_t ng    = mimo[1] & HE_MIMO_GROUPING_MASK;
     bool codebook = (mimo[1] & HE_MIMO_CODEBOOK_MASK) != 0;
-    bool is_mu    = (mimo[1] & HE_MIMO_FB_TYPE_MASK) != 0;
-    /* Token occupies bits [5:0] of MIMO ctrl byte 3 */
+    bool is_mu    = (mimo[1] & HE_MIMO_FB_TYPE_MASK)  != 0;
     uint8_t tok   = mimo[HE_MIMO_TOKEN_BYTE_IDX] & HE_MIMO_TOKEN_MASK;
 
     uint8_t bphi, bpsi;
@@ -338,7 +347,6 @@ static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
     result->num_streams     = nc;
     result->num_rows        = nr;
     result->phi_count       = phi_count(nc, nr);
-    /* HE interleaves one psi per phi pair, so counts are equal */
     result->psi_count       = phi_count(nc, nr);
     result->num_subcarriers = subcarrier_count((wifi_bw_t)bw, ng);
 
@@ -348,11 +356,7 @@ static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
     if (!alloc_angles(result))
         return false;
 
-    /*
-     * HE report field layout (802.11ax): SNR (Nc bytes) precedes the
-     * compressed angle matrix. This differs from VHT where angles come first.
-     */
-    const uint16_t snr_start   = 2 + HE_MIMO_CTRL_LEN;
+    const uint16_t snr_start   = 2u + HE_MIMO_CTRL_LEN;
     const uint16_t angle_start = snr_start + nc;
 
     if (body_len <= angle_start) {
@@ -362,15 +366,14 @@ static bool parse_he_cbf(const uint8_t *body, uint16_t body_len,
 
     parse_snr(body + snr_start, nc, result);
 
-    const uint8_t *report = body + angle_start;
-    uint16_t report_len   = body_len - angle_start;
+    const uint8_t  *report     = body + angle_start;
+    const uint16_t  report_len = body_len - angle_start;
 
     if (!parse_angles(report, report_len, nc, nr,
                        bphi, bpsi, result)) {
         wifi_cbf_result_free(result);
         return false;
     }
-
     return true;
 }
 
@@ -380,15 +383,16 @@ bool scan_for_cbf(const uint8_t *frame, uint16_t len,
                   const wifi_pkt_rx_ctrl_t *rx_ctrl,
                   wifi_cbf_result_t *out)
 {
-    if (!frame || !rx_ctrl || !out || len < (MGMT_HDR_BODY_OFFSET + 2))
+    const uint16_t min_len = MGMT_HDR_BODY_OFFSET +
+                             MGMT_HDR_ACT_CAT_OFFSET;
+    if (!frame || !rx_ctrl || !out || len < min_len)
         return false;
 
     const uint8_t *fc = frame + MGMT_HDR_FC_OFFSET;
     if (!is_action_frame(fc) && !is_action_noack_frame(fc))
         return false;
 
-    /* Account for optional 4-byte HT Control field (+HTC frames) */
-    uint16_t       body_off = mgmt_body_offset(fc);
+    uint16_t body_off = mgmt_body_offset(fc);
     if (len < (uint16_t)(body_off + 2))
         return false;
 
@@ -400,7 +404,6 @@ bool scan_for_cbf(const uint8_t *frame, uint16_t len,
     memset(out, 0, sizeof(*out));
 
     bool matched = false;
-
     if (cat == ACTION_CAT_VHT && act == VHT_ACTION_CBF)
         matched = parse_vht_cbf(body, body_len, out);
     else if (cat == ACTION_CAT_HE && act == HE_ACTION_CBF_CQI)
@@ -445,7 +448,7 @@ bool scan_for_ndpa(const uint8_t *frame, uint16_t len,
  * ies     : (in)  uint8_t* start of IEs
  * ies_len : (in)  uint16_t total bytes in IE buffer
  * ie_id   : (in)  uint8_t IE ID to find
- * ie_len  : (out) uint8_t* length of IE value field (excluding id/len bytes)
+ * ie_len  : (out) uint8_t* length of IE value field
  *
  * Returns pointer to IE value, or NULL if not found.
  */
@@ -509,7 +512,7 @@ static const uint8_t *find_ie_ext(const uint8_t *ies, uint16_t ies_len,
  *
  * ie     : (in)     uint8_t* IE value bytes
  * ie_len : (in)     uint8_t IE value length
- * rates  : (in/out) wifi_rate_set_t* rate set to append to (max 16 entries)
+ * rates  : (in/out) wifi_rate_set_t* accumulator (max 16 entries)
  */
 static void append_rates(const uint8_t *ie, uint8_t ie_len,
                           wifi_rate_set_t *rates)
@@ -537,11 +540,11 @@ bool scan_for_ssid(const uint8_t *frame, uint16_t len,
     out->rssi         = (int8_t)rx_ctrl->rssi;
     out->channel      = (uint8_t)rx_ctrl->channel;
 
-    const uint8_t *ies = frame + MGMT_HDR_BODY_OFFSET + BCN_IES_OFFSET;
-    uint16_t ies_len   = len - MGMT_HDR_BODY_OFFSET - BCN_IES_OFFSET;
+    const uint8_t *ies   = frame + MGMT_HDR_BODY_OFFSET + BCN_IES_OFFSET;
+    uint16_t       ies_len = len - MGMT_HDR_BODY_OFFSET - BCN_IES_OFFSET;
 
-    uint8_t         ie_len = 0;
-    const uint8_t  *ie_val;
+    uint8_t        ie_len = 0;
+    const uint8_t *ie_val;
 
     ie_val = find_ie(ies, ies_len, IE_ID_SSID, &ie_len);
     if (ie_val && ie_len <= 32) {
@@ -560,15 +563,16 @@ bool scan_for_ssid(const uint8_t *frame, uint16_t len,
     ie_val = find_ie(ies, ies_len, IE_ID_HT_CAP, &ie_len);
     if (ie_val && ie_len >= 2) {
         out->cap_flags  |= WIFI_CAP_HT;
-        out->ht_cap_info = (uint16_t)(ie_val[0] | ((uint16_t)ie_val[1] << 8));
+        out->ht_cap_info = (uint16_t)(ie_val[0] |
+                           ((uint16_t)ie_val[1] << 8));
     }
 
     ie_val = find_ie(ies, ies_len, IE_ID_VHT_CAP, &ie_len);
     if (ie_val && ie_len >= 4) {
         out->cap_flags   |= WIFI_CAP_VHT;
-        out->vht_cap_info = (uint32_t)ie_val[0]              |
-                            ((uint32_t)ie_val[1] << 8)        |
-                            ((uint32_t)ie_val[2] << 16)       |
+        out->vht_cap_info = (uint32_t)ie_val[0]         |
+                            ((uint32_t)ie_val[1] <<  8)  |
+                            ((uint32_t)ie_val[2] << 16)  |
                             ((uint32_t)ie_val[3] << 24);
     }
 
@@ -579,17 +583,81 @@ bool scan_for_ssid(const uint8_t *frame, uint16_t len,
     return true;
 }
 
+bool scan_for_csi(const wifi_csi_info_t *info, wifi_csi_result_t *out)
+{
+    if (!info || !out || !info->buf || info->len == 0)
+        return false;
+
+    /* Skip the first hardware word when the driver flags it invalid. */
+    const uint16_t offset = info->first_word_invalid ? 4u : 0u;
+    if (offset >= info->len)
+        return false;
+
+    memset(out, 0, sizeof(*out));
+    memcpy(out->src_mac, info->mac,  WIFI_MAC_ADDR_LEN);
+    memcpy(out->dst_mac, info->dmac, WIFI_MAC_ADDR_LEN);
+    out->timestamp_us = (int64_t)info->rx_ctrl.timestamp;
+    out->rssi         = (int8_t)info->rx_ctrl.rssi;
+    out->channel      = (uint8_t)info->rx_ctrl.channel;
+    out->num_samples  = info->len - offset;
+
+    out->data = (int8_t *)malloc((size_t)out->num_samples);
+    if (!out->data)
+        return false;
+
+    memcpy(out->data, info->buf + offset, (size_t)out->num_samples);
+    return true;
+}
+
+void wifi_csi_result_free(wifi_csi_result_t *result)
+{
+    if (!result)
+        return;
+    free(result->data);
+    result->data = NULL;
+}
+
+void wifi_cbf_result_free(wifi_cbf_result_t *result)
+{
+    if (!result)
+        return;
+    free(result->phi);
+    free(result->psi);
+    result->phi = NULL;
+    result->psi = NULL;
+}
+
 /* ---------- Monitor mode ---------- */
 
 /*
+ * csi_rx_cb - ESP-IDF CSI callback; dispatches to the user CSI callback.
+ *
+ * ctx  : (in) unused
+ * data : (in) wifi_csi_info_t* from the driver
+ */
+static void csi_rx_cb(void *ctx, wifi_csi_info_t *data)
+{
+    (void)ctx;
+    if (!data || !s_scanner.on_csi)
+        return;
+
+    wifi_csi_result_t csi = {0};
+    if (scan_for_csi(data, &csi)) {
+        s_scanner.on_csi(&csi);
+        wifi_csi_result_free(&csi);
+    }
+}
+
+/*
  * promiscuous_rx_cb - ESP-IDF promiscuous callback; dispatches each
- *                    received frame to the registered scanner functions.
+ *                     received frame to the registered scanner functions.
  *
  * buf  : (in) void* wifi_promiscuous_pkt_t from the driver
  * type : (in) wifi_promiscuous_pkt_type_t packet type classification
  */
 static void promiscuous_rx_cb(void *buf, wifi_promiscuous_pkt_type_t type)
 {
+    (void)type;
     if (!buf)
         return;
 
@@ -625,7 +693,8 @@ static void promiscuous_rx_cb(void *buf, wifi_promiscuous_pkt_type_t type)
 esp_err_t start_monitor(uint8_t channel,
                          cbf_cb_t  on_cbf,
                          ndpa_cb_t on_ndpa,
-                         ssid_cb_t on_ssid)
+                         ssid_cb_t on_ssid,
+                         csi_cb_t  on_csi)
 {
     if (s_scanner.active) {
         ESP_LOGW(TAG, "monitor already active");
@@ -635,6 +704,7 @@ esp_err_t start_monitor(uint8_t channel,
     s_scanner.on_cbf  = on_cbf;
     s_scanner.on_ndpa = on_ndpa;
     s_scanner.on_ssid = on_ssid;
+    s_scanner.on_csi  = on_csi;
 
     wifi_promiscuous_filter_t filter = {
         .filter_mask = WIFI_PROMIS_FILTER_MASK_MGMT |
@@ -661,8 +731,47 @@ esp_err_t start_monitor(uint8_t channel,
         return ret;
     }
 
+    if (on_csi) {
+        /* wifi_csi_config_t == wifi_csi_acquire_config_t on MAC v3 */
+        const wifi_csi_config_t csi_cfg = {
+            .enable                 = true,
+            .acquire_csi_legacy     = true,
+            .acquire_csi_force_lltf = true,
+            .acquire_csi_ht20       = true,
+            .acquire_csi_ht40       = true,
+            .acquire_csi_vht        = true,
+            .acquire_csi_su         = true,
+            .acquire_csi_mu         = true,
+            .acquire_csi_dcm        = true,
+            .acquire_csi_beamformed = true,
+        };
+
+        ret = esp_wifi_set_csi_config(&csi_cfg);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "CSI config failed: %d", ret);
+            esp_wifi_set_promiscuous(false);
+            return ret;
+        }
+
+        ret = esp_wifi_set_csi_rx_cb(csi_rx_cb, NULL);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "CSI rx cb failed: %d", ret);
+            esp_wifi_set_promiscuous(false);
+            return ret;
+        }
+
+        ret = esp_wifi_set_csi(true);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "enable CSI failed: %d", ret);
+            esp_wifi_set_promiscuous(false);
+            return ret;
+        }
+    }
+
     ret = switch_channel(channel);
     if (ret != ESP_OK) {
+        if (on_csi)
+            esp_wifi_set_csi(false);
         esp_wifi_set_promiscuous(false);
         return ret;
     }
@@ -685,6 +794,9 @@ esp_err_t stop_monitor(void)
     if (!s_scanner.active)
         return ESP_OK;
 
+    if (s_scanner.on_csi)
+        esp_wifi_set_csi(false);
+
     esp_err_t ret = esp_wifi_set_promiscuous(false);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "disable promiscuous failed: %d", ret);
@@ -694,14 +806,4 @@ esp_err_t stop_monitor(void)
     memset(&s_scanner, 0, sizeof(s_scanner));
     ESP_LOGI(TAG, "monitor stopped");
     return ESP_OK;
-}
-
-void wifi_cbf_result_free(wifi_cbf_result_t *result)
-{
-    if (!result)
-        return;
-    free(result->phi);
-    free(result->psi);
-    result->phi = NULL;
-    result->psi = NULL;
 }

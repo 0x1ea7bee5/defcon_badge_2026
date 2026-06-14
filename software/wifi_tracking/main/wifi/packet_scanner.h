@@ -14,6 +14,13 @@
 typedef void (*cbf_cb_t)(const wifi_cbf_result_t *result);
 
 /*
+ * csi_cb_t - Callback invoked for each CSI measurement.
+ *            result is valid only for the duration of the callback.
+ *            result: (in) parsed CSI data
+ */
+typedef void (*csi_cb_t)(const wifi_csi_result_t *result);
+
+/*
  * ndpa_cb_t - Callback invoked for each NDPA frame.
  *             result: (in) parsed NDPA data
  */
@@ -68,21 +75,43 @@ bool scan_for_ssid(const uint8_t *frame, uint16_t len,
                    wifi_ap_info_t *out);
 
 /*
+ * scan_for_csi - Extract CSI data from an ESP32 CSI callback event.
+ *
+ * info : (in)  wifi_csi_info_t* from esp_wifi_set_csi_rx_cb
+ * out  : (out) populated on success; caller must call
+ *              wifi_csi_result_free() when done
+ *
+ * Skips the first hardware word (4 bytes) when first_word_invalid is
+ * set by the driver. Returns true on success.
+ */
+bool scan_for_csi(const wifi_csi_info_t *info, wifi_csi_result_t *out);
+
+/*
+ * wifi_csi_result_free - Free the dynamically allocated data buffer
+ *                        inside a wifi_csi_result_t.
+ *
+ * result : (in/out) result struct; data is freed and set to NULL
+ */
+void wifi_csi_result_free(wifi_csi_result_t *result);
+
+/*
  * start_monitor - Enable promiscuous (monitor) mode on the given channel.
- *                 Registers an internal promiscuous callback that dispatches
+ *                 Registers promiscuous and CSI callbacks that dispatch
  *                 packets to the user-supplied callbacks.
  *
- * channel  : (in) WiFi channel number (1-14 for 2.4 GHz, 36+ for 5 GHz)
+ * channel  : (in) WiFi channel (1-14 for 2.4 GHz, 36+ for 5 GHz)
  * on_cbf   : (in) callback for beamforming feedback frames (may be NULL)
  * on_ndpa  : (in) callback for NDPA frames (may be NULL)
  * on_ssid  : (in) callback for beacon frames (may be NULL)
+ * on_csi   : (in) callback for CSI measurements (may be NULL)
  *
  * Returns ESP_OK on success, ESP_ERR_INVALID_STATE if already active.
  */
 esp_err_t start_monitor(uint8_t channel,
                          cbf_cb_t  on_cbf,
                          ndpa_cb_t on_ndpa,
-                         ssid_cb_t on_ssid);
+                         ssid_cb_t on_ssid,
+                         csi_cb_t  on_csi);
 
 /*
  * switch_channel - Change the sniffing channel while monitor mode is active.

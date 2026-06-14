@@ -1,5 +1,5 @@
-#ifndef GET_MATRICES_H
-#define GET_MATRICES_H
+#ifndef GET_MATRICES_CBF_H
+#define GET_MATRICES_CBF_H
 
 #include <stdbool.h>
 #include <stdint.h>

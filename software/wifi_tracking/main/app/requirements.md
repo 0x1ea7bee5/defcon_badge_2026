@@ -10,7 +10,6 @@ Radio Manager Task - This will handle switching between bluetooth, wifi client c
 Sniffer Task - Will handle sniffing data collection. Will pass sniffing data to the DSP task. 
 
 
-
 UI Task - This task will also be responsible for user facing things (button tracking, joystick tracking, writing to the OLED display, etc.)
 
 App state Task - This task will keep track of the app state (ie, does the user switch from bluetooth to wifi client to wifi sniffer,etc.; does the user move the joystick to select a different channel, etc.). This task will coordinate all other tasks.

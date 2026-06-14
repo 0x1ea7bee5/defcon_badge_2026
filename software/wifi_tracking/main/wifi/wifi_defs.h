@@ -37,6 +37,8 @@
 #define MGMT_HDR_BSSID_OFFSET   16
 #define MGMT_HDR_SEQ_OFFSET     22
 #define MGMT_HDR_BODY_OFFSET    24
+#define MGMT_HDR_ACT_CAT_OFFSET 2
+
 
 /* Control Frame (NDPA) Offsets */
 #define CTRL_HDR_FC_OFFSET      0
@@ -133,7 +135,7 @@
 /* VHT subcarriers for Ng=1, Ng=2, Ng=4 */
 #define VHT_NSC_20_NG1          52
 #define VHT_NSC_40_NG1          108
-#define VHT_NSC_80_NG1          234
+#define VHT_NSC_80_NG1          234 
 #define VHT_NSC_160_NG1         468
 
 #define VHT_NSC_20_NG2          26
@@ -161,6 +163,25 @@
 #define HE_NSC_40_NG4           27
 #define HE_NSC_80_NG4           59
 #define HE_NSC_160_NG4          117
+
+/*
+ * wifi_csi_result_t - CSI measurement from the ESP32 CSI subsystem.
+ *
+ * data holds num_samples int8_t values in interleaved I/Q order
+ * (I0, Q0, I1, Q1, ...). Dynamically allocated; caller must call
+ * wifi_csi_result_free() after use.
+ * The first hardware word (4 bytes) is omitted when first_word_invalid
+ * is set by the driver, so num_samples may be less than the raw length.
+ */
+typedef struct {
+    uint8_t  src_mac[WIFI_MAC_ADDR_LEN];
+    uint8_t  dst_mac[WIFI_MAC_ADDR_LEN];
+    int64_t  timestamp_us;
+    int8_t   rssi;
+    uint8_t  channel;
+    uint16_t num_samples;
+    int8_t  *data;
+} wifi_csi_result_t;
 
 /* ---------- Enumerated Types ---------- */
 

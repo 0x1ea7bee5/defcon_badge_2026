@@ -1,6 +1,6 @@
 #include <math.h>
 #include <string.h>
-#include "get_matrices.h"
+#include "get_matrices_cbf.h"
 
 /*
  * get_angle_bits - Derive phi and psi bit widths from a CBF result.
