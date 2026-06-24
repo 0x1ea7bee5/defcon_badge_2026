@@ -29,7 +29,9 @@ switch_channel - Should allow for the user to switch the channel during sniffing
 
 stop_monitor - takes esp32 out of monitor mode to allow for other radio functions to be used later.
 
-scan_for_csi - This callback/function should specifically use the CSI function of the ESP32 to get channel state information. This callback/function should return some sort of data structure containing the channel state information, source mac address, destination mac address, rssi. Feel free to include any other information that you believe may be useful for estimating the channel state. 
+scan_for_csi - This callback/function should specifically use the CSI function of the ESP32 to get channel state information. This callback/function should return some sort of data structure containing the channel state information, source mac address, destination mac address, rssi. You must also include all of the data from rx_ctl, such as timestamp, channel, noise floor,etc.
+
+Feel free to include any other information that you believe may be useful for estimating the channel state. 
 
 
 ### wifi_client.c / wifi_client.h

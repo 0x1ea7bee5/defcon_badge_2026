@@ -596,10 +596,37 @@ bool scan_for_csi(const wifi_csi_info_t *info, wifi_csi_result_t *out)
     memset(out, 0, sizeof(*out));
     memcpy(out->src_mac, info->mac,  WIFI_MAC_ADDR_LEN);
     memcpy(out->dst_mac, info->dmac, WIFI_MAC_ADDR_LEN);
-    out->timestamp_us = (int64_t)info->rx_ctrl.timestamp;
-    out->rssi         = (int8_t)info->rx_ctrl.rssi;
-    out->channel      = (uint8_t)info->rx_ctrl.channel;
-    out->num_samples  = info->len - offset;
+
+    const wifi_pkt_rx_ctrl_t *rc = &info->rx_ctrl;
+
+    /* timing */
+    out->timestamp_us = (int64_t)rc->timestamp;
+
+    /* signal quality */
+    out->rssi        = (int8_t)rc->rssi;
+    out->noise_floor = (int8_t)rc->noise_floor;
+
+    /* channel / frequency */
+    out->channel           = (uint8_t)rc->channel;
+    out->secondary_channel = (uint8_t)rc->second;
+
+    /* PHY metadata */
+    out->rate          = (uint8_t)rc->rate;
+    out->cur_bb_format = (uint8_t)rc->cur_bb_format;
+    out->he_siga1      = (uint32_t)rc->he_siga1;
+    out->he_siga2      = (uint16_t)rc->he_siga2;
+    out->sig_len       = (uint16_t)rc->sig_len;
+    out->rx_state      = (uint8_t)rc->rx_state;
+
+    /* channel estimate validity */
+    out->rx_channel_estimate_len = (uint16_t)rc->rx_channel_estimate_len;
+    out->rx_channel_estimate_vld = (bool)rc->rx_channel_estimate_info_vld;
+
+    /* frame info */
+    out->is_group = (bool)rc->is_group;
+    out->rx_seq   = info->rx_seq;
+
+    out->num_samples = info->len - offset;
 
     out->data = (int8_t *)malloc((size_t)out->num_samples);
     if (!out->data)

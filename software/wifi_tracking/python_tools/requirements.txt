@@ -3,4 +3,5 @@ pandas
 plotly
 pyserial
 matplotlib
+scipy
 graphifyy

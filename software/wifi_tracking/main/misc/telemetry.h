@@ -34,4 +34,21 @@ bool telemetry_send(const uint8_t *data, size_t len);
  */
 bool telemetry_send_cbf(const wifi_cbf_result_t *cbf);
 
+/*
+ * telemetry_send_csi - Serialize and emit a binary CSI telemetry packet.
+ *
+ * Wire format:
+ *   [MAGIC 4B: C5 1D FE ED][PAYLOAD_LEN 2B LE][PAYLOAD][XOR_CKSUM 1B]
+ *
+ * Payload: src_mac(6) dst_mac(6) rssi(1) channel(1)
+ *          num_samples(2 LE) data[num_samples]
+ *
+ * data contains interleaved signed int8 I/Q values (I0,Q0,I1,Q1,...).
+ *
+ * csi : (in) const wifi_csi_result_t* — parsed CSI result
+ *
+ * Returns true on success.
+ */
+bool telemetry_send_csi(const wifi_csi_result_t *csi);
+
 #endif /* TELEMETRY_H */

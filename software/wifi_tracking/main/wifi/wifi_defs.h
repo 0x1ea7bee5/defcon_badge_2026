@@ -167,18 +167,67 @@
 /*
  * wifi_csi_result_t - CSI measurement from the ESP32 CSI subsystem.
  *
+ * All rx_ctrl fields from wifi_csi_info_t are captured here so callers
+ * do not need to retain the raw driver struct.
+ *
  * data holds num_samples int8_t values in interleaved I/Q order
  * (I0, Q0, I1, Q1, ...). Dynamically allocated; caller must call
  * wifi_csi_result_free() after use.
  * The first hardware word (4 bytes) is omitted when first_word_invalid
  * is set by the driver, so num_samples may be less than the raw length.
+ *
+ * rx_ctrl fields:
+ *   timestamp_us     : receive time (µs, local clock)
+ *   rssi             : received signal strength (dBm)
+ *   noise_floor      : RF noise floor (dBm)
+ *   channel          : primary WiFi channel
+ *   secondary_channel: 0 = none, 1 = above, 2 = below
+ *   rate             : PHY rate encoding (L-SIG Rate field)
+ *   cur_bb_format    : frame format (0=legacy, 1=HT, 3=VHT, 11=HE)
+ *   he_siga1         : HE-SIG-A1 word (or HT-SIG); encodes MCS, BW, etc.
+ *   he_siga2         : HE-SIG-A2 word
+ *   sig_len          : MPDU length including FCS (bytes)
+ *   rx_state         : reception status (0 = no error)
+ *   rx_channel_estimate_len  : bytes of channel estimate in driver buf
+ *   rx_channel_estimate_vld  : true when channel estimate is valid
+ *   is_group         : true for group-addressed (broadcast/multicast) frames
+ *
+ * wifi_csi_info_t fields:
+ *   rx_seq           : 802.11 sequence number of the triggering frame
  */
 typedef struct {
+    /* --- addressing --- */
     uint8_t  src_mac[WIFI_MAC_ADDR_LEN];
     uint8_t  dst_mac[WIFI_MAC_ADDR_LEN];
+
+    /* --- timing --- */
     int64_t  timestamp_us;
+
+    /* --- signal quality --- */
     int8_t   rssi;
+    int8_t   noise_floor;
+
+    /* --- channel / frequency --- */
     uint8_t  channel;
+    uint8_t  secondary_channel;
+
+    /* --- PHY metadata --- */
+    uint8_t  rate;
+    uint8_t  cur_bb_format;
+    uint32_t he_siga1;
+    uint16_t he_siga2;
+    uint16_t sig_len;
+    uint8_t  rx_state;
+
+    /* --- channel estimate validity --- */
+    uint16_t rx_channel_estimate_len;
+    bool     rx_channel_estimate_vld;
+
+    /* --- frame info --- */
+    bool     is_group;
+    uint16_t rx_seq;
+
+    /* --- CSI I/Q samples --- */
     uint16_t num_samples;
     int8_t  *data;
 } wifi_csi_result_t;

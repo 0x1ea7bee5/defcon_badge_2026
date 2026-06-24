@@ -11,7 +11,8 @@
  */
 
 static const char HEX[] = "0123456789ABCDEF";
-static const uint8_t MAGIC[4] = {0xCB, 0xF1, 0xFE, 0xED};
+static const uint8_t MAGIC[4]     = {0xCB, 0xF1, 0xFE, 0xED};
+static const uint8_t MAGIC_CSI[4] = {0xC5, 0x1D, 0xFE, 0xED};
 
 /* Emit one byte as two hex chars; if ck != NULL also accumulate XOR. */
 static void hb(uint8_t v, uint8_t *ck)
@@ -126,6 +127,33 @@ bool telemetry_send_cbf(const wifi_cbf_result_t *cbf)
     }
 
     /* Checksum byte (not included in its own XOR) */
+    hb(ck, NULL);
+    printf("\n");
+    fflush(stdout);
+    return true;
+}
+
+bool telemetry_send_csi(const wifi_csi_result_t *csi)
+{
+    if (!csi || !csi->data || csi->num_samples == 0)
+        return false;
+
+    /* payload: src_mac(6) dst_mac(6) rssi(1) channel(1)
+     *          num_samples(2 LE) data[num_samples]  */
+    const uint16_t plen = 16u + csi->num_samples;
+
+    printf("TELEM:");
+    hbuf(MAGIC_CSI, 4, NULL);
+    hu16(plen, NULL);
+
+    uint8_t ck = 0;
+    hbuf(csi->src_mac, WIFI_MAC_ADDR_LEN, &ck);
+    hbuf(csi->dst_mac, WIFI_MAC_ADDR_LEN, &ck);
+    hb((uint8_t)csi->rssi, &ck);
+    hb(csi->channel,       &ck);
+    hu16(csi->num_samples, &ck);
+    for (uint16_t i = 0; i < csi->num_samples; i++)
+        hb((uint8_t)csi->data[i], &ck);
     hb(ck, NULL);
     printf("\n");
     fflush(stdout);

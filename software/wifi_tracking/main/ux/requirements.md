@@ -5,9 +5,11 @@ This file has definitions and requirements for the ux sub-directory. THe files i
 ## Structure
 - `/main/ux/display/` - folder containing files for display rendering code
 - `/main/ux/menu/` - folder containing files for menu control and menu state
+- `/main/ux/menu/menu_ctl.c/h` - menu controller, provides callbacks and functions to update the display based on the menu state, and send update signals to the 
+
 - `/main/ux/display/display_ctl.c/h` - display controller, provides simple and powerful functions and callbacks to draw to the display.
 - `/main/ux/display/display_ctl.c/h`
-- `/main/ux/display/menu_ctl.c/h` - menu controller, provides callbacks and functions to update the display based on menu and graphics state.
+.
 - `/main/ux/button_ctl.c/h` - provides simple callbacks/functions to read menu button state
 - `/main/ux/joystick_ctl.c/h` - provides simple callbacks/functions to read joystick information
 
