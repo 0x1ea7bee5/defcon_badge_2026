@@ -13,7 +13,7 @@
 
 static const char *TAG = "main";
 
-#define MONITOR_CHANNEL   44
+#define MONITOR_CHANNEL   100
 #define SCAN_INTERVAL_MS  5000
 #define SCAN_INTERVAL_CBF 5000
 #define SCAN_INTERVAL_CSI 500
@@ -160,7 +160,7 @@ void app_main(void)
     ESP_ERROR_CHECK(
         start_monitor(MONITOR_CHANNEL, on_cbf, NULL, NULL, NULL));
 
-    xTaskCreate(scan_switch_task, "scan_switch", 4096, NULL, 5, NULL);
+    //xTaskCreate(scan_switch_task, "scan_switch", 4096, NULL, 5, NULL);
 
     while (1)
         vTaskDelay(pdMS_TO_TICKS(1000));

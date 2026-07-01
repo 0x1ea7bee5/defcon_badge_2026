@@ -56,6 +56,7 @@ import numpy as np
 from scipy.interpolate import interp1d as _interp1d
 import matplotlib.pyplot as plt
 import rare_est
+import save_telemetry
 import matplotlib.gridspec as gridspec
 from matplotlib.animation import FuncAnimation
 from matplotlib.collections import LineCollection
@@ -86,7 +87,7 @@ class _PauseMixin:
 
 # Set True to apply a moving-average smoothing filter to all CBF plots.
 DENOISE     = False
-DENOISE_WIN = 5      # smoothing window width (samples)
+DENOISE_WIN = 3      # smoothing window width (samples)
 DENOM_LIM   = 0.01  # discard ratio points where |denominator| < this
 
 # Set True to apply cubic-spline oversampling after denoising.
@@ -429,6 +430,8 @@ class SharedDataStore:
         self.csi_info  = {}   # src_mac -> {rssi, channel}
         self.csi_order = []   # insertion-ordered unique src MACs
         self._running  = True
+        # Packet listeners: fn(kind, frame_data) called per ingested packet.
+        self._packet_listeners = []
 
     def _ingest_cbf(self, pkt):
         mac = pkt['mac']
@@ -490,27 +493,70 @@ class SharedDataStore:
             if len(self.cbf_v_trail_data[mac]) > _MAX_CPX_TRAIL:
                 self.cbf_v_trail_data[mac].pop(0)
 
-            # RARE-L DoA estimation — run on each received packet.
-            n_src = max(1, min(nc, nr - 1))
-            try:
-                result = rare_est.rare_l_estimate(
-                    v_all, n_sources=n_src,
-                    array_shape=ARRAY_SHAPE)
-            except Exception:
-                nan_d = np.full(n_src, np.nan)
-                nan_z = np.full(n_src, np.nan + 0j)
-                nan_s = np.zeros(len(rare_est._SCAN_ANGLES_DEG))
-                result = {
-                    'mode': 'ula', 'eigenvalues': np.array([]),
-                    'n_sources': n_src,
-                    'az': {'doa': nan_d, 'roots': nan_z, 'spectrum_db': nan_s},
-                    'el': None,
+            # RARE-L DoA estimation — one result per spatial stream.
+            # Each stream c uses V[:,c:c+1] so n_sources is fixed at 1.
+            def _rare_l_fallback(shape):
+                nan_d   = np.full(1, np.nan)
+                az_scan = rare_est._SCAN_ANGLES_DEG
+                az_nan  = np.zeros(len(az_scan))
+                if shape is None:
+                    # ULA — include roots, no elevation
+                    nan_z = np.full(1, np.nan + 0j)
+                    return {
+                        'mode': 'ula', 'eigenvalues': np.array([]),
+                        'n_sources': 1,
+                        'az': {'doa': nan_d, 'roots': nan_z,
+                               'spectrum_db': az_nan,
+                               'scan_deg': az_scan},
+                        'el': None,
+                    }
+                # UPA / decoupled — no roots, elevation present
+                el_scan = np.linspace(-90.0, 90.0, 91)
+                return {
+                    'mode': 'upa', 'eigenvalues': np.array([]),
+                    'n_sources': 1,
+                    'az': {'doa': nan_d,
+                           'spectrum_db': az_nan,
+                           'scan_deg': az_scan},
+                    'el': {'doa': nan_d,
+                           'spectrum_db': np.zeros(91),
+                           'scan_deg': el_scan},
                 }
+
+            stream_results = []
+            for c in range(nc):
+                v_c = v_all[:, :, c:c + 1]
+                try:
+                    r_c = rare_est.rare_l_estimate(
+                        v_c, n_sources=1, array_shape=ARRAY_SHAPE)
+                except Exception:
+                    r_c = _rare_l_fallback(ARRAY_SHAPE)
+                stream_results.append(r_c)
+
+            result = stream_results[0]   # kept for listener compatibility
+
             if mac not in self.rare_l_data:
                 self.rare_l_data[mac] = []
-            self.rare_l_data[mac].append(result)
+            self.rare_l_data[mac].append(
+                {'nc': nc, 'streams': stream_results})
             if len(self.rare_l_data[mac]) > _MAX_CPX_TRAIL:
                 self.rare_l_data[mac].pop(0)
+
+            # Notify packet listeners (e.g. TelemetrySaver).
+            _cbf_frame = {
+                'mac':       mac,
+                'nr':        nr,
+                'nc':        nc,
+                'num_sc':    n_sc,
+                'phy_type':  pkt['phy_type'],
+                'is_mu':     pkt['is_mu'],
+                'bandwidth': pkt['bandwidth'],
+                'snr':       pkt['snr'],
+                'pairs':     pairs,
+                'rare_l':    result,
+            }
+            for _fn in self._packet_listeners:
+                _fn('cbf', _cbf_frame)
 
     def _ingest_csi(self, pkt):
         mac = pkt['src_mac']
@@ -527,6 +573,25 @@ class SharedDataStore:
             'rssi':    pkt['rssi'],
             'channel': pkt['channel'],
         }
+
+        # Notify packet listeners (e.g. TelemetrySaver).
+        _csi_frame = {
+            'mac':     mac,
+            'rssi':    pkt['rssi'],
+            'channel': pkt['channel'],
+            'amp':     pkt['amplitudes'],
+            'phase':   pkt['phases'],
+        }
+        for _fn in self._packet_listeners:
+            _fn('csi', _csi_frame)
+
+    def add_packet_listener(self, fn):
+        """Register fn(kind, frame_data) called on every ingested packet.
+
+        Args:
+            fn (callable): Called with ('cbf'|'csi', frame_data dict).
+        """
+        self._packet_listeners.append(fn)
 
     def _reader(self, port, baud):
         import serial
@@ -2248,6 +2313,1054 @@ class CBFStreamWaterfallPlotter(_PauseMixin):
 
 
 # -----------------------------------------------------------------------
+# VV^H spatial covariance waterfall plotter
+# -----------------------------------------------------------------------
+
+class VVHWaterfallPlotter(_PauseMixin):
+    """
+    Spatial covariance waterfall — per lower-triangle element of V·Vᴴ.
+
+    For each CBF frame, computes R[s] = V[s] @ V[s]ᴴ for every
+    subcarrier s.  R is (nr × nr) Hermitian; only the nr*(nr+1)/2
+    lower-triangle elements (i >= j) are unique and plotted.
+
+    One figure row per element (i, j), i >= j:
+        Left  : |R[i,j]| waterfall (frames × subcarriers, viridis, dB)
+        Right : ∠R[i,j]  waterfall (frames × subcarriers, hsv, radians)
+
+    Amplitude is normalised to the per-frame peak then converted to dB.
+    Layout: nr*(nr+1)/2 rows × 4 cols [amp | amp_cb | phase | phase_cb].
+    Grid rebuilds lazily when nr changes.  MAC slider at bottom.
+    """
+
+    _AMP_DB_MIN = -40.0
+    _AMP_DB_MAX =   0.0
+
+    def __init__(self, store):
+        self.store                = store
+        self.current_mac_idx      = 0
+        self.current_stream_idx   = 0
+        self._frame_count         = 0
+        self.fig                  = None
+        self.mac_slider           = None
+        self.stream_slider        = None
+        self._ax_grid             = {}
+        self._amp_cbars           = {}
+        self._phase_cbars         = {}
+        self._built_nr            = None
+        self._pairs               = []
+        self._suptitle            = None
+
+    # ----------------------------------------------------------------
+    # Lazy axes construction
+    # ----------------------------------------------------------------
+
+    def _setup_axes(self, nr):
+        """(Re-)build gridspec for nr antennas.
+
+        Args:
+            nr (int): Number of receive antennas.
+        """
+        self.fig.clf()
+        self._ax_grid     = {}
+        self._amp_cbars   = {}
+        self._phase_cbars = {}
+        self._pairs       = [
+            (i, j) for i in range(nr) for j in range(i + 1)]
+
+        n_rows = len(self._pairs)
+        gs = gridspec.GridSpec(
+            n_rows + 2, 4,
+            figure=self.fig,
+            height_ratios=[10] * n_rows + [0.6, 0.6],
+            width_ratios=[10, 0.4, 10, 0.4],
+            hspace=0.4, wspace=0.3)
+
+        for idx, (i, j) in enumerate(self._pairs):
+            self._ax_grid[(i, j, 'amp')]      = self.fig.add_subplot(
+                gs[idx, 0])
+            self._ax_grid[(i, j, 'amp_cb')]   = self.fig.add_subplot(
+                gs[idx, 1])
+            self._ax_grid[(i, j, 'phase')]    = self.fig.add_subplot(
+                gs[idx, 2])
+            self._ax_grid[(i, j, 'phase_cb')] = self.fig.add_subplot(
+                gs[idx, 3])
+
+        ax_mac = self.fig.add_subplot(gs[n_rows, :])
+        self.mac_slider = Slider(
+            ax_mac, 'MAC index', 0, 1,
+            valinit=min(self.current_mac_idx, 0),
+            valstep=1, color='darkorange')
+        self.mac_slider.on_changed(
+            lambda v: setattr(self, 'current_mac_idx', int(v)))
+
+        ax_st = self.fig.add_subplot(gs[n_rows + 1, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=min(self.current_stream_idx, 0),
+            valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
+
+        self._suptitle = self.fig.suptitle(
+            'CBF VVᴴ Element Waterfall', fontsize=9)
+        self.fig.set_size_inches(14, 2.2 * n_rows + 1.4)
+        self._built_nr = nr
+
+    # ----------------------------------------------------------------
+    # Matrix builder
+    # ----------------------------------------------------------------
+
+    @staticmethod
+    def _build_element_matrices(history, i, j, stream_idx):
+        """Compute |R_c[i,j]| (dB) and ∠R_c[i,j] waterfall matrices.
+
+        R_c[s] = outer(V[s,:,c], conj(V[s,:,c])) — per-stream outer product
+        for stream c=stream_idx.  Amplitude normalised to global peak.
+
+        Args:
+            history (list): v_trail frames, each with 'subcarriers' dict.
+            i (int): Lower-triangle row index.
+            j (int): Lower-triangle column index.
+            stream_idx (int): Spatial stream column to use.
+        Returns:
+            tuple: (amp_db, phase_mat) each shape (n_frames, n_sc).
+        """
+        n_frames = len(history)
+        n_sc     = max(
+            max(f['subcarriers'].keys()) + 1
+            for f in history if f['subcarriers'])
+
+        amp_mat   = np.zeros((n_frames, n_sc))
+        phase_mat = np.zeros((n_frames, n_sc))
+
+        for fi, frame in enumerate(history):
+            for sc_idx, V in frame['subcarriers'].items():
+                if V.shape[0] <= max(i, j) or V.shape[1] <= stream_idx:
+                    continue
+                v_c = V[:, stream_idx]
+                R   = np.outer(v_c, v_c.conj())
+                val = R[i, j]
+                amp_mat[fi, sc_idx]   = abs(val)
+                phase_mat[fi, sc_idx] = float(np.angle(val))
+
+        peak = amp_mat.max()
+        if peak > 1e-12:
+            amp_mat /= peak
+
+        amp_db = 20.0 * np.log10(
+            np.maximum(_smooth_2d(amp_mat), 1e-12))
+        return amp_db, _smooth_phase_2d(phase_mat)
+
+    # ----------------------------------------------------------------
+    # Per-element draw
+    # ----------------------------------------------------------------
+
+    def _draw_element(self, history, mac, i, j, stream_idx):
+        """Draw amplitude and phase waterfall for element R_c[i,j].
+
+        Args:
+            history (list): v_trail frame history for the selected MAC.
+            mac (str): MAC address label.
+            i (int): Row index.
+            j (int): Column index.
+            stream_idx (int): Spatial stream index.
+        """
+        amp_db, phase_mat = self._build_element_matrices(
+            history, i, j, stream_idx)
+
+        # ---- amplitude ----
+        ax = self._ax_grid[(i, j, 'amp')]
+        ax.cla()
+        ax.tick_params(labelsize=5)
+        ax.set_title(f'|VVᴴ[{i},{j}]| (dB)', fontsize=6)  # stream set by caller
+        ax.set_xlabel('Subcarrier', fontsize=5)
+        ax.set_ylabel('Frame', fontsize=5)
+
+        im_am = ax.imshow(
+            amp_db[::-1], aspect='auto', cmap='viridis',
+            vmin=self._AMP_DB_MIN, vmax=self._AMP_DB_MAX,
+            extent=[0, amp_db.shape[1], 0, amp_db.shape[0]],
+            interpolation='nearest')
+
+        key = (i, j)
+        if key not in self._amp_cbars:
+            cb = self.fig.colorbar(
+                im_am, cax=self._ax_grid[(i, j, 'amp_cb')])
+            cb.set_label('dB', fontsize=5)
+            cb.ax.tick_params(labelsize=5)
+            self._amp_cbars[key] = cb
+        else:
+            self._amp_cbars[key].update_normal(im_am)
+
+        # ---- phase ----
+        ax = self._ax_grid[(i, j, 'phase')]
+        ax.cla()
+        ax.tick_params(labelsize=5)
+        ax.set_title(f'∠VVᴴ[{i},{j}]', fontsize=6)
+        ax.set_xlabel('Subcarrier', fontsize=5)
+        ax.set_ylabel('Frame', fontsize=5)
+
+        im_ph = ax.imshow(
+            phase_mat[::-1], aspect='auto', cmap='hsv',
+            vmin=-np.pi, vmax=np.pi,
+            extent=[0, phase_mat.shape[1], 0, phase_mat.shape[0]],
+            interpolation='nearest')
+
+        if key not in self._phase_cbars:
+            cb = self.fig.colorbar(
+                im_ph, cax=self._ax_grid[(i, j, 'phase_cb')])
+            cb.set_label('rad', fontsize=5)
+            cb.set_ticks([-np.pi, 0, np.pi])
+            cb.set_ticklabels(['-π', '0', 'π'], fontsize=5)
+            self._phase_cbars[key] = cb
+        else:
+            self._phase_cbars[key].update_normal(im_ph)
+
+    # ----------------------------------------------------------------
+    # Animation callback
+    # ----------------------------------------------------------------
+
+    def _animate(self, _frame):
+        if self._paused:
+            return
+        with self.store.lock:
+            snap       = {mac: list(hist)
+                          for mac, hist
+                          in self.store.cbf_v_trail_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            stream_idx = self.current_stream_idx
+
+        macs = [m for m in snap_ord if snap.get(m)]
+        if not macs:
+            self._frame_count += 1
+            return
+
+        n_mac = len(macs)
+        if self.mac_slider and (n_mac - 1) > self.mac_slider.valmax:
+            self.mac_slider.valmax = n_mac - 1
+            self.mac_slider.ax.set_xlim(0, n_mac - 1)
+
+        mac_idx = min(mac_idx, n_mac - 1)
+        mac     = macs[mac_idx]
+        history = snap[mac]
+
+        nr = history[-1]['nr']
+        nc = history[-1]['nc']
+        if nr != self._built_nr:
+            self._setup_axes(nr)
+
+        if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+            self.stream_slider.valmax = nc - 1
+            self.stream_slider.ax.set_xlim(0, nc - 1)
+        stream_idx = min(stream_idx, nc - 1)
+
+        if self._suptitle:
+            self._suptitle.set_text(
+                f'CBF VVᴴ Element Waterfall — {mac}  Stream {stream_idx}')
+
+        for i, j in self._pairs:
+            self._draw_element(history, mac, i, j, stream_idx)
+
+        self._frame_count += 1
+
+    # ----------------------------------------------------------------
+    # Setup
+    # ----------------------------------------------------------------
+
+    def run(self):
+        """Create the VVᴴ waterfall figure. Returns FuncAnimation."""
+        fig = plt.figure(figsize=(14, 7))
+        self.fig = fig
+        fig.text(0.5, 0.5, '(waiting for CBF data…)',
+                 ha='center', va='center', fontsize=12,
+                 transform=fig.transFigure)
+
+        self._add_pause_button(fig)
+        return FuncAnimation(
+            fig, self._animate,
+            interval=INTERVAL, cache_frame_data=False)
+
+
+# -----------------------------------------------------------------------
+# VV^H off-diagonal ratio waterfall plotter
+# -----------------------------------------------------------------------
+
+class VVHRatioWaterfallPlotter(_PauseMixin):
+    """
+    Waterfall of VV^H off-diagonal elements normalised by their column
+    diagonal: ratio[i,j] = R[i,j] / R[j,j]  for i > j.
+
+    R[j,j] is the real, non-negative power at receive antenna j.
+    Dividing by it gives a normalised complex coherence value whose
+    magnitude is bounded by sqrt(R[i,i]/R[j,j]) (Cauchy-Schwarz) and
+    whose phase equals the raw inter-antenna phase.
+
+    For nr antennas there are nr*(nr-1)/2 off-diagonal pairs.
+    Example layout for nr=4 (reading order matches the request):
+        R[1,0]/R[0,0]  R[2,0]/R[0,0]  R[3,0]/R[0,0]
+        R[2,1]/R[1,1]  R[3,1]/R[1,1]
+        R[3,2]/R[2,2]
+
+    One figure row per pair:
+        Left  : |ratio[i,j]| waterfall (frames × subcarriers, viridis, dB)
+        Right : ∠ratio[i,j]  waterfall (frames × subcarriers, hsv, radians)
+
+    Amplitude is normalised to the per-element global peak then dB.
+    Grid rebuilds lazily when nr changes.  MAC slider at bottom.
+    """
+
+    _AMP_DB_MIN = -40.0
+    _AMP_DB_MAX =   0.0
+
+    def __init__(self, store):
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_stream_idx = 0
+        self._frame_count       = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.stream_slider      = None
+        self._ax_grid           = {}
+        self._amp_cbars         = {}
+        self._phase_cbars       = {}
+        self._built_nr          = None
+        self._pairs             = []
+        self._suptitle          = None
+
+    # ----------------------------------------------------------------
+    # Lazy axes construction
+    # ----------------------------------------------------------------
+
+    def _setup_axes(self, nr):
+        """Build gridspec for nr*(nr-1)/2 off-diagonal ratio rows.
+
+        Args:
+            nr (int): Number of receive antennas.
+        """
+        self.fig.clf()
+        self._ax_grid     = {}
+        self._amp_cbars   = {}
+        self._phase_cbars = {}
+        self._pairs       = [
+            (i, j) for j in range(nr) for i in range(j + 1, nr)]
+
+        n_rows = len(self._pairs)
+        if n_rows == 0:
+            return
+
+        gs = gridspec.GridSpec(
+            n_rows + 2, 4,
+            figure=self.fig,
+            height_ratios=[10] * n_rows + [0.6, 0.6],
+            width_ratios=[10, 0.4, 10, 0.4],
+            hspace=0.4, wspace=0.3)
+
+        for idx, (i, j) in enumerate(self._pairs):
+            self._ax_grid[(i, j, 'amp')]      = self.fig.add_subplot(
+                gs[idx, 0])
+            self._ax_grid[(i, j, 'amp_cb')]   = self.fig.add_subplot(
+                gs[idx, 1])
+            self._ax_grid[(i, j, 'phase')]    = self.fig.add_subplot(
+                gs[idx, 2])
+            self._ax_grid[(i, j, 'phase_cb')] = self.fig.add_subplot(
+                gs[idx, 3])
+
+        ax_mac = self.fig.add_subplot(gs[n_rows, :])
+        self.mac_slider = Slider(
+            ax_mac, 'MAC index', 0, 1,
+            valinit=min(self.current_mac_idx, 0),
+            valstep=1, color='darkorange')
+        self.mac_slider.on_changed(
+            lambda v: setattr(self, 'current_mac_idx', int(v)))
+
+        ax_st = self.fig.add_subplot(gs[n_rows + 1, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=min(self.current_stream_idx, 0),
+            valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
+
+        self._suptitle = self.fig.suptitle(
+            'CBF VVᴴ Off-diagonal Ratio Waterfall', fontsize=9)
+        self.fig.set_size_inches(14, 2.2 * n_rows + 1.4)
+        self._built_nr = nr
+
+    # ----------------------------------------------------------------
+    # Matrix builder
+    # ----------------------------------------------------------------
+
+    @staticmethod
+    def _build_ratio_matrices(history, i, j, stream_idx):
+        """Compute |R_c[i,j]/R_c[j,j]| (dB) and ∠(ratio) matrices.
+
+        R_c = outer(V[:,c], conj(V[:,c])) for stream c=stream_idx.
+        R_c[j,j] = |V[j,c]|^2 (real, non-negative).
+
+        Args:
+            history (list): v_trail frames with 'subcarriers' dict.
+            i (int): Off-diagonal row index (i > j).
+            j (int): Column index (also selects normalising diagonal).
+            stream_idx (int): Spatial stream column to use.
+        Returns:
+            tuple: (amp_db, phase_mat) each shape (n_frames, n_sc).
+        """
+        n_frames = len(history)
+        n_sc     = max(
+            max(f['subcarriers'].keys()) + 1
+            for f in history if f['subcarriers'])
+
+        amp_mat   = np.zeros((n_frames, n_sc))
+        phase_mat = np.zeros((n_frames, n_sc))
+
+        for fi, frame in enumerate(history):
+            for sc_idx, V in frame['subcarriers'].items():
+                if V.shape[0] <= i or V.shape[1] <= stream_idx:
+                    continue
+                v_c  = V[:, stream_idx]
+                R    = np.outer(v_c, v_c.conj())
+                diag = float(R[j, j].real)
+                if diag < DENOM_LIM:
+                    continue
+                ratio = R[i, j] / diag
+                amp_mat[fi, sc_idx]   = abs(ratio)
+                phase_mat[fi, sc_idx] = float(np.angle(ratio))
+
+        peak = amp_mat.max()
+        if peak > 1e-12:
+            amp_mat /= peak
+
+        amp_db = 20.0 * np.log10(
+            np.maximum(_smooth_2d(amp_mat), 1e-12))
+        return amp_db, _smooth_phase_2d(phase_mat)
+
+    # ----------------------------------------------------------------
+    # Per-element draw
+    # ----------------------------------------------------------------
+
+    def _draw_element(self, history, i, j, stream_idx):
+        """Draw amplitude and phase waterfall for ratio R_c[i,j]/R_c[j,j].
+
+        Args:
+            history (list): v_trail frame history.
+            i (int): Off-diagonal row index.
+            j (int): Column (diagonal) index.
+            stream_idx (int): Spatial stream index.
+        """
+        amp_db, phase_mat = self._build_ratio_matrices(
+            history, i, j, stream_idx)
+        label = f'VVᴴ[{i},{j}] / VVᴴ[{j},{j}]  s{stream_idx}'
+
+        # ---- amplitude ----
+        ax = self._ax_grid[(i, j, 'amp')]
+        ax.cla()
+        ax.tick_params(labelsize=5)
+        ax.set_title(f'|{label}| (dB)', fontsize=6)
+        ax.set_xlabel('Subcarrier', fontsize=5)
+        ax.set_ylabel('Frame', fontsize=5)
+
+        im_am = ax.imshow(
+            amp_db[::-1], aspect='auto', cmap='viridis',
+            vmin=self._AMP_DB_MIN, vmax=self._AMP_DB_MAX,
+            extent=[0, amp_db.shape[1], 0, amp_db.shape[0]],
+            interpolation='nearest')
+
+        key = (i, j)
+        if key not in self._amp_cbars:
+            cb = self.fig.colorbar(
+                im_am, cax=self._ax_grid[(i, j, 'amp_cb')])
+            cb.set_label('dB', fontsize=5)
+            cb.ax.tick_params(labelsize=5)
+            self._amp_cbars[key] = cb
+        else:
+            self._amp_cbars[key].update_normal(im_am)
+
+        # ---- phase ----
+        ax = self._ax_grid[(i, j, 'phase')]
+        ax.cla()
+        ax.tick_params(labelsize=5)
+        ax.set_title(f'∠{label}', fontsize=6)
+        ax.set_xlabel('Subcarrier', fontsize=5)
+        ax.set_ylabel('Frame', fontsize=5)
+
+        im_ph = ax.imshow(
+            phase_mat[::-1], aspect='auto', cmap='hsv',
+            vmin=-np.pi, vmax=np.pi,
+            extent=[0, phase_mat.shape[1], 0, phase_mat.shape[0]],
+            interpolation='nearest')
+
+        if key not in self._phase_cbars:
+            cb = self.fig.colorbar(
+                im_ph, cax=self._ax_grid[(i, j, 'phase_cb')])
+            cb.set_label('rad', fontsize=5)
+            cb.set_ticks([-np.pi, 0, np.pi])
+            cb.set_ticklabels(['-π', '0', 'π'], fontsize=5)
+            self._phase_cbars[key] = cb
+        else:
+            self._phase_cbars[key].update_normal(im_ph)
+
+    # ----------------------------------------------------------------
+    # Animation callback
+    # ----------------------------------------------------------------
+
+    def _animate(self, _frame):
+        if self._paused:
+            return
+        with self.store.lock:
+            snap       = {mac: list(hist)
+                          for mac, hist
+                          in self.store.cbf_v_trail_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            stream_idx = self.current_stream_idx
+
+        macs = [m for m in snap_ord if snap.get(m)]
+        if not macs:
+            self._frame_count += 1
+            return
+
+        n_mac = len(macs)
+        if self.mac_slider and (n_mac - 1) > self.mac_slider.valmax:
+            self.mac_slider.valmax = n_mac - 1
+            self.mac_slider.ax.set_xlim(0, n_mac - 1)
+
+        mac_idx = min(mac_idx, n_mac - 1)
+        mac     = macs[mac_idx]
+        history = snap[mac]
+
+        nr = history[-1]['nr']
+        nc = history[-1]['nc']
+        if nr != self._built_nr:
+            self._setup_axes(nr)
+
+        if not self._pairs:
+            self._frame_count += 1
+            return
+
+        if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+            self.stream_slider.valmax = nc - 1
+            self.stream_slider.ax.set_xlim(0, nc - 1)
+        stream_idx = min(stream_idx, nc - 1)
+
+        if self._suptitle:
+            self._suptitle.set_text(
+                f'CBF VVᴴ Off-diagonal Ratio Waterfall — {mac}'
+                f'  Stream {stream_idx}')
+
+        for i, j in self._pairs:
+            self._draw_element(history, i, j, stream_idx)
+
+        self._frame_count += 1
+
+    # ----------------------------------------------------------------
+    # Setup
+    # ----------------------------------------------------------------
+
+    def run(self):
+        """Create VVᴴ ratio waterfall figure. Returns FuncAnimation."""
+        fig = plt.figure(figsize=(14, 7))
+        self.fig = fig
+        fig.text(0.5, 0.5, '(waiting for CBF data…)',
+                 ha='center', va='center', fontsize=12,
+                 transform=fig.transFigure)
+
+        self._add_pause_button(fig)
+        return FuncAnimation(
+            fig, self._animate,
+            interval=INTERVAL, cache_frame_data=False)
+
+
+# -----------------------------------------------------------------------
+# VV^H off-diagonal ratio — complex-plane trail plotter
+# -----------------------------------------------------------------------
+
+class VVHRatioComplexPlotter(_PauseMixin):
+    """
+    Complex-plane trail of off-diagonal VV^H elements normalised by their
+    column diagonal: ratio[i,j] = R[i,j] / R[j,j]  for i > j.
+
+    One Cartesian subplot per strict lower-triangle pair, arranged in a
+    lower-triangular grid of size (nr-1) × (nr-1):
+        Row 0 : (1,0)
+        Row 1 : (2,0)  (2,1)
+        Row 2 : (3,0)  (3,1)  (3,2)
+        …
+
+    Each subplot shows the trail of ratio[i,j] at the selected subcarrier
+    across all received frames, coloured by normalised frame age:
+        plasma colourmap — dim = oldest, bright = newest
+        dotted LineCollection connecting consecutive frames
+        red dot  — most recent frame
+
+    Because R[j,j] is real and non-negative, the ratio shares the exact
+    phase of R[i,j] but has a normalised magnitude in [0, ∞).  Values
+    near the unit circle indicate high inter-antenna correlation.
+
+    Subcarrier slider (steelblue) + MAC slider (darkorange) at the bottom.
+    """
+
+    def __init__(self, store):
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_sc_idx     = 0
+        self.current_stream_idx = 0
+        self._frame_count       = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.sc_slider          = None
+        self.stream_slider      = None
+        self._ax_grid           = {}
+        self._built_nr          = None
+        self._pairs             = []
+        self._suptitle          = None
+
+    # ----------------------------------------------------------------
+    # Lazy axes construction
+    # ----------------------------------------------------------------
+
+    def _setup_axes(self, nr):
+        """Build (nr-1)×(nr-1) lower-triangular grid for off-diagonal pairs.
+
+        Args:
+            nr (int): Number of receive antennas.
+        """
+        self.fig.clf()
+        self._ax_grid = {}
+        self._pairs   = [
+            (i, j) for i in range(1, nr) for j in range(i)]
+
+        n_cols = max(nr - 1, 1)
+        n_rows = nr - 1
+
+        gs = gridspec.GridSpec(
+            n_rows + 3, n_cols,
+            figure=self.fig,
+            height_ratios=[10] * n_rows + [0.5, 0.5, 0.5],
+            hspace=0.6, wspace=0.45)
+
+        for i in range(1, nr):
+            for j in range(i):
+                ax = self.fig.add_subplot(gs[i - 1, j])
+                ax.tick_params(labelsize=5)
+                self._ax_grid[(i, j)] = ax
+
+        ax_sc = self.fig.add_subplot(gs[n_rows, :])
+        self.sc_slider = Slider(
+            ax_sc, 'Subcarrier', 0, 1,
+            valinit=0, valstep=1, color='steelblue')
+        self.sc_slider.on_changed(
+            lambda v: setattr(self, 'current_sc_idx', int(v)))
+        self.sc_slider.label.set_fontsize(7)
+
+        ax_mac = self.fig.add_subplot(gs[n_rows + 1, :])
+        self.mac_slider = Slider(
+            ax_mac, 'MAC index', 0, 1,
+            valinit=min(self.current_mac_idx, 0),
+            valstep=1, color='darkorange')
+        self.mac_slider.on_changed(
+            lambda v: setattr(self, 'current_mac_idx', int(v)))
+        self.mac_slider.label.set_fontsize(7)
+
+        ax_st = self.fig.add_subplot(gs[n_rows + 2, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=min(self.current_stream_idx, 0),
+            valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
+        self.stream_slider.label.set_fontsize(7)
+
+        self._suptitle = self.fig.suptitle(
+            'CBF VVᴴ Off-diagonal Ratio — Complex-Plane Trail',
+            fontsize=10)
+        dim = max(3.5 * n_cols, 6.0)
+        self.fig.set_size_inches(dim, dim + 0.8)
+        self._built_nr = nr
+
+    # ----------------------------------------------------------------
+    # Per-element draw
+    # ----------------------------------------------------------------
+
+    @staticmethod
+    def _draw_element(ax, history, i, j, sc_idx, stream_idx):
+        """Draw complex-plane trail for R_c[i,j]/R_c[j,j] at sc_idx.
+
+        R_c = outer(V[:,c], conj(V[:,c])) for stream c=stream_idx.
+        Frames where R_c[j,j] < 1e-12 are skipped.
+
+        Args:
+            ax: Cartesian matplotlib Axes.
+            history (list): v_trail frames with 'subcarriers' dict.
+            i (int): Off-diagonal row index (i > j).
+            j (int): Column index (also selects normalising diagonal).
+            sc_idx (int): Selected subcarrier index.
+            stream_idx (int): Spatial stream column to use.
+        """
+        ax.cla()
+        ax.set_title(
+            f'VVᴴ[{i},{j}]/VVᴴ[{j},{j}] s{stream_idx}', fontsize=6)
+        ax.set_xlabel('Real', fontsize=5)
+        ax.set_ylabel('Imag', fontsize=5)
+        ax.tick_params(labelsize=5)
+        ax.axhline(0, color='grey', lw=0.4, ls='--')
+        ax.axvline(0, color='grey', lw=0.4, ls='--')
+        ax.set_aspect('equal', adjustable='datalim')
+
+        trail = []
+        for frame in history:
+            V = frame['subcarriers'].get(sc_idx)
+            if V is None or V.shape[0] <= i or V.shape[1] <= stream_idx:
+                continue
+            v_c  = V[:, stream_idx]
+            R    = np.outer(v_c, v_c.conj())
+            diag = float(R[j, j].real)
+            if diag < DENOM_LIM:
+                continue
+            trail.append(R[i, j] / diag)
+
+        if not trail:
+            return
+
+        reals  = _smooth_1d([v.real for v in trail])
+        imags  = _smooth_1d([v.imag for v in trail])
+        n      = len(reals)
+        t_norm = np.linspace(0.0, 1.0, n)
+
+        if n > 1:
+            xy   = np.array([reals, imags]).T.reshape(-1, 1, 2)
+            segs = np.concatenate([xy[:-1], xy[1:]], axis=1)
+            lc   = LineCollection(
+                segs, cmap='plasma',
+                norm=plt.Normalize(0.0, 1.0),
+                linewidth=0.8, linestyle=':', alpha=0.55, zorder=2)
+            lc.set_array(t_norm[:-1])
+            ax.add_collection(lc)
+
+        ax.scatter(reals, imags,
+                   c=t_norm, cmap='plasma',
+                   s=14, alpha=0.8, linewidths=0, zorder=3)
+        ax.scatter([reals[-1]], [imags[-1]],
+                   c='red', s=30, zorder=4, linewidths=0)
+        ax.autoscale_view()
+
+    # ----------------------------------------------------------------
+    # Animation callback
+    # ----------------------------------------------------------------
+
+    def _animate(self, _frame):
+        if self._paused:
+            return
+        with self.store.lock:
+            snap       = {mac: list(hist)
+                          for mac, hist
+                          in self.store.cbf_v_trail_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            sc_idx     = self.current_sc_idx
+            stream_idx = self.current_stream_idx
+
+        macs = [m for m in snap_ord if snap.get(m)]
+        if not macs:
+            self._frame_count += 1
+            return
+
+        n_mac = len(macs)
+        if self.mac_slider and (n_mac - 1) > self.mac_slider.valmax:
+            self.mac_slider.valmax = n_mac - 1
+            self.mac_slider.ax.set_xlim(0, n_mac - 1)
+
+        mac_idx = min(mac_idx, n_mac - 1)
+        mac     = macs[mac_idx]
+        history = snap[mac]
+
+        nr = history[-1]['nr']
+        nc = history[-1]['nc']
+        if nr != self._built_nr:
+            self._setup_axes(nr)
+
+        if not self._pairs:
+            self._frame_count += 1
+            return
+
+        n_sc = len(history[-1]['subcarriers'])
+        if self.sc_slider and (n_sc - 1) > self.sc_slider.valmax:
+            self.sc_slider.valmax = n_sc - 1
+            self.sc_slider.ax.set_xlim(0, n_sc - 1)
+        sc_idx = min(sc_idx, n_sc - 1)
+
+        if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+            self.stream_slider.valmax = nc - 1
+            self.stream_slider.ax.set_xlim(0, nc - 1)
+        stream_idx = min(stream_idx, nc - 1)
+
+        if self._suptitle:
+            self._suptitle.set_text(
+                'CBF VVᴴ Off-diagonal Ratio — Complex-Plane Trail'
+                f' — {mac}  SC {sc_idx}  Stream {stream_idx}')
+
+        for i, j in self._pairs:
+            self._draw_element(
+                self._ax_grid[(i, j)], history, i, j, sc_idx, stream_idx)
+
+        self._frame_count += 1
+
+    # ----------------------------------------------------------------
+    # Setup
+    # ----------------------------------------------------------------
+
+    def run(self):
+        """Create VVᴴ ratio complex-plane figure. Returns FuncAnimation."""
+        fig = plt.figure(figsize=(9, 9))
+        self.fig = fig
+        fig.text(0.5, 0.5, '(waiting for CBF data…)',
+                 ha='center', va='center', fontsize=12,
+                 transform=fig.transFigure)
+
+        self._add_pause_button(fig)
+        return FuncAnimation(
+            fig, self._animate,
+            interval=INTERVAL, cache_frame_data=False)
+
+
+# -----------------------------------------------------------------------
+# VV^H complex-plane trail plotter
+# -----------------------------------------------------------------------
+
+class VVHComplexPlotter(_PauseMixin):
+    """
+    Complex-plane trail of VV^H lower-triangle elements vs frame index.
+
+    For each CBF frame, computes R[s] = V[s] @ V[s]^H for the selected
+    subcarrier s.  The nr*(nr+1)/2 lower-triangle elements (i >= j) are
+    displayed in a lower-triangular grid of Cartesian complex-plane plots.
+
+    Each subplot shows the trail of R[i,j] values over time (one complex
+    value per received frame), coloured by normalised frame index:
+        plasma colourmap — dim = oldest, bright = newest
+        dotted LineCollection connecting consecutive frames
+        red dot   — most recent frame
+
+    Diagonal elements (i==j) are always real ≥ 0, so the trail lies on
+    the positive real axis.  Off-diagonal elements trace the inter-antenna
+    correlation in the full complex plane.
+
+    Subcarrier slider + MAC slider at the bottom.
+    """
+
+    def __init__(self, store):
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_sc_idx     = 0
+        self.current_stream_idx = 0
+        self._frame_count       = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.sc_slider          = None
+        self.stream_slider      = None
+        self._ax_grid           = {}
+        self._built_nr          = None
+        self._pairs             = []
+        self._suptitle          = None
+        self._prev_mac_idx      = -1
+
+    # ----------------------------------------------------------------
+    # Lazy axes construction
+    # ----------------------------------------------------------------
+
+    def _setup_axes(self, nr):
+        """Build lower-triangular Cartesian grid for nr antennas.
+
+        Args:
+            nr (int): Number of receive antennas.
+        """
+        self.fig.clf()
+        self._ax_grid = {}
+        self._pairs   = [
+            (i, j) for i in range(nr) for j in range(i + 1)]
+
+        gs = gridspec.GridSpec(
+            nr + 3, nr,
+            figure=self.fig,
+            height_ratios=[10] * nr + [0.5, 0.5, 0.5],
+            hspace=0.55, wspace=0.4)
+
+        for i in range(nr):
+            for j in range(i + 1):
+                ax = self.fig.add_subplot(gs[i, j])
+                ax.tick_params(labelsize=5)
+                self._ax_grid[(i, j)] = ax
+
+        ax_sc = self.fig.add_subplot(gs[nr, :])
+        self.sc_slider = Slider(
+            ax_sc, 'Subcarrier', 0, 1,
+            valinit=0, valstep=1, color='steelblue')
+        self.sc_slider.on_changed(
+            lambda v: setattr(self, 'current_sc_idx', int(v)))
+        self.sc_slider.label.set_fontsize(7)
+
+        ax_mac = self.fig.add_subplot(gs[nr + 1, :])
+        self.mac_slider = Slider(
+            ax_mac, 'MAC index', 0, 1,
+            valinit=min(self.current_mac_idx, 0),
+            valstep=1, color='darkorange')
+        self.mac_slider.on_changed(
+            lambda v: setattr(self, 'current_mac_idx', int(v)))
+        self.mac_slider.label.set_fontsize(7)
+
+        ax_st = self.fig.add_subplot(gs[nr + 2, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=min(self.current_stream_idx, 0),
+            valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
+        self.stream_slider.label.set_fontsize(7)
+
+        self._suptitle = self.fig.suptitle(
+            'CBF VVᴴ Complex-Plane Trail', fontsize=10)
+        dim = max(3.5 * nr, 7.0)
+        self.fig.set_size_inches(dim, dim + 0.8)
+        self._built_nr = nr
+
+    # ----------------------------------------------------------------
+    # Per-element draw
+    # ----------------------------------------------------------------
+
+    @staticmethod
+    def _draw_element(ax, history, i, j, sc_idx, stream_idx):
+        """Draw complex-plane trail for R_c[i,j] at the selected subcarrier.
+
+        R_c = outer(V[:,c], conj(V[:,c])) for stream c=stream_idx.
+
+        Args:
+            ax: Cartesian matplotlib Axes.
+            history (list): v_trail frames with 'subcarriers' dict.
+            i (int): Row index of element.
+            j (int): Column index of element.
+            sc_idx (int): Selected subcarrier index.
+            stream_idx (int): Spatial stream column to use.
+        """
+        ax.cla()
+        ax.set_title(f'VVᴴ[{i},{j}] s{stream_idx}', fontsize=7)
+        ax.set_xlabel('Real', fontsize=5)
+        ax.set_ylabel('Imag', fontsize=5)
+        ax.tick_params(labelsize=5)
+        ax.axhline(0, color='grey', lw=0.4, ls='--')
+        ax.axvline(0, color='grey', lw=0.4, ls='--')
+        ax.set_aspect('equal', adjustable='datalim')
+
+        trail = []
+        for frame in history:
+            V = frame['subcarriers'].get(sc_idx)
+            if (V is not None and V.shape[0] > max(i, j)
+                    and V.shape[1] > stream_idx):
+                v_c = V[:, stream_idx]
+                R   = np.outer(v_c, v_c.conj())
+                trail.append(R[i, j])
+
+        if not trail:
+            return
+
+        reals  = _smooth_1d([v.real for v in trail])
+        imags  = _smooth_1d([v.imag for v in trail])
+        n      = len(reals)
+        t_norm = np.linspace(0.0, 1.0, n)
+
+        if n > 1:
+            xy   = np.array([reals, imags]).T.reshape(-1, 1, 2)
+            segs = np.concatenate([xy[:-1], xy[1:]], axis=1)
+            lc   = LineCollection(
+                segs, cmap='plasma',
+                norm=plt.Normalize(0.0, 1.0),
+                linewidth=0.8, linestyle=':', alpha=0.55, zorder=2)
+            lc.set_array(t_norm[:-1])
+            ax.add_collection(lc)
+
+        ax.scatter(reals, imags,
+                   c=t_norm, cmap='plasma',
+                   s=14, alpha=0.8, linewidths=0, zorder=3)
+        ax.scatter([reals[-1]], [imags[-1]],
+                   c='red', s=30, zorder=4, linewidths=0)
+        ax.autoscale_view()
+
+    # ----------------------------------------------------------------
+    # Animation callback
+    # ----------------------------------------------------------------
+
+    def _animate(self, _frame):
+        if self._paused:
+            return
+        with self.store.lock:
+            snap       = {mac: list(hist)
+                          for mac, hist
+                          in self.store.cbf_v_trail_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            sc_idx     = self.current_sc_idx
+            stream_idx = self.current_stream_idx
+
+        macs = [m for m in snap_ord if snap.get(m)]
+        if not macs:
+            self._frame_count += 1
+            return
+
+        n_mac = len(macs)
+        if self.mac_slider and (n_mac - 1) > self.mac_slider.valmax:
+            self.mac_slider.valmax = n_mac - 1
+            self.mac_slider.ax.set_xlim(0, n_mac - 1)
+
+        mac_idx = min(mac_idx, n_mac - 1)
+        mac     = macs[mac_idx]
+        history = snap[mac]
+
+        nr = history[-1]['nr']
+        nc = history[-1]['nc']
+        if nr != self._built_nr:
+            self._setup_axes(nr)
+
+        n_sc = len(history[-1]['subcarriers'])
+        if self.sc_slider and (n_sc - 1) > self.sc_slider.valmax:
+            self.sc_slider.valmax = n_sc - 1
+            self.sc_slider.ax.set_xlim(0, n_sc - 1)
+        sc_idx = min(sc_idx, n_sc - 1)
+
+        if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+            self.stream_slider.valmax = nc - 1
+            self.stream_slider.ax.set_xlim(0, nc - 1)
+        stream_idx = min(stream_idx, nc - 1)
+
+        if self._suptitle:
+            self._suptitle.set_text(
+                f'CBF VVᴴ Complex-Plane Trail — {mac}'
+                f'  SC {sc_idx}  Stream {stream_idx}')
+
+        for i, j in self._pairs:
+            self._draw_element(
+                self._ax_grid[(i, j)], history, i, j, sc_idx, stream_idx)
+
+        self._frame_count += 1
+
+    # ----------------------------------------------------------------
+    # Setup
+    # ----------------------------------------------------------------
+
+    def run(self):
+        """Create VVᴴ complex-plane figure. Returns FuncAnimation."""
+        fig = plt.figure(figsize=(10, 10))
+        self.fig = fig
+        fig.text(0.5, 0.5, '(waiting for CBF data…)',
+                 ha='center', va='center', fontsize=12,
+                 transform=fig.transFigure)
+
+        self._add_pause_button(fig)
+        return FuncAnimation(
+            fig, self._animate,
+            interval=INTERVAL, cache_frame_data=False)
+
+
+# -----------------------------------------------------------------------
 # CSI channel impulse response (IFFT) plotter
 # -----------------------------------------------------------------------
 
@@ -2521,12 +3634,12 @@ class RARELComplexPlotter(_PauseMixin):
     """
 
     def __init__(self, store):
-        self.store             = store
-        self.current_mac_idx   = 0
-        self.current_n_sources = 1
-        self.fig               = None
-        self.mac_slider        = None
-        self.nsrc_slider       = None
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_stream_idx = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.stream_slider      = None
 
     # ----------------------------------------------------------------
     # Helpers
@@ -2547,10 +3660,23 @@ class RARELComplexPlotter(_PauseMixin):
         ax.plot(np.cos(circ), np.sin(circ),
                 color='steelblue', lw=0.8, ls='--', alpha=0.5, zorder=1)
 
+        # roots are only available in ULA mode
+        sample = next(
+            (f.get(axis_key) for f in history if f.get(axis_key)),
+            None)
+        has_roots = sample is not None and 'roots' in sample
+
+        if not has_roots:
+            msg = ('ULA mode\n(no elevation)' if axis_key == 'el'
+                   else 'Decoupled-MUSIC mode\n(no polynomial roots)')
+            ax.text(0.5, 0.5, msg, ha='center', va='center',
+                    fontsize=9, transform=ax.transAxes, color='grey')
+            return
+
         all_r, all_i, all_t = [], [], []
         for t, frame in enumerate(history):
             ax_data = frame.get(axis_key)
-            if ax_data is None:
+            if ax_data is None or 'roots' not in ax_data:
                 continue
             for z in ax_data['roots']:
                 all_r.append(float(z.real))
@@ -2566,7 +3692,7 @@ class RARELComplexPlotter(_PauseMixin):
 
         if history:
             latest = history[-1].get(axis_key)
-            if latest is not None:
+            if latest is not None and 'roots' in latest:
                 for doa, z in zip(latest['doa'], latest['roots']):
                     ax.scatter([z.real], [z.imag],
                                c='red', s=28, zorder=4, linewidths=0)
@@ -2576,10 +3702,6 @@ class RARELComplexPlotter(_PauseMixin):
                             xy=(z.real, z.imag),
                             xytext=(5, 5), textcoords='offset points',
                             fontsize=7, color='red')
-            else:
-                ax.text(0.5, 0.5, 'ULA mode\n(no elevation)',
-                        ha='center', va='center', fontsize=9,
-                        transform=ax.transAxes, color='grey')
         ax.autoscale_view()
 
     @staticmethod
@@ -2600,10 +3722,10 @@ class RARELComplexPlotter(_PauseMixin):
                     transform=ax.transAxes, color='grey')
             return
 
-        angles  = rare_est._SCAN_ANGLES_DEG
+        angles  = ax_data.get('scan_deg', rare_est._SCAN_ANGLES_DEG)
         spec_db = ax_data['spectrum_db']
         ax.plot(angles, spec_db, color='steelblue', lw=1.0)
-        ax.set_xlim(-90, 90)
+        ax.set_xlim(float(angles[0]), float(angles[-1]))
         ax.set_ylim(-40, 2)
         ax.axhline(-3, color='grey', lw=0.5, ls=':', alpha=0.6)
         ax.grid(True, lw=0.3, alpha=0.4)
@@ -2621,10 +3743,11 @@ class RARELComplexPlotter(_PauseMixin):
         if self._paused:
             return
         with self.store.lock:
-            snap     = {mac: list(hist)
-                        for mac, hist in self.store.rare_l_data.items()}
-            snap_ord = list(self.store.cbf_order)
-            mac_idx  = self.current_mac_idx
+            snap       = {mac: list(hist)
+                          for mac, hist in self.store.rare_l_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            stream_idx = self.current_stream_idx
 
         n_mac = len(snap_ord)
         if n_mac > 1 and (n_mac - 1) > self.mac_slider.valmax:
@@ -2636,18 +3759,25 @@ class RARELComplexPlotter(_PauseMixin):
             mac_idx = min(mac_idx, len(macs) - 1)
             mac     = macs[mac_idx]
             history = snap[mac]
-            self._draw_root_pane(
-                self.ax_az_cpx, history, 'az',
-                f'Az Roots — {mac}')
-            self._draw_root_pane(
-                self.ax_el_cpx, history, 'el',
-                f'El Roots — {mac}')
-            self._draw_spectrum_pane(
-                self.ax_az_spec, history, 'az',
-                f'Az MUSIC — {mac}')
-            self._draw_spectrum_pane(
-                self.ax_el_spec, history, 'el',
-                f'El MUSIC — {mac}')
+
+            nc = history[-1]['nc']
+            if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+                self.stream_slider.valmax = nc - 1
+                self.stream_slider.ax.set_xlim(0, nc - 1)
+            stream_idx = min(stream_idx, nc - 1)
+
+            sh = [f['streams'][min(stream_idx, len(f['streams']) - 1)]
+                  for f in history]
+
+            tag = f'{mac}  Stream {stream_idx}'
+            self._draw_root_pane(self.ax_az_cpx, sh, 'az',
+                                 f'Az Roots — {tag}')
+            self._draw_root_pane(self.ax_el_cpx, sh, 'el',
+                                 f'El Roots — {tag}')
+            self._draw_spectrum_pane(self.ax_az_spec, sh, 'az',
+                                     f'Az MUSIC — {tag}')
+            self._draw_spectrum_pane(self.ax_el_spec, sh, 'el',
+                                     f'El MUSIC — {tag}')
         else:
             for ax in (self.ax_az_cpx, self.ax_el_cpx,
                        self.ax_az_spec, self.ax_el_spec):
@@ -2664,7 +3794,6 @@ class RARELComplexPlotter(_PauseMixin):
         self.fig = fig
         fig.suptitle('RARE-L DoA — Complex Plane & MUSIC Spectrum', fontsize=12)
 
-        # 2×2 plot grid + two slider rows
         gs = gridspec.GridSpec(
             4, 2, figure=fig,
             height_ratios=[7, 7, 0.55, 0.55],
@@ -2682,12 +3811,12 @@ class RARELComplexPlotter(_PauseMixin):
         self.mac_slider.on_changed(
             lambda v: setattr(self, 'current_mac_idx', int(v)))
 
-        ax_nsrc = fig.add_subplot(gs[3, :])
-        self.nsrc_slider = Slider(
-            ax_nsrc, 'n_sources', 1, 4,
-            valinit=1, valstep=1, color='steelblue')
-        self.nsrc_slider.on_changed(
-            lambda v: setattr(self, 'current_n_sources', int(v)))
+        ax_st = fig.add_subplot(gs[3, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=0, valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
 
         self._add_pause_button(fig)
         return FuncAnimation(
@@ -2721,12 +3850,14 @@ class RARELWaterfallPlotter(_PauseMixin):
     _DB_MAX =   0.0
 
     def __init__(self, store):
-        self.store           = store
-        self.current_mac_idx = 0
-        self.fig             = None
-        self.mac_slider      = None
-        self._az_cbar        = None
-        self._el_cbar        = None
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_stream_idx = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.stream_slider      = None
+        self._az_cbar           = None
+        self._el_cbar           = None
 
     # ----------------------------------------------------------------
     # Helpers
@@ -2747,11 +3878,16 @@ class RARELWaterfallPlotter(_PauseMixin):
                     transform=ax.transAxes, color='grey')
             return cbar_ref
 
+        scan_deg = valid[0][axis_key].get(
+            'scan_deg', np.linspace(-90.0, 90.0,
+                                    len(valid[0][axis_key]['spectrum_db'])))
+        ang0, ang1 = float(scan_deg[0]), float(scan_deg[-1])
+
         mat = np.array([f[axis_key]['spectrum_db'] for f in valid])
         im  = ax.imshow(
             mat[::-1], aspect='auto', cmap='inferno',
             vmin=self._DB_MIN, vmax=self._DB_MAX,
-            extent=[-90, 90, 0, len(valid)],
+            extent=[ang0, ang1, 0, len(valid)],
             interpolation='nearest')
 
         if cbar_ref is None:
@@ -2769,7 +3905,7 @@ class RARELWaterfallPlotter(_PauseMixin):
                                c='cyan', s=14, linewidths=0,
                                alpha=0.75, zorder=3)
 
-        ax.set_xlim(-90, 90)
+        ax.set_xlim(ang0, ang1)
         ax.set_ylim(0, len(valid))
         return cbar_ref
 
@@ -2806,10 +3942,11 @@ class RARELWaterfallPlotter(_PauseMixin):
         if self._paused:
             return
         with self.store.lock:
-            snap     = {mac: list(hist)
-                        for mac, hist in self.store.rare_l_data.items()}
-            snap_ord = list(self.store.cbf_order)
-            mac_idx  = self.current_mac_idx
+            snap       = {mac: list(hist)
+                          for mac, hist in self.store.rare_l_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            stream_idx = self.current_stream_idx
 
         n_mac = len(snap_ord)
         if n_mac > 1 and (n_mac - 1) > self.mac_slider.valmax:
@@ -2821,13 +3958,24 @@ class RARELWaterfallPlotter(_PauseMixin):
             mac_idx = min(mac_idx, len(macs) - 1)
             mac     = macs[mac_idx]
             history = snap[mac]
+
+            nc = history[-1]['nc']
+            if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+                self.stream_slider.valmax = nc - 1
+                self.stream_slider.ax.set_xlim(0, nc - 1)
+            stream_idx = min(stream_idx, nc - 1)
+
+            sh  = [f['streams'][min(stream_idx, len(f['streams']) - 1)]
+                   for f in history]
+            tag = f'{mac}  Stream {stream_idx}'
+
             self._az_cbar = self._draw_wf_pane(
-                self.ax_az, self.ax_az_cb, history, 'az',
-                f'Az MUSIC Waterfall — {mac}', self._az_cbar)
+                self.ax_az, self.ax_az_cb, sh, 'az',
+                f'Az MUSIC Waterfall — {tag}', self._az_cbar)
             self._el_cbar = self._draw_wf_pane(
-                self.ax_el, self.ax_el_cb, history, 'el',
-                f'El MUSIC Waterfall — {mac}', self._el_cbar)
-            self._draw_eigenvalues(history, mac)
+                self.ax_el, self.ax_el_cb, sh, 'el',
+                f'El MUSIC Waterfall — {tag}', self._el_cbar)
+            self._draw_eigenvalues(sh, tag)
         else:
             for ax in (self.ax_az, self.ax_el, self.ax_eig):
                 ax.cla()
@@ -2844,11 +3992,9 @@ class RARELWaterfallPlotter(_PauseMixin):
         fig.suptitle(
             'RARE-L DoA — MUSIC Pseudospectrum Waterfall', fontsize=12)
 
-        # rows: az waterfall | el waterfall | slider
-        # cols: waterfall | colorbar | eigenvalues
         gs = gridspec.GridSpec(
-            3, 3, figure=fig,
-            height_ratios=[7, 7, 0.6],
+            4, 3, figure=fig,
+            height_ratios=[7, 7, 0.6, 0.6],
             width_ratios=[10, 0.4, 4],
             hspace=0.55, wspace=0.4)
 
@@ -2864,6 +4010,13 @@ class RARELWaterfallPlotter(_PauseMixin):
             valinit=0, valstep=1, color='darkorange')
         self.mac_slider.on_changed(
             lambda v: setattr(self, 'current_mac_idx', int(v)))
+
+        ax_st = fig.add_subplot(gs[3, :])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=0, valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
 
         self._add_pause_button(fig)
         return FuncAnimation(
@@ -2893,10 +4046,12 @@ class RARELAnglePlotter(_PauseMixin):
     _Y_PAD = 5.0   # degrees of padding beyond ±90 on angle axes
 
     def __init__(self, store):
-        self.store           = store
-        self.current_mac_idx = 0
-        self.fig             = None
-        self.mac_slider      = None
+        self.store              = store
+        self.current_mac_idx    = 0
+        self.current_stream_idx = 0
+        self.fig                = None
+        self.mac_slider         = None
+        self.stream_slider      = None
 
     # ----------------------------------------------------------------
     # Helper — draw one angle-vs-time pane
@@ -2961,10 +4116,11 @@ class RARELAnglePlotter(_PauseMixin):
         if self._paused:
             return
         with self.store.lock:
-            snap     = {mac: list(hist)
-                        for mac, hist in self.store.rare_l_data.items()}
-            snap_ord = list(self.store.cbf_order)
-            mac_idx  = self.current_mac_idx
+            snap       = {mac: list(hist)
+                          for mac, hist in self.store.rare_l_data.items()}
+            snap_ord   = list(self.store.cbf_order)
+            mac_idx    = self.current_mac_idx
+            stream_idx = self.current_stream_idx
 
         n_mac = len(snap_ord)
         if n_mac > 1 and (n_mac - 1) > self.mac_slider.valmax:
@@ -2976,12 +4132,21 @@ class RARELAnglePlotter(_PauseMixin):
             mac_idx = min(mac_idx, len(macs) - 1)
             mac     = macs[mac_idx]
             history = snap[mac]
+
+            nc = history[-1]['nc']
+            if self.stream_slider and (nc - 1) > self.stream_slider.valmax:
+                self.stream_slider.valmax = nc - 1
+                self.stream_slider.ax.set_xlim(0, nc - 1)
+            stream_idx = min(stream_idx, nc - 1)
+
+            sh  = [f['streams'][min(stream_idx, len(f['streams']) - 1)]
+                   for f in history]
+            tag = f'{mac}  Stream {stream_idx}'
+
             self._draw_angle_pane(
-                self.ax_az, history, 'az',
-                f'Azimuth — {mac}', 'steelblue')
+                self.ax_az, sh, 'az', f'Azimuth — {tag}', 'steelblue')
             self._draw_angle_pane(
-                self.ax_el, history, 'el',
-                f'Elevation — {mac}', 'darkorange')
+                self.ax_el, sh, 'el', f'Elevation — {tag}', 'darkorange')
         else:
             for ax in (self.ax_az, self.ax_el):
                 ax.cla()
@@ -2997,14 +4162,21 @@ class RARELAnglePlotter(_PauseMixin):
             2, 1, figsize=(14, 7), sharex=False)
         self.fig = fig
         fig.suptitle('RARE-L DoA Angles Over Time', fontsize=12)
-        fig.subplots_adjust(hspace=0.45, top=0.90, bottom=0.14)
+        fig.subplots_adjust(hspace=0.45, top=0.90, bottom=0.18)
 
-        ax_mac = fig.add_axes([0.12, 0.04, 0.76, 0.030])
+        ax_mac = fig.add_axes([0.12, 0.08, 0.76, 0.025])
         self.mac_slider = Slider(
             ax_mac, 'MAC index', 0, 1,
             valinit=0, valstep=1, color='darkorange')
         self.mac_slider.on_changed(
             lambda v: setattr(self, 'current_mac_idx', int(v)))
+
+        ax_st = fig.add_axes([0.12, 0.04, 0.76, 0.025])
+        self.stream_slider = Slider(
+            ax_st, 'Stream', 0, 1,
+            valinit=0, valstep=1, color='mediumseagreen')
+        self.stream_slider.on_changed(
+            lambda v: setattr(self, 'current_stream_idx', int(v)))
 
         self._add_pause_button(fig)
         return FuncAnimation(
@@ -3027,20 +4199,33 @@ def main():
     store = SharedDataStore()
     store.start_reader(args.port, args.baud)
 
-    # Figures 1, 2, 4, 5, 6 hidden — data still ingested by the store.
-    cbf_wf_plotter      = CBFStreamWaterfallPlotter(store)  # fig 1
-    rarel_cpx_plotter   = RARELComplexPlotter(store)        # fig 2
-    rarel_wf_plotter    = RARELWaterfallPlotter(store)      # fig 3
-    rarel_ang_plotter   = RARELAnglePlotter(store)          # fig 4
+    saver = save_telemetry.TelemetrySaver(store)
+    saver.start()
+
+    cbf_wf_plotter        = CBFStreamWaterfallPlotter(store)   # fig 1
+    rarel_cpx_plotter     = RARELComplexPlotter(store)         # fig 2
+    rarel_wf_plotter      = RARELWaterfallPlotter(store)       # fig 3
+    rarel_ang_plotter     = RARELAnglePlotter(store)           # fig 4
+    vvh_wf_plotter        = VVHWaterfallPlotter(store)         # fig 5
+    vvh_ratio_wf_plotter  = VVHRatioWaterfallPlotter(store)   # fig 6
+    vvh_ratio_cpx_plotter = VVHRatioComplexPlotter(store)     # fig 7
+    vvh_cpx_plotter       = VVHComplexPlotter(store)           # fig 8
 
     # Keep animation objects alive — assigning to _ would GC them.
-    _ani_cbf_wf     = cbf_wf_plotter.run()
-    _ani_rarel_cpx  = rarel_cpx_plotter.run()
-    _ani_rarel_wf   = rarel_wf_plotter.run()
-    _ani_rarel_ang  = rarel_ang_plotter.run()
+    _ani_cbf_wf        = cbf_wf_plotter.run()
+    _ani_rarel_cpx     = rarel_cpx_plotter.run()
+    _ani_rarel_wf      = rarel_wf_plotter.run()
+    _ani_rarel_ang     = rarel_ang_plotter.run()
+    _ani_vvh_wf        = vvh_wf_plotter.run()
+    _ani_vvh_ratio_wf  = vvh_ratio_wf_plotter.run()
+    _ani_vvh_ratio_cpx = vvh_ratio_cpx_plotter.run()
+    _ani_vvh_cpx       = vvh_cpx_plotter.run()
 
-    plt.show()
-    store._running = False
+    try:
+        plt.show()
+    finally:
+        store._running = False
+        saver.stop()
 
 
 if __name__ == '__main__':

@@ -132,3 +132,77 @@ Great. please create a new file called rare_est.py in the same directory as plot
 
 addendum:
 please hide figure 1, figure 2, figure 6 figure 5 and figure 4. please add another figure that plots the azimuth and elevation angles over time 
+
+
+addendum:
+please add an additional file called save_telemetry.py that does the following:
+gets called by plot_telemetry.py
+generates a csv with the format <timestamp>_CSI_INFO.csv
+generates a csv with the format <timestamp>_CBF_INFO.csv 
+each row in the csi info csv has a column for the timestamp, mac address, singular values, cbf phase, amplitude, etc.
+each row in the cbf info csv has a column for the timestamp, mac address, singular values, cbf phase, amplitude, etc. each unique combination of stream and antenna index should have its own column
+
+
+please add an additional file called plot_saved_telemetry.py that generates the same kinds of plots as the plot_telemetry.py file, but reads from the <timestamp>_CSI_INFO.csv and <timestamp>_CBF_INFO.csv filenames provided by the user.
+
+addendum: for plot_saved_telemetry; i need you to add one more window with the following:
+take V and compute VV* for each packet
+since this matrix is symmetric, create a subplot for each unique element in VV* (choose lower triangle)
+this subplot should be a waterfall plot of VV* over all subcarriers. there should be a waterfall plot for both phase and magnitude.
+
+Add this to plot_telemetry.py to maintain parity.
+
+please also create another window that follows this format but does a complex plane polar plot instead (like previous polar plots). do this for both plot_telemtry.py and plot_saved_telemetry.py
+
+also create a new subcarrier waterfall plot for both phase and magnitude
+
+
+Addendum: for plot_telemetry.py, please create another phase + mag waterfall plot where you are plotting the ratio between each unique VV* combination (ie 0,3) by the corresponding diagonal. As an exaple, for the following vv*:
+
+00
+10 11
+20 21 22
+30 31 32 33
+
+you would plot:
+
+10/00
+20/00
+30/00
+21/11
+31/11
+32/22
+
+
+great can you now create another window that creates polar plots / complex plane plots with these ratios, following similar polar/complex plot formats as previously used
+
+
+
+
+
+can you also apply the denoising and smothing filters to the VV* and VV* ratio data? I want these filter to still be controlled by the variables mentioned before
+
+
+addendum:
+Could you modify the computation of VV* to be per spatial stream?
+So for example, suppose V is as follows
+
+Stream0 Stream1
+V_s0_a0 V_s1_a0
+V_s0_a1 V_s1_a1
+V_s0_a2 V_s1_a2
+V_s0_a3 V_s1_a3
+
+
+
+Compute
+
+Stream0 Stream0*
+Stream1 Stream1*
+
+separately
+
+I want you to modify the existing plotting code for VV* to reflect this (ie, split the waterfall plots by spatial stream, split the polar plots by spatial stream, split the polar ratio plots by spatial stream, etc.)
+
+
+Addendum: can you split the RARE-L estimation to be separated by spatial stream data? I want to be able to see the estimations by spatial stream. Also, unhide the RARE-L plots.
