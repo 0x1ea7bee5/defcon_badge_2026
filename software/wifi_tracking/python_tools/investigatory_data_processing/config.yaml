@@ -1,0 +1,7 @@
+# Investigatory data processing configuration.
+# Consumed by live_plot.py and plot_existing_data.ipynb.
+
+apply_smooth_filter: false   # moving-average denoising along subcarriers
+apply_antialias: true       # cubic-spline upsampling along frame axis
+plot_window: 100            # rolling window depth (frames)
+denom_ratio: 0.01           # minimum denominator magnitude for ratio plots

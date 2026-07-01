@@ -11,6 +11,7 @@ rx_data.py - responsible for retrieving data over serial, and adding it to a eff
 dsp.py - responsible for basic dsp required for plotting
 live_plot.py - live plotting file
 plot_existing_data.ipynb - interactive jupyter notebook for plotting saved data. Should have maintain parity with live plot; should plot all of the specific plot types.
+config.yaml - configuration file used by live plot and plotting jupyter notebook
 
 ### Core File functions
 
@@ -18,7 +19,8 @@ rx_data.py - this should receive the serialized CBF and CSI data sent by the tel
 
 dsp.py - this should do a lot of different kinds of non-specific DSP from data provided by rx_data.py, or even saved data passed as an argument. This file should be able to:
 
-- (denoise) (antialias) Apply denoising and antialiasing filters (reference the implementation used in archive/plot_telemetry.py) 
+- (denoise) (antialias) Apply denoising and antialiasing filters (reference the implementation used in archive/plot_telemetry.py). Denoising and antialiasing should be enabled by default. These filters should be separate.
+- (remove_singularity) throws away data that is computed from a ratio if the denominator is below the denominator threshold. This is to prevent too large of values during plotting.
 - (compute_vv_star) Computes the matrix VV*
 - (compute_vv_star_ss) Separates V into its unique spatial stream columns, and computes v_nv_n*, where v_n is the column corresponding to a single spatial stream. 
     So for example
@@ -48,6 +50,11 @@ rare_est.py - this is generally fine, but I need you to make the following modif
     I also want you to clean up this file a bit to conform to the coding guidelines I have mentioned. I want to be able to easily feed data into the self-calibration function and then feed data + estimated array geometry into the rare-l algorithm.
 
 
+config.yaml - this file has the following variables:
+apply_antialias: true - applies the antialiasing filter to the data
+apply_smooth_fiolter: true - applies the smoothing filter to the data
+plot_window: 200 - the plot widow size for live plotting
+denom_ratio: 0.01 -  minimum denominator ratio
 
 
 ## General Plot files
@@ -55,10 +62,11 @@ The following files will contain generic definitions for plot types. The charact
 Base plot characteristics:
     - If a plot has legends, the user must be able to click the legend item to hide the trace associated with the legend item.
     - All plots should have a sliding window that plots the last N samples. Let N=200 and be configurable.
+    - The plot title should include the mac address that is currently being displayed.
 plot_types/waterfalls.py
-    This type of plot will plot phase and magnitude waterfalls over subcarriers for a given mac address. There must be a slider to switch between different mac addresses. This plot type should support multiple subplots with multiple columns/rows.
+    This type of plot will plot phase and magnitude waterfalls over subcarriers for a given mac address. There must be a slider to switch between different mac addresses. This plot type should support multiple subplots with multiple columns/rows. This plot also needs to have a labeled color bar.
 plot_types/complex_plane.py
-    This type of plot will plot the provided data in the complex plane over time. Newer data points should be more opaque than older data points. Data from different "antenna" columns should be plotted as separate legend items, and should be plotted with different shapes (stars,circles,diamonds,etc). Each new point should be connected to older points with a half opacity dashed line. This plot should have a checkbox labeled "plot all subcarriers". When this box is checked, all subcarriers should be plotted simultaneously, with each subcarrier given a unique color corresponding to a continuous color map. When this box is unchecked, only a single subcarrier should be plotted at a time. There should be a subcarrier slider that selects the subcarrier to plot when the "plot all subcarriers" box is unchecked. This slider should do nothing when the box is checked. This plot type should support multiple subplots with multiple rows/columns.
+    This type of plot will plot the provided data in the complex plane over time. Newer data points should be more opaque than older data points. Data from different "antenna" columns should be plotted as separate legend items, and should be plotted with different shapes (stars,circles,diamonds,etc). Each new point should be connected to older points with a half opacity dashed line. This plot should have a checkbox labeled "plot all subcarriers". When this box is checked, all subcarriers should be plotted simultaneously, with each subcarrier given a unique color corresponding to a continuous color map. When this box is unchecked, only a single subcarrier should be plotted at a time. There should be a subcarrier slider that selects the subcarrier to plot when the "plot all subcarriers" box is unchecked. This slider should do nothing when the box is checked. This plot type should support multiple subplots with multiple rows/columns. The complex plots should autoscale.
 plot_types/time_series.py
     This will be a simple time series plot that plots the provided data over time with a nice time-dependent color map. This plot type should support multiple subplots with multiple rows/columns.
 plot_types/histograms.py
@@ -75,6 +83,7 @@ The following files will contain more specific types of plots. These specific pl
 - vv* ratio spatial stream waterfall (VVH_ratio_ss_waterfall) - should be similar to VVH_ss_waterfall, but should instead plot from vv_star_ratio_ss
 - vv* spatial stream complex plane plot (VVH_ratio_ss_cplx)- should be similar to VVH_ss_cplx, but should instead plot from vv_star_ratio.
 - Estimated Array +AOA plot (est_array_plot) - as defined in the rare_est.py file, there is a function that should allow for the exact array geometry to be estimated. This plot should have a subplot on the left that plots the estimated array geometry in 3d space. The subplots on the right should plot the azimuth angle over time (top) and elevation angle over time(bottom) from the rare-l algorithm. The rare-l algorithm should be using the geometry from the estimation. Both should update in real time
+The VVH and VVH ratio + spatial stream variants should have subplot formats that are lower triangular. So the subplots should all be square. The subplots should be large.
 
 
 ## Live plot file (live_plot.py)

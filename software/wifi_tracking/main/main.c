@@ -13,7 +13,7 @@
 
 static const char *TAG = "main";
 
-#define MONITOR_CHANNEL   100
+#define MONITOR_CHANNEL   44
 #define SCAN_INTERVAL_MS  5000
 #define SCAN_INTERVAL_CBF 5000
 #define SCAN_INTERVAL_CSI 500

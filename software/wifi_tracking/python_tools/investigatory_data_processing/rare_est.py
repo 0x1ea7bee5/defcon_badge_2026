@@ -1,81 +1,16 @@
 """
-RARE-L: Root Array Response Estimation with L Subcarrier Snapshots
-====================================================================
-Extended to support arbitrary (non-rectangular) array geometries.
+RARE-L: Root Array Response Estimation with L Subcarrier Snapshots.
 
-What changed and why
---------------------
-The original UPA path assumed elements were laid out on a perfect M×N
-rectangular grid, which allowed the full (MN×MN) covariance to be
-marginalised into independent row/column sub-covariances by simple
-block-diagonal averaging:
+Supports ULA, rectangular UPA, and arbitrary array geometries via
+elevation-compensated decoupled MUSIC.
 
-    R_row[n1, n2] = (1/M) sum_m R[m·N+n1, m·N+n2]
-
-This works because for a Kronecker-factorable steering vector
-a(az, el) = a_col(v) ⊗ a_row(u), the row-average cancels the elevation
-phase and leaves only the azimuth ULA structure. For an arbitrary array
-the steering vector does NOT factor, so there are no natural row-blocks
-to average and the x/y phase contributions are inseparably entangled in
-every entry of R.
-
-Fix: elevation-compensated decoupled MUSIC
-------------------------------------------
-The key observation is that if we KNEW the elevation angle el, we could
-decouple azimuth estimation exactly — even for an arbitrary array:
-
-    R_comp[i,j] = R[i,j] · exp(-j 2π (y_i - y_j) sin(el))
-
-This phase compensation removes the elevation contribution from R,
-leaving a covariance that depends only on the x-coordinate differences
-(and therefore has the structure of a 1D ULA covariance in x). We can
-then run arbitrary-geometry 1D MUSIC over azimuth on R_comp.
-
-Since el is unknown, we scan over a coarse elevation grid, compute the
-azimuth MUSIC spectrum for each candidate elevation, and score each
-candidate by its peak spectral power. The elevation with the best score
-is selected, followed by a refined azimuth extraction.
-
-Complexity: O(n_el_scan × Nr² + n_el_scan × n_az_scan × Nr)
-vs full 2D MUSIC: O(n_el × n_az × Nr²)
-
-For a typical setup (Nr=16, n_el=91, n_az=91) the decoupled approach
-is ~Nr = 16× cheaper than full 2D MUSIC.
-
-When the array IS rectangular, this algorithm still applies and gives
-the same answers as the original block-averaging (verified numerically).
-
-Arbitrary-geometry MUSIC (no ULA assumption)
---------------------------------------------
-The 1D MUSIC spectrum over azimuth, given candidate elevation el:
-
-    P(az | el) = 1 / |a_x(az,el)^H C_comp a_x(az,el)|
-
-where:
-    C_comp = E_n^comp (E_n^comp)^H  — noise projector of R_comp
-    a_x(az, el)[i] = exp(j 2π x_i sin(az) cos(el))  — x-only steering
-
-Similarly for elevation after azimuth is fixed. The full 2D steering
-vector for arbitrary arrays (used in music_spectrum_2d) is:
-
-    a(az, el)[i] = exp(j 2π (x_i sin(az) cos(el) + y_i sin(el)))
-
-New / changed public symbols
-----------------------------
-  ArrayGeometry             — dataclass holding element positions
-  build_geometry()          — construct geometry for rectangular or arbitrary arrays
-  build_hexagonal_geometry()— hex close-packed array
-  build_l_shaped_geometry() — L-shaped array (two ULAs sharing a corner)
-  music_spectrum_arb()      — 1D MUSIC over azimuth for arbitrary array at fixed elevation
-  decoupled_doa_estimate()  — core fix: elevation-compensated decoupled MUSIC
-  rare_l_estimate()         — updated signature; accepts geometry= kwarg
-
-Unchanged public symbols
-------------------------
-  covariance_from_cbf, noise_subspace, noise_projector,
-  rare_l_polynomial, select_doa_roots, roots_to_doa,
-  music_spectrum, music_spectrum_db,
-  music_spectrum_2d (updated: uses actual positions, no Kronecker assumption)
+Public symbols:
+  ArrayGeometry, build_geometry, build_hexagonal_geometry,
+  build_l_shaped_geometry, covariance_from_cbf, noise_subspace,
+  noise_projector, rare_l_polynomial, select_doa_roots,
+  roots_to_doa, music_spectrum, music_spectrum_db,
+  music_spectrum_arb, decoupled_doa_estimate, rare_l_estimate,
+  calibrate_array_geometry
 """
 
 from __future__ import annotations
@@ -103,7 +38,8 @@ class ArrayGeometry:
         d_x (float): nominal x-axis spacing (wavelengths) — used as ULA
             spacing when running 1D Root-MUSIC on a rectangular array.
             For arbitrary arrays it sets the Nyquist band of the azimuth scan.
-        d_y (float): nominal y-axis spacing (wavelengths), same role for elevation.
+        d_y (float): nominal y-axis spacing (wavelengths),
+            same role for elevation.
     """
     pos: np.ndarray    # (Nr, 2), wavelengths
     d_x: float = DEFAULT_D_LAMBDA
@@ -435,7 +371,8 @@ def decoupled_doa_estimate(
           After compensation, R_comp depends only on x-coordinate differences
           for a source at elevation el_k, making it behave like a 1D (x-only)
           covariance.
-       b. Eigendecompose R_comp to get the elevation-compensated noise projector C_comp.
+       b. Eigendecompose R_comp to get the elevation-compensated noise
+          projector C_comp.
        c. Compute the 1D azimuth MUSIC spectrum P(az | el_k) using x-only
           steering vectors. Score = peak value of P.
     3. Select el* = argmax_k score(el_k).
@@ -467,16 +404,23 @@ def decoupled_doa_estimate(
         geo:       ArrayGeometry with element positions.
         n_sources: number of sources to estimate.
         n_el_scan: number of coarse elevation scan points (default 91).
-        n_az_fine: number of azimuth scan points for final estimate (default 361).
+        n_az_fine: number of azimuth scan points for final estimate
+            (default 361).
 
     Returns:
         dict:
-            az_doa (np.ndarray): azimuth estimates in degrees, shape (n_sources,).
-            el_doa (np.ndarray): elevation estimates in degrees, shape (n_sources,).
-            az_spectrum_db (np.ndarray): azimuth MUSIC spectrum at best el, dB, shape (n_az_fine,).
-            el_spectrum_db (np.ndarray): elevation MUSIC spectrum at best az, dB, shape (n_el_scan,).
-            az_scan_deg (np.ndarray): azimuth scan angles (degrees), shape (n_az_fine,).
-            el_scan_deg (np.ndarray): elevation scan angles (degrees), shape (n_el_scan,).
+            az_doa (np.ndarray): azimuth estimates in degrees,
+                shape (n_sources,).
+            el_doa (np.ndarray): elevation estimates in degrees,
+                shape (n_sources,).
+            az_spectrum_db (np.ndarray): azimuth MUSIC spectrum at
+                best el, dB, shape (n_az_fine,).
+            el_spectrum_db (np.ndarray): elevation MUSIC spectrum at
+                best az, dB, shape (n_el_scan,).
+            az_scan_deg (np.ndarray): azimuth scan angles (degrees),
+                shape (n_az_fine,).
+            el_scan_deg (np.ndarray): elevation scan angles (degrees),
+                shape (n_el_scan,).
     """
     pos   = geo.pos
     x     = pos[:, 0]
@@ -680,7 +624,7 @@ def music_spectrum_2d(
     spec   = np.zeros((n_el, n_az))
 
     for ei, el in enumerate(el_rad):
-        y_phase = 2.0 * np.pi * y * np.sin(el)    # (Nr,) elevation contribution
+        y_phase = 2.0 * np.pi * y * np.sin(el)
         cos_el  = np.cos(el)
         for ai, az in enumerate(az_rad):
             phase        = y_phase + 2.0 * np.pi * x * np.sin(az) * cos_el
@@ -710,7 +654,8 @@ def rare_l_estimate(
 
     Geometry precedence (highest to lowest):
       1. geometry= (ArrayGeometry) — used as-is for the decoupled MUSIC path.
-      2. array_shape=(M, N) — builds a rectangular geometry, uses decoupled MUSIC.
+      2. array_shape=(M, N) — builds a rectangular geometry,
+         uses decoupled MUSIC.
       3. Neither — ULA, runs the original 1D Root-MUSIC pipeline.
 
     Note: the decoupled MUSIC path (cases 1 and 2) is always used for 2D
@@ -735,7 +680,8 @@ def rare_l_estimate(
             n_sources (int):       n_sources used.
             az (dict):             DoA results for azimuth axis.
                 doa (np.ndarray):        degrees, shape (n_sources,).
-                spectrum_db (np.ndarray): MUSIC spectrum, shape (361 or n_el_scan,).
+                spectrum_db (np.ndarray): MUSIC spectrum,
+                    shape (361 or n_el_scan,).
                 scan_deg (np.ndarray):   scan angles for the spectrum.
             el (dict or None):     same structure for elevation. None if ULA.
     """
@@ -775,7 +721,8 @@ def rare_l_estimate(
         )
 
     # ---- Decoupled MUSIC ------------------------------------------------
-    result = decoupled_doa_estimate(R, geometry, n_sources, n_el_scan=n_el_scan)
+    result = decoupled_doa_estimate(
+        R, geometry, n_sources, n_el_scan=n_el_scan)
 
     _, eigs_full = noise_subspace(R, max(1, min(n_sources, nr - 1)))
 
@@ -818,7 +765,8 @@ def _self_test():
                 sigs[k] += np.outer(a, s) / np.sqrt(2)
         noise_std = 10 ** (-snr / 20.0)
         sigs += noise_std * (rng.standard_normal(sigs.shape)
-                             + 1j * rng.standard_normal(sigs.shape)) / np.sqrt(2)
+                             + 1j * rng.standard_normal(sigs.shape)
+                             ) / np.sqrt(2)
         return sigs
 
     tol = 2.0   # degrees
@@ -837,7 +785,8 @@ def _self_test():
     out = rare_l_estimate(v, n_sources=1, array_shape=(4, 4))
     az, el = out['az']['doa'][0], out['el']['doa'][0]
     ok  = abs(az - 15.0) < tol and abs(el - 10.0) < tol
-    print(f"[UPA]  az={az:.2f}°  el={el:.2f}°  (true 15°, 10°)  {'OK' if ok else 'FAIL'}")
+    print(f"[UPA]  az={az:.2f}°  el={el:.2f}°  (true 15°, 10°)"
+          f"  {'OK' if ok else 'FAIL'}")
 
     # Hexagonal
     geo = build_hexagonal_geometry(n_rings=2)
@@ -868,3 +817,83 @@ def _self_test():
 
 if __name__ == "__main__":
     _self_test()
+
+
+# -----------------------------------------------------------------------
+# Array self-calibration
+# -----------------------------------------------------------------------
+
+def calibrate_array_geometry(
+    v_all:     np.ndarray,
+    n_sources: int = 1,
+    init_geo:  Optional[ArrayGeometry] = None,
+    n_rows:    int = 1,
+    n_cols:    int = 1,
+    max_iter:  int = 200,
+) -> ArrayGeometry:
+    """Estimate array geometry via subspace self-calibration.
+
+    Minimises the noise-subspace projection residual over element
+    positions, with element 0 fixed at the origin as reference:
+
+        min_{pos}  Σ_k || P_noise · a(az_k, el_k, pos) ||²
+
+    Initial DoA estimates az_k, el_k are obtained from decoupled
+    MUSIC using init_geo (or a rectangular grid if not supplied).
+    The noise projector P_noise is computed once from the full
+    covariance R and held fixed during optimisation.
+
+    Args:
+        v_all (np.ndarray): (n_sc, nr, nc) complex CBF snapshots.
+        n_sources (int): Number of sources.
+        init_geo (ArrayGeometry): Starting geometry. Built from
+            n_rows/n_cols when None.
+        n_rows (int): Rows for rectangular initial geometry.
+        n_cols (int): Cols for rectangular initial geometry.
+        max_iter (int): Optimiser iteration limit.
+    Returns:
+        ArrayGeometry: Calibrated element positions.
+    """
+    from scipy.optimize import minimize
+
+    nr    = v_all.shape[1]
+    R     = covariance_from_cbf(v_all)
+    n_src = max(1, min(n_sources, nr - 1))
+    E_n, _  = noise_subspace(R, n_src)
+    P_n     = noise_projector(E_n)
+
+    if init_geo is None:
+        init_geo = build_geometry(n_rows=n_rows, n_cols=n_cols)
+
+    # Initial DoA estimates
+    res0   = decoupled_doa_estimate(R, init_geo, n_src)
+    az_rad = np.deg2rad(res0['az_doa'])
+    el_rad = np.deg2rad(res0['el_doa'])
+    valid  = ~(np.isnan(az_rad) | np.isnan(el_rad))
+    az_rad = az_rad[valid]
+    el_rad = el_rad[valid]
+
+    def _residual(free_pos_flat: np.ndarray) -> float:
+        # Element 0 fixed at origin; optimise elements 1..nr-1.
+        pos = np.zeros((nr, 2))
+        pos[1:] = free_pos_flat.reshape(nr - 1, 2)
+        total   = 0.0
+        for az, el in zip(az_rad, el_rad):
+            phase = (
+                pos[:, 0] * np.sin(az) * np.cos(el)
+                + pos[:, 1] * np.sin(el)
+            )
+            a     = np.exp(1j * 2.0 * np.pi * phase)
+            proj  = P_n @ a
+            total += float(np.real(proj.conj() @ proj))
+        return total
+
+    x0  = init_geo.pos[1:].ravel()
+    opt = minimize(
+        _residual, x0, method='L-BFGS-B',
+        options={'maxiter': max_iter, 'ftol': 1e-10})
+
+    pos_cal       = np.zeros((nr, 2))
+    pos_cal[1:]   = opt.x.reshape(nr - 1, 2)
+    return ArrayGeometry(
+        pos=pos_cal, d_x=init_geo.d_x, d_y=init_geo.d_y)
