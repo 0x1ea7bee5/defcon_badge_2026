@@ -15,11 +15,13 @@ config.yaml - configuration file used by live plot and plotting jupyter notebook
 
 ### Core File functions
 
-rx_data.py - this should receive the serialized CBF and CSI data sent by the telemetry process on the esp32. You may reference how this is done in archive/plot_telemetry.py, as that implementation is generally fine. Please make rx_data.py as efficient as possible. This file will be used by a different python file for live plotting and data saving.
+rx_data.py - this should receive the serialized CBF and CSI data sent by the telemetry process on the esp32. Please make rx_data.py as efficient as possible. This file will be used by a different python file for live plotting and data saving.
 
 dsp.py - this should do a lot of different kinds of non-specific DSP from data provided by rx_data.py, or even saved data passed as an argument. This file should be able to:
 
-- (denoise) (antialias) Apply denoising and antialiasing filters (reference the implementation used in archive/plot_telemetry.py). Denoising and antialiasing should be enabled by default. These filters should be separate.
+- (denoise) - Apply a denoising filter. should be enabled by default. should be able to be mixed with other filters.
+- (antialias)- standard anti-aliasing filter. should be enabled by default. should be able to be mixed with other filters.
+- (upsample) - A cubic spline upsampling filter.
 - (remove_singularity) throws away data that is computed from a ratio if the denominator is below the denominator threshold. This is to prevent too large of values during plotting.
 - (compute_vv_star) Computes the matrix VV*
 - (compute_vv_star_ss) Separates V into its unique spatial stream columns, and computes v_nv_n*, where v_n is the column corresponding to a single spatial stream. 
@@ -52,7 +54,8 @@ rare_est.py - this is generally fine, but I need you to make the following modif
 
 config.yaml - this file has the following variables:
 apply_antialias: true - applies the antialiasing filter to the data
-apply_smooth_fiolter: true - applies the smoothing filter to the data
+apply_smooth_filter: true - applies the smoothing filter to the data
+apply_cubic_spline_upsample: true - applies the upsampling filter
 plot_window: 200 - the plot widow size for live plotting
 denom_ratio: 0.01 -  minimum denominator ratio
 
@@ -82,15 +85,18 @@ The following files will contain more specific types of plots. These specific pl
 - VV* ratio complex plane plot (VVH_ratio_cplx) - should be similar to VVH_cplx, but should instead plot from vv_star_ratio.
 - vv* ratio spatial stream waterfall (VVH_ratio_ss_waterfall) - should be similar to VVH_ss_waterfall, but should instead plot from vv_star_ratio_ss
 - vv* spatial stream complex plane plot (VVH_ratio_ss_cplx)- should be similar to VVH_ss_cplx, but should instead plot from vv_star_ratio.
-- Estimated Array +AOA plot (est_array_plot) - as defined in the rare_est.py file, there is a function that should allow for the exact array geometry to be estimated. This plot should have a subplot on the left that plots the estimated array geometry in 3d space. The subplots on the right should plot the azimuth angle over time (top) and elevation angle over time(bottom) from the rare-l algorithm. The rare-l algorithm should be using the geometry from the estimation. Both should update in real time
+- Estimated Array +AOA plot (est_array_plot) - as defined in the rare_est.py file, there is a function that should allow for the exact array geometry to be estimated. This plot should have a subplot on the left that plots the estimated array geometry in 3d space. The subplots on the right should plot the azimuth angle over time (top) and elevation angle over time(bottom) from the rare-l algorithm. The rare-l algorithm should be using the geometry from the estimation. Both should update in real time. The title of this plot should include the selected mac address. This Estimate array + AOA plot should only plot for the selected mac address. multiple plots should be able to be opened at a time.
+- Array Calibration accuracy plot (array_cal_accuracy) - this plot should provide insight into what is being calculation in the decoupled_doa_estimate function
+- V complex plane plot (V_cplx)- a complex plane plot that plots just V. Similar filters should apply.
+
 The VVH and VVH ratio + spatial stream variants should have subplot formats that are lower triangular. So the subplots should all be square. The subplots should be large.
 
 
 ## Live plot file (live_plot.py)
-This file needs to create an interactive applet with a bunch of buttons. Each button needs to correspond to each of the unique specific plot file types. When these buttons are pressed, a window the specific plot should pop up, and begin live plotting. There needs to be an additional "save data" button that, when pressed, generates csvs with the format <timestamp>_CSI_INFO.csv and <timestamp>_CBF_INFO.csv, and saves them to the database/collected_data folder. Please refer to archive/plot_telemetry.py for the format of these csvs. Add necessary helper functions to handle the combination of DSP and plotting. There should be an additional drop down list that allows for the user to select a valid mac address (based on whether or not a cbf was received), for which the next plotting button clicked will open the plot for that mac address.
+This file needs to create an interactive applet with a bunch of buttons. Each button needs to correspond to each of the unique specific plot file types. When these buttons are pressed, a window the specific plot should pop up, and begin live plotting. There needs to be an additional "save data" button that, when pressed, generates csvs with the format <timestamp>_CSI_INFO.csv and <timestamp>_CBF_INFO.csv, and saves them to the database/collected_data folder. Each packet should be timestamped. Add necessary helper functions to handle the combination of DSP and plotting. There should be an additional drop down list that allows for the user to select a valid mac address (based on whether or not a cbf was received), for which the next plotting button clicked will open the plot for that mac address.
 
-## saved plot file (plot_existing_data.ipynb)
-This file needs to be an interactive jupyter notebook that can read the files saved from the live plot "save data" button, and plot all of the specific plot files. This notebook should maintain parity with the live plotter. There should be a time slider that allows for the user to mimic behavior over time.
+## saved plot file (replay_plot.py)
+This file needs to be an interactive python file that can read the files saved from the live plot "save data" button, and plot all of the specific plot files. This file should maintain parity with the live plotter. There should be a time slider that allows for the user to mimic behavior over time. It should function similarly to the live viewer.
 
 
 

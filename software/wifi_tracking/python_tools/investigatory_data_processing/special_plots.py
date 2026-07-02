@@ -22,7 +22,7 @@ Public plot functions:
   VVH_ss_waterfall, VVH_ss_cplx,
   VVH_ratio_waterfall, VVH_ratio_cplx,
   VVH_ratio_ss_waterfall, VVH_ratio_ss_cplx,
-  est_array_plot
+  est_array_plot, array_cal_accuracy
 
 DSP helpers (also importable):
   get_vvh(store, mac)       -> R_all (n_frames, n_sc, nr, nr)
@@ -36,6 +36,7 @@ import threading
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.widgets as _mpl_widgets
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Slider
 from mpl_toolkits.mplot3d import Axes3D   # noqa: F401
@@ -44,6 +45,28 @@ import dsp
 import rare_est
 from plot_types.waterfalls import WaterfallFigure
 from plot_types.complex_plane import ComplexPlaneFigure
+
+# ------------------------------------------------------------------
+# Patch Slider._update to handle concurrent mouse-grab conflicts.
+# Multiple sliders across figures can race on grab_mouse; release the
+# stale holder and retry rather than crashing.
+# ------------------------------------------------------------------
+
+_orig_slider_update = _mpl_widgets.Slider._update
+
+
+def _safe_slider_update(self, event):
+    try:
+        _orig_slider_update(self, event)
+    except RuntimeError:
+        try:
+            event.canvas.release_mouse(event.canvas.mouse_grabber)
+            _orig_slider_update(self, event)
+        except Exception:
+            pass
+
+
+_mpl_widgets.Slider._update = _safe_slider_update
 
 # ------------------------------------------------------------------
 # Configuration
@@ -206,16 +229,18 @@ def _make_cpx(
 
 
 def _wf_data(
-    R_all:    np.ndarray,
-    denoise:  bool = True,
-    antialias: bool = True,
+    R_all:                np.ndarray,
+    denoise:              bool = True,
+    antialias:            bool = True,
+    cubic_spline_upsample: bool = True,
 ) -> dict:
     """Build waterfall data_dict from VV* history.
 
     Args:
         R_all (np.ndarray): (n_frames, n_sc, nr, nr) complex.
         denoise (bool): Apply moving-average along subcarriers.
-        antialias (bool): Apply cubic-spline upsampling along frames.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
     Returns:
         dict: {(i,j): (mag_db, phase)} waterfall data.
     """
@@ -231,14 +256,18 @@ def _wf_data(
         if antialias:
             amp_db = dsp.antialias(amp_db)
             phase  = dsp.antialias_phase(phase)
+        if cubic_spline_upsample:
+            amp_db = dsp.cubic_spline_upsample(amp_db)
+            phase  = dsp.cubic_spline_upsample_phase(phase)
         data[(i, j)] = (amp_db, phase)
     return data
 
 
 def _ratio_wf_data(
-    ratio:     dict,
-    denoise:   bool = True,
-    antialias: bool = True,
+    ratio:                dict,
+    denoise:              bool = True,
+    antialias:            bool = True,
+    cubic_spline_upsample: bool = True,
 ) -> dict:
     """Build waterfall data_dict from a ratio dict.
 
@@ -250,7 +279,8 @@ def _ratio_wf_data(
     Args:
         ratio (dict): {(i,j): (n_frames, n_sc) complex}.
         denoise (bool): Apply moving-average along subcarriers.
-        antialias (bool): Apply cubic-spline upsampling along frames.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
     Returns:
         dict: {(i,j): (mag_db, phase)} waterfall data.
     """
@@ -271,21 +301,26 @@ def _ratio_wf_data(
         if antialias:
             amp_db = dsp.antialias(amp_db)
             ph     = dsp.antialias_phase(ph)
+        if cubic_spline_upsample:
+            amp_db = dsp.cubic_spline_upsample(amp_db)
+            ph     = dsp.cubic_spline_upsample_phase(ph)
         data[(i, j)] = (amp_db, ph)
     return data
 
 
 def _cpx_data(
-    R_all:     np.ndarray,
-    denoise:   bool = True,
-    antialias: bool = True,
+    R_all:                np.ndarray,
+    denoise:              bool = True,
+    antialias:            bool = True,
+    cubic_spline_upsample: bool = True,
 ) -> dict:
     """Build complex-plane data_dict from VV* history.
 
     Args:
         R_all (np.ndarray): (n_frames, n_sc, nr, nr) complex.
         denoise (bool): Apply moving-average along subcarriers.
-        antialias (bool): Apply cubic-spline upsampling along frames.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
     Returns:
         dict: {(i,j): [series_array]} complex-plane data.
     """
@@ -298,14 +333,18 @@ def _cpx_data(
         if antialias:
             elem = (dsp.antialias(elem.real)
                     + 1j * dsp.antialias(elem.imag))
+        if cubic_spline_upsample:
+            elem = (dsp.cubic_spline_upsample(elem.real)
+                    + 1j * dsp.cubic_spline_upsample(elem.imag))
         result[(i, j)] = [elem]
     return result
 
 
 def _ratio_cpx_data(
-    ratio:     dict,
-    denoise:   bool = True,
-    antialias: bool = True,
+    ratio:                dict,
+    denoise:              bool = True,
+    antialias:            bool = True,
+    cubic_spline_upsample: bool = True,
 ) -> dict:
     """Build complex-plane data_dict from a ratio dict.
 
@@ -316,7 +355,8 @@ def _ratio_cpx_data(
     Args:
         ratio (dict): {(i,j): (n_frames, n_sc) complex}.
         denoise (bool): Apply moving-average along subcarriers.
-        antialias (bool): Apply cubic-spline upsampling along frames.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
     Returns:
         dict: {(i,j): [series_array]} complex-plane data.
     """
@@ -326,7 +366,11 @@ def _ratio_cpx_data(
         if denoise:
             v = dsp.denoise(v)
         if antialias:
-            v = dsp.antialias(v.real) + 1j * dsp.antialias(v.imag)
+            v = (dsp.antialias(v.real)
+                 + 1j * dsp.antialias(v.imag))
+        if cubic_spline_upsample:
+            v = (dsp.cubic_spline_upsample(v.real)
+                 + 1j * dsp.cubic_spline_upsample(v.imag))
         result[k] = [v]
     return result
 
@@ -337,11 +381,12 @@ def _ratio_cpx_data(
 
 def VVH_waterfall(
     store,
-    interval:  int  = INTERVAL,
-    window:    int  = WINDOW_LEN,
-    denoise:   bool = True,
-    antialias: bool = True,
-    mac:       str  = '',
+    interval:              int  = INTERVAL,
+    window:                int  = WINDOW_LEN,
+    denoise:               bool = True,
+    antialias:             bool = True,
+    cubic_spline_upsample: bool = True,
+    mac:                   str  = '',
     **_kw,
 ):
     """VV* lower-triangular magnitude + phase waterfall.
@@ -351,7 +396,8 @@ def VVH_waterfall(
         interval (int): Animation refresh in ms.
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -364,7 +410,8 @@ def VVH_waterfall(
         R_all = get_vvh(store, mac)
         if R_all is None:
             return
-        wf.draw(_wf_data(R_all, denoise=denoise, antialias=antialias))
+        wf.draw(_wf_data(R_all, denoise=denoise, antialias=antialias,
+                         cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(wf.fig, _update, interval=interval, blit=False)
     wf.fig.show()
@@ -377,11 +424,12 @@ def VVH_waterfall(
 
 def VVH_cplx(
     store,
-    interval:  int  = INTERVAL,
-    window:    int  = WINDOW_LEN,
-    denoise:   bool = True,
-    antialias: bool = True,
-    mac:       str  = '',
+    interval:              int  = INTERVAL,
+    window:                int  = WINDOW_LEN,
+    denoise:               bool = True,
+    antialias:             bool = True,
+    cubic_spline_upsample: bool = True,
+    mac:                   str  = '',
     **_kw,
 ):
     """VV* lower-triangular complex-plane plot.
@@ -391,7 +439,8 @@ def VVH_cplx(
         interval (int): Animation refresh in ms.
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -406,7 +455,8 @@ def VVH_cplx(
             return
         cpx.set_n_sc(R_all.shape[1])
         cpx.draw(_cpx_data(
-            R_all, denoise=denoise, antialias=antialias))
+            R_all, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(cpx.fig, _update, interval=interval, blit=False)
     cpx.fig.show()
@@ -419,11 +469,12 @@ def VVH_cplx(
 
 def VVH_ss_waterfall(
     store,
-    interval:  int  = INTERVAL,
-    window:    int  = WINDOW_LEN,
-    denoise:   bool = True,
-    antialias: bool = True,
-    mac:       str  = '',
+    interval:              int  = INTERVAL,
+    window:                int  = WINDOW_LEN,
+    denoise:               bool = True,
+    antialias:             bool = True,
+    cubic_spline_upsample: bool = True,
+    mac:                   str  = '',
     **_kw,
 ):
     """Per-stream VV* waterfall with spatial-stream slider.
@@ -433,7 +484,8 @@ def VVH_ss_waterfall(
         interval (int): Animation refresh in ms.
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -454,7 +506,8 @@ def VVH_ss_waterfall(
             return
         nc_ = _meta(store, mac).get('nc', 1)
         ss_sl.valmax = max(nc_ - 1, 1)
-        wf.draw(_wf_data(R_ss, denoise=denoise, antialias=antialias))
+        wf.draw(_wf_data(R_ss, denoise=denoise, antialias=antialias,
+                         cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(wf.fig, _update, interval=interval, blit=False)
     wf.fig.show()
@@ -467,11 +520,12 @@ def VVH_ss_waterfall(
 
 def VVH_ss_cplx(
     store,
-    interval:  int  = INTERVAL,
-    window:    int  = WINDOW_LEN,
-    denoise:   bool = True,
-    antialias: bool = True,
-    mac:       str  = '',
+    interval:              int  = INTERVAL,
+    window:                int  = WINDOW_LEN,
+    denoise:               bool = True,
+    antialias:             bool = True,
+    cubic_spline_upsample: bool = True,
+    mac:                   str  = '',
     **_kw,
 ):
     """Per-stream VV* complex-plane plot with stream slider.
@@ -481,7 +535,8 @@ def VVH_ss_cplx(
         interval (int): Animation refresh in ms.
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -504,7 +559,8 @@ def VVH_ss_cplx(
         ss_sl.valmax = max(nc_ - 1, 1)
         cpx.set_n_sc(R_ss.shape[1])
         cpx.draw(_cpx_data(
-            R_ss, denoise=denoise, antialias=antialias))
+            R_ss, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(cpx.fig, _update, interval=interval, blit=False)
     cpx.fig.show()
@@ -517,12 +573,14 @@ def VVH_ss_cplx(
 
 def VVH_ratio_waterfall(
     store,
-    interval:  int   = INTERVAL,
-    window:    int   = WINDOW_LEN,
-    denom_lim: float = DENOM_LIM,
-    denoise:   bool  = True,
-    antialias: bool  = True,
-    mac:       str   = '',
+    interval:              int   = INTERVAL,
+    window:                int   = WINDOW_LEN,
+    denom_lim:             float = DENOM_LIM,
+    denoise:               bool  = True,
+    antialias:             bool  = True,
+    cubic_spline_upsample: bool  = True,
+    mac:                   str   = '',
+    **_kw,
 ):
     """VV* ratio waterfall (lower-tri / diagonal).
 
@@ -532,7 +590,8 @@ def VVH_ratio_waterfall(
         window (int): Rolling window depth.
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -553,7 +612,8 @@ def VVH_ratio_waterfall(
             return
         ratio = dsp.vv_star_ratio(R_all, denom_lim)
         wf.draw(_ratio_wf_data(
-            ratio, denoise=denoise, antialias=antialias))
+            ratio, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(wf.fig, _update, interval=interval, blit=False)
     wf.fig.show()
@@ -566,12 +626,14 @@ def VVH_ratio_waterfall(
 
 def VVH_ratio_cplx(
     store,
-    interval:  int   = INTERVAL,
-    window:    int   = WINDOW_LEN,
-    denom_lim: float = DENOM_LIM,
-    denoise:   bool  = True,
-    antialias: bool  = True,
-    mac:       str   = '',
+    interval:              int   = INTERVAL,
+    window:                int   = WINDOW_LEN,
+    denom_lim:             float = DENOM_LIM,
+    denoise:               bool  = True,
+    antialias:             bool  = True,
+    cubic_spline_upsample: bool  = True,
+    mac:                   str   = '',
+    **_kw,
 ):
     """VV* ratio complex-plane plot.
 
@@ -581,7 +643,8 @@ def VVH_ratio_cplx(
         window (int): Rolling window depth.
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -604,7 +667,8 @@ def VVH_ratio_cplx(
         cpx.set_n_sc(R_all.shape[1])
         ratio = dsp.vv_star_ratio(R_all, denom_lim)
         cpx.draw(_ratio_cpx_data(
-            ratio, denoise=denoise, antialias=antialias))
+            ratio, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(cpx.fig, _update, interval=interval, blit=False)
     cpx.fig.show()
@@ -617,12 +681,14 @@ def VVH_ratio_cplx(
 
 def VVH_ratio_ss_waterfall(
     store,
-    interval:  int   = INTERVAL,
-    window:    int   = WINDOW_LEN,
-    denom_lim: float = DENOM_LIM,
-    denoise:   bool  = True,
-    antialias: bool  = True,
-    mac:       str   = '',
+    interval:              int   = INTERVAL,
+    window:                int   = WINDOW_LEN,
+    denom_lim:             float = DENOM_LIM,
+    denoise:               bool  = True,
+    antialias:             bool  = True,
+    cubic_spline_upsample: bool  = True,
+    mac:                   str   = '',
+    **_kw,
 ):
     """Per-stream VV* ratio waterfall with stream slider.
 
@@ -632,7 +698,8 @@ def VVH_ratio_ss_waterfall(
         window (int): Rolling window depth.
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -661,7 +728,8 @@ def VVH_ratio_ss_waterfall(
         ss_sl.valmax = max(nc_ - 1, 1)
         ratio = dsp.vv_star_ratio(R_ss, denom_lim)
         wf.draw(_ratio_wf_data(
-            ratio, denoise=denoise, antialias=antialias))
+            ratio, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(wf.fig, _update, interval=interval, blit=False)
     wf.fig.show()
@@ -674,12 +742,14 @@ def VVH_ratio_ss_waterfall(
 
 def VVH_ratio_ss_cplx(
     store,
-    interval:  int   = INTERVAL,
-    window:    int   = WINDOW_LEN,
-    denom_lim: float = DENOM_LIM,
-    denoise:   bool  = True,
-    antialias: bool  = True,
-    mac:       str   = '',
+    interval:              int   = INTERVAL,
+    window:                int   = WINDOW_LEN,
+    denom_lim:             float = DENOM_LIM,
+    denoise:               bool  = True,
+    antialias:             bool  = True,
+    cubic_spline_upsample: bool  = True,
+    mac:                   str   = '',
+    **_kw,
 ):
     """Per-stream VV* ratio complex-plane plot with stream slider.
 
@@ -689,7 +759,8 @@ def VVH_ratio_ss_cplx(
         window (int): Rolling window depth.
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
-        antialias (bool): Apply frame-axis antialiasing.
+        antialias (bool): Apply low-pass anti-aliasing along frames.
+        cubic_spline_upsample (bool): Apply cubic-spline upsampling.
         mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
@@ -720,7 +791,8 @@ def VVH_ratio_ss_cplx(
         cpx.set_n_sc(R_ss.shape[1])
         ratio = dsp.vv_star_ratio(R_ss, denom_lim)
         cpx.draw(_ratio_cpx_data(
-            ratio, denoise=denoise, antialias=antialias))
+            ratio, denoise=denoise, antialias=antialias,
+            cubic_spline_upsample=cubic_spline_upsample))
 
     ani = FuncAnimation(cpx.fig, _update, interval=interval, blit=False)
     cpx.fig.show()
@@ -737,6 +809,7 @@ def est_array_plot(
     window:      int   = WINDOW_LEN,
     array_shape: tuple = ARRAY_SHAPE,
     cal_every:   int   = 1,
+    mac:         str   = '',
     **_kw,
 ):
     """Calibrated array geometry + AoA over time.
@@ -746,6 +819,7 @@ def est_array_plot(
     Bottom-right: Elevation angle over time.
 
     Geometry is re-calibrated every cal_every animation frames.
+    Multiple windows may be open simultaneously for different MACs.
 
     Args:
         store: DataStore instance.
@@ -753,11 +827,14 @@ def est_array_plot(
         window (int): Rolling window depth.
         array_shape (tuple): (rows, cols) for initial geometry.
         cal_every (int): Re-calibrate every N frames.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    fig = plt.figure('Array Geometry + AoA', figsize=(12, 5))
-    fig.suptitle('Estimated Array Geometry + AoA', fontsize=10)
+    mac   = mac or _first_mac(store)
+    title = f'Array Geometry + AoA  [{mac}]'
+    fig   = plt.figure(title, figsize=(12, 5))
+    fig.suptitle(title, fontsize=10)
 
     gs = gridspec.GridSpec(
         2, 2, figure=fig,
@@ -780,9 +857,6 @@ def est_array_plot(
         'cal_running': False,
     }
 
-    def _nominal_geo(n_r, n_c):
-        return rare_est.build_geometry(n_rows=n_r, n_cols=n_c)
-
     def _run_calibration(v_mean, init_g):
         """Background calibration — updates state['geo'] when done."""
         try:
@@ -794,7 +868,6 @@ def est_array_plot(
             state['cal_running'] = False
 
     def _update(_f):
-        mac  = _first_mac(store)
         frames = _snapshot_frames(store, mac)
         if not frames:
             return
@@ -803,9 +876,6 @@ def est_array_plot(
         v4d = np.stack([f['v_all'] for f in frames], axis=0)
         nf, n_sc, nr, nc = v4d.shape
 
-        # Build a geometry consistent with the actual array size.
-        # array_shape is a hint; if its element count != nr, fall back
-        # to a 1×nr ULA so geometry always matches the data.
         n_r, n_c = array_shape
         if n_r * n_c != nr:
             n_r, n_c = 1, nr
@@ -815,12 +885,12 @@ def est_array_plot(
         # previously calibrated geometry so positions evolve over time.
         if state['geo'] is None:
             try:
-                init_g = _nominal_geo(n_r, n_c)
+                init_g = rare_est.build_random_geometry(nr)
                 v_mean = v4d.mean(axis=0)
                 state['geo'] = rare_est.calibrate_array_geometry(
                     v_mean, n_sources=1, init_geo=init_g)
             except Exception:
-                state['geo'] = _nominal_geo(n_r, n_c)
+                state['geo'] = rare_est.build_random_geometry(nr)
 
         elif (state['frame'] % cal_every == 0
               and not state['cal_running']):
@@ -862,11 +932,11 @@ def est_array_plot(
         ax_geo.set_ylabel('y (λ)', fontsize=7)
         ax_geo.set_zlabel('z (λ)', fontsize=7)
         pos = geo.pos
-        ax_geo.scatter(pos[:, 0], pos[:, 1], np.zeros(len(pos)),
+        ax_geo.scatter(pos[:, 0], pos[:, 1], pos[:, 2],
                        c=range(len(pos)), cmap='viridis',
                        s=60, depthshade=False)
-        for idx, (x, y) in enumerate(pos):
-            ax_geo.text(x, y, 0, f' {idx}', fontsize=7)
+        for idx, (px, py, pz) in enumerate(pos):
+            ax_geo.text(px, py, pz, f' {idx}', fontsize=7)
 
         # AoA time-series subplots
         x = np.arange(len(state['az']))
@@ -885,6 +955,115 @@ def est_array_plot(
         ax_el.set_ylim(-90, 90)
         ax_el.grid(True, lw=0.3, alpha=0.3)
         ax_el.plot(x, state['el'], color='darkorange', lw=1.2)
+
+        fig.canvas.draw_idle()
+
+    ani = FuncAnimation(fig, _update, interval=interval, blit=False)
+    fig.show()
+    return fig, ani
+
+
+# ------------------------------------------------------------------
+# array_cal_accuracy
+# ------------------------------------------------------------------
+
+def array_cal_accuracy(
+    store,
+    interval:    int   = INTERVAL,
+    window:      int   = WINDOW_LEN,
+    array_shape: tuple = ARRAY_SHAPE,
+    mac:         str   = '',
+    **_kw,
+):
+    """MUSIC spectrum and eigenvalue profile from decoupled_doa_estimate.
+
+    Three subplots that expose the internals of decoupled_doa_estimate:
+      Left:   Azimuth MUSIC spectrum at the best-fit elevation.
+              A sharp peak indicates a confident, well-resolved DoA.
+      Centre: Elevation MUSIC spectrum at the estimated azimuth.
+      Right:  Eigenvalue spectrum; the signal eigenvalue (blue) versus
+              the noise floor (grey) reflects the channel SNR.
+    Red dashed lines mark the estimated DoA peaks in each spectrum.
+
+    Args:
+        store: DataStore instance.
+        interval (int): Animation refresh in ms.
+        window (int): Rolling window depth (frames averaged for R).
+        array_shape (tuple): (rows, cols) hint for geometry.
+        mac (str): MAC address to display; defaults to first seen.
+    Returns:
+        tuple: (fig, FuncAnimation).
+    """
+    mac   = mac or _first_mac(store)
+    title = f'Array Cal Accuracy  [{mac}]'
+
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4), num=title)
+    fig.suptitle(title, fontsize=10)
+    fig.subplots_adjust(wspace=0.35, top=0.88)
+
+    ax_az, ax_el, ax_eig = axes
+    state = {'geo': None}
+
+    def _label_ax(ax, xlabel, ylabel, ax_title):
+        ax.set_title(ax_title, fontsize=8)
+        ax.set_xlabel(xlabel,   fontsize=7)
+        ax.set_ylabel(ylabel,   fontsize=7)
+        ax.grid(True, lw=0.3, alpha=0.3)
+
+    _label_ax(ax_az,  'Azimuth (°)',   'Power (dB)', 'Azimuth MUSIC Spectrum')
+    _label_ax(ax_el,  'Elevation (°)', 'Power (dB)', 'Elevation MUSIC Spectrum')
+    _label_ax(ax_eig, 'Index',         'Magnitude',  'Eigenvalue Spectrum')
+
+    def _update(_f):
+        frames = _snapshot_frames(store, mac)
+        if not frames:
+            return
+
+        v4d = np.stack([f['v_all'] for f in frames], axis=0)
+        _nf, _n_sc, nr, _nc = v4d.shape
+
+        n_r, n_c = array_shape
+        if n_r * n_c != nr:
+            n_r, n_c = 1, nr
+
+        if state['geo'] is None:
+            state['geo'] = rare_est.build_random_geometry(nr)
+
+        try:
+            v_mean = v4d.mean(axis=0)            # (n_sc, nr, nc)
+            R      = rare_est.covariance_from_cbf(v_mean)
+            result = rare_est.decoupled_doa_estimate(
+                R, state['geo'], n_sources=1)
+            _E_n, eigs = rare_est.noise_subspace(R, 1)
+        except Exception:
+            return
+
+        ax_az.cla()
+        _label_ax(ax_az, 'Azimuth (°)', 'Power (dB)',
+                  'Azimuth MUSIC Spectrum')
+        ax_az.set_ylim(-40, 1)
+        ax_az.plot(result['az_scan_deg'], result['az_spectrum_db'],
+                   color='steelblue', lw=1.2)
+        for az in result['az_doa']:
+            if np.isfinite(az):
+                ax_az.axvline(az, color='red', lw=1.0, ls='--', alpha=0.7)
+
+        ax_el.cla()
+        _label_ax(ax_el, 'Elevation (°)', 'Power (dB)',
+                  'Elevation MUSIC Spectrum')
+        ax_el.set_ylim(-40, 1)
+        ax_el.plot(result['el_scan_deg'], result['el_spectrum_db'],
+                   color='darkorange', lw=1.2)
+        for el in result['el_doa']:
+            if np.isfinite(el):
+                ax_el.axvline(el, color='red', lw=1.0, ls='--', alpha=0.7)
+
+        ax_eig.cla()
+        _label_ax(ax_eig, 'Index', 'Magnitude', 'Eigenvalue Spectrum')
+        idxs   = np.arange(len(eigs))
+        colors = ['steelblue'] + ['lightgrey'] * max(0, len(eigs) - 1)
+        ax_eig.bar(idxs, eigs, color=colors)
+        ax_eig.set_xticks(idxs)
 
         fig.canvas.draw_idle()
 

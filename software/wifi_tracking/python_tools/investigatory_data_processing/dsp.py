@@ -65,10 +65,10 @@ def denoise_phase(
 
 
 # ------------------------------------------------------------------
-# Antialiasing / oversampling
+# Cubic-spline upsampling
 # ------------------------------------------------------------------
 
-def antialias(
+def cubic_spline_upsample(
     arr: np.ndarray, factor: int = _OVERSAMP_FACTOR
 ) -> np.ndarray:
     """Cubic-spline upsampling along axis 0 (time axis).
@@ -92,10 +92,10 @@ def antialias(
     return _interp1d(x, arr, axis=0, kind=kind)(x_up)
 
 
-def antialias_phase(
+def cubic_spline_upsample_phase(
     arr: np.ndarray, factor: int = _OVERSAMP_FACTOR
 ) -> np.ndarray:
-    """Phase-aware upsampling (handles ±π wrap).
+    """Phase-aware cubic-spline upsampling (handles ±π wrap).
 
     Args:
         arr (np.ndarray): Phase array in radians, 1-D or 2-D real.
@@ -105,7 +105,67 @@ def antialias_phase(
     """
     c = np.exp(1j * arr)
     return np.angle(
-        antialias(c.real, factor) + 1j * antialias(c.imag, factor))
+        cubic_spline_upsample(c.real, factor)
+        + 1j * cubic_spline_upsample(c.imag, factor))
+
+
+# ------------------------------------------------------------------
+# Anti-aliasing (low-pass filter)
+# ------------------------------------------------------------------
+
+_AA_CUTOFF = 0.4   # normalized cutoff (fraction of Nyquist)
+_AA_ORDER  = 4     # Butterworth filter order
+
+
+def antialias(
+    arr:    np.ndarray,
+    cutoff: float = _AA_CUTOFF,
+    order:  int   = _AA_ORDER,
+) -> np.ndarray:
+    """Low-pass Butterworth anti-aliasing filter along axis 0 (time axis).
+
+    Removes temporal frequencies above cutoff * Nyquist.
+
+    Args:
+        arr (np.ndarray): 1-D or 2-D real array.
+        cutoff (float): Normalized cutoff frequency (0–1, fraction of
+            Nyquist).
+        order (int): Butterworth filter order.
+    Returns:
+        np.ndarray: Filtered array, same shape.
+    """
+    from scipy.signal import butter, sosfiltfilt
+    sos = butter(order, cutoff, btype='low', output='sos')
+    # sosfiltfilt requires data length > 3 * (2 * n_sections).
+    min_len = 3 * (2 * len(sos)) + 1
+    if arr.shape[0] < min_len:
+        return arr
+    try:
+        if arr.ndim == 1:
+            return sosfiltfilt(sos, arr)
+        return sosfiltfilt(sos, arr, axis=0)
+    except ValueError:
+        return arr
+
+
+def antialias_phase(
+    arr:    np.ndarray,
+    cutoff: float = _AA_CUTOFF,
+    order:  int   = _AA_ORDER,
+) -> np.ndarray:
+    """Phase-aware low-pass anti-aliasing filter (handles ±π wrap).
+
+    Args:
+        arr (np.ndarray): Phase array in radians, 1-D or 2-D real.
+        cutoff (float): Normalized cutoff frequency.
+        order (int): Butterworth filter order.
+    Returns:
+        np.ndarray: Filtered phase, same shape.
+    """
+    c = np.exp(1j * arr)
+    return np.angle(
+        antialias(c.real, cutoff, order)
+        + 1j * antialias(c.imag, cutoff, order))
 
 
 # ------------------------------------------------------------------
@@ -243,7 +303,7 @@ def vv_star_ratio_ss(
 
 
 # ------------------------------------------------------------------
-# Smoothing pipeline (denoise → antialias)
+# Smoothing pipeline (denoise → cubic_spline_upsample)
 # ------------------------------------------------------------------
 
 def smooth_real(
@@ -251,7 +311,7 @@ def smooth_real(
     win:    int = _DENOISE_WIN,
     factor: int = _OVERSAMP_FACTOR,
 ) -> np.ndarray:
-    """Denoise then antialias a real-valued 1-D or 2-D array.
+    """Denoise then cubic-spline upsample a real-valued array.
 
     Args:
         arr (np.ndarray): Input real array.
@@ -260,7 +320,7 @@ def smooth_real(
     Returns:
         np.ndarray: Filtered array.
     """
-    return antialias(denoise(arr, win), factor)
+    return cubic_spline_upsample(denoise(arr, win), factor)
 
 
 def smooth_phase(
@@ -268,7 +328,7 @@ def smooth_phase(
     win:    int = _DENOISE_WIN,
     factor: int = _OVERSAMP_FACTOR,
 ) -> np.ndarray:
-    """Denoise then antialias a phase array (handles ±π wrap).
+    """Denoise then cubic-spline upsample a phase array (handles ±π wrap).
 
     Args:
         arr (np.ndarray): Phase array in radians.
@@ -277,7 +337,7 @@ def smooth_phase(
     Returns:
         np.ndarray: Filtered phase array.
     """
-    return antialias_phase(denoise_phase(arr, win), factor)
+    return cubic_spline_upsample_phase(denoise_phase(arr, win), factor)
 
 
 def smooth_complex(
@@ -285,7 +345,7 @@ def smooth_complex(
     win:    int = _DENOISE_WIN,
     factor: int = _OVERSAMP_FACTOR,
 ) -> np.ndarray:
-    """Denoise then antialias a complex array.
+    """Denoise then cubic-spline upsample a complex array.
 
     Denoises real and imaginary parts jointly via unit-circle
     averaging (phase-aware), then upsamples along axis 0.
@@ -299,8 +359,8 @@ def smooth_complex(
     """
     denoised = denoise(arr, win)
     return (
-        antialias(denoised.real, factor)
-        + 1j * antialias(denoised.imag, factor)
+        cubic_spline_upsample(denoised.real, factor)
+        + 1j * cubic_spline_upsample(denoised.imag, factor)
     )
 
 

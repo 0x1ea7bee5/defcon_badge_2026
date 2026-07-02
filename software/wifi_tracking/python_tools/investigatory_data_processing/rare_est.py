@@ -5,8 +5,9 @@ Supports ULA, rectangular UPA, and arbitrary array geometries via
 elevation-compensated decoupled MUSIC.
 
 Public symbols:
-  ArrayGeometry, build_geometry, build_hexagonal_geometry,
-  build_l_shaped_geometry, covariance_from_cbf, noise_subspace,
+  ArrayGeometry, build_geometry, build_random_geometry,
+  build_hexagonal_geometry, build_l_shaped_geometry,
+  covariance_from_cbf, noise_subspace,
   noise_projector, rare_l_polynomial, select_doa_roots,
   roots_to_doa, music_spectrum, music_spectrum_db,
   music_spectrum_arb, decoupled_doa_estimate, rare_l_estimate,
@@ -34,14 +35,15 @@ class ArrayGeometry:
     """Describes the physical layout of an antenna array.
 
     Attributes:
-        pos (np.ndarray): shape (Nr, 2).  pos[i] = [x_i, y_i] in wavelengths.
+        pos (np.ndarray): shape (Nr, 3).  pos[i] = [x_i, y_i, z_i] in
+            wavelengths.  Planar arrays have z_i = 0 for all elements.
         d_x (float): nominal x-axis spacing (wavelengths) — used as ULA
             spacing when running 1D Root-MUSIC on a rectangular array.
             For arbitrary arrays it sets the Nyquist band of the azimuth scan.
         d_y (float): nominal y-axis spacing (wavelengths),
             same role for elevation.
     """
-    pos: np.ndarray    # (Nr, 2), wavelengths
+    pos: np.ndarray    # (Nr, 3), wavelengths
     d_x: float = DEFAULT_D_LAMBDA
     d_y: float = DEFAULT_D_LAMBDA
 
@@ -57,11 +59,13 @@ def build_geometry(
     """Construct an ArrayGeometry for rectangular or arbitrary layouts.
 
     Rectangular shortcut: pass n_rows, n_cols, d_x, d_y (no pos).
-    Arbitrary layout:     pass pos (Nr×2 array of [x, y] in wavelengths).
+    Arbitrary layout:     pass pos (Nr×3 array of [x, y, z] in wavelengths).
+    Planar (2-column) pos is accepted and padded with z=0.
 
     Args:
-        pos:    (Nr, 2) real array of element positions in wavelengths.
-                If None, a row-major rectangular grid is generated.
+        pos:    (Nr, 3) real array of element positions in wavelengths.
+                (Nr, 2) arrays are accepted and padded with z=0.
+                If None, a row-major rectangular grid at z=0 is generated.
         n_rows: number of rows    (ignored when pos is supplied).
         n_cols: number of columns (ignored when pos is supplied).
         d_x:    column (x) spacing in wavelengths.
@@ -74,11 +78,15 @@ def build_geometry(
         xs = np.arange(n_cols) * d_x
         ys = np.arange(n_rows) * d_y
         xg, yg = np.meshgrid(xs, ys)
-        pos = np.column_stack([xg.ravel(), yg.ravel()])   # (Nr, 2), row-major
+        nr = n_rows * n_cols
+        pos = np.column_stack(
+            [xg.ravel(), yg.ravel(), np.zeros(nr)])   # (Nr, 3), row-major
     else:
         pos = np.asarray(pos, dtype=float)
-        if pos.ndim != 2 or pos.shape[1] != 2:
-            raise ValueError("pos must have shape (Nr, 2).")
+        if pos.ndim != 2 or pos.shape[1] not in (2, 3):
+            raise ValueError("pos must have shape (Nr, 2) or (Nr, 3).")
+        if pos.shape[1] == 2:
+            pos = np.column_stack([pos, np.zeros(len(pos))])
         if not np.all(np.isfinite(pos)):
             raise ValueError("pos contains non-finite values.")
 
@@ -109,10 +117,38 @@ def build_hexagonal_geometry(
         for r in range(-n_rings, n_rings + 1):
             if max(abs(q), abs(r), abs(-q - r)) <= n_rings:
                 positions.append([d_lam * (q + r / 2.0),
-                                   d_lam * (r * np.sqrt(3) / 2.0)])
+                                   d_lam * (r * np.sqrt(3) / 2.0),
+                                   0.0])
     pos = np.array(sorted(positions, key=lambda p: (round(p[1], 9),
                                                      round(p[0], 9))))
     return ArrayGeometry(pos=pos, d_x=d_lam, d_y=d_lam)
+
+
+def build_random_geometry(
+    nr:       int,
+    max_dist: float = 1.0,
+) -> ArrayGeometry:
+    """Build an ArrayGeometry with element 0 at the origin and elements
+    1..nr-1 at uniformly random positions within a sphere of radius max_dist.
+
+    Positions are drawn uniformly in volume (not surface) via:
+        direction = normalised Gaussian sample  (uniform on sphere surface)
+        radius    = U(0,1)^(1/3) * max_dist    (uniform in sphere volume)
+
+    Args:
+        nr (int): Total number of array elements.
+        max_dist (float): Maximum distance from the origin in wavelengths.
+    Returns:
+        ArrayGeometry
+    """
+    pos = np.zeros((nr, 3))
+    if nr > 1:
+        dirs  = np.random.randn(nr - 1, 3)
+        norms = np.linalg.norm(dirs, axis=1, keepdims=True)
+        dirs  = dirs / np.maximum(norms, 1e-12)
+        r     = np.random.uniform(0.0, 1.0, (nr - 1, 1)) ** (1.0 / 3.0)
+        pos[1:] = dirs * r * max_dist
+    return ArrayGeometry(pos=pos, d_x=DEFAULT_D_LAMBDA, d_y=DEFAULT_D_LAMBDA)
 
 
 def build_l_shaped_geometry(
@@ -133,8 +169,8 @@ def build_l_shaped_geometry(
     Returns:
         ArrayGeometry
     """
-    xs  = [(i * d_x, 0.0) for i in range(n_arm)]
-    ys  = [(0.0, i * d_y) for i in range(1, n_arm)]
+    xs  = [(i * d_x, 0.0, 0.0) for i in range(n_arm)]
+    ys  = [(0.0, i * d_y, 0.0) for i in range(1, n_arm)]
     return ArrayGeometry(pos=np.array(xs + ys), d_x=d_x, d_y=d_y)
 
 
@@ -318,16 +354,17 @@ def music_spectrum_arb(
     pos_x:  np.ndarray,
     el_rad: float,
     n_pts:  int = 361,
+    pos_z:  Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """1D MUSIC azimuth spectrum for an arbitrary array at fixed elevation.
 
     Uses the elevation-compensated noise projector C_comp (built from
-    R_comp = R · phase_compensation(el)) and the x-only steering vector:
+    R_comp = R · phase_compensation(el)) and the 3D azimuth steering:
 
-        a_x(az)[i] = exp(j 2π x_i sin(az) cos(el))
+        a(az)[i] = exp(j 2π (x_i sin(az) + z_i cos(az)) cos(el))
 
-    This function is called inside decoupled_doa_estimate and can also
-    be used standalone for visualisation.
+    For planar arrays (z=0) this reduces to exp(j 2π x_i sin(az) cos(el)).
+    The z term is non-zero only when pos_z is supplied and non-zero.
 
     Args:
         C_comp:  noise projector of elevation-compensated covariance,
@@ -335,6 +372,8 @@ def music_spectrum_arb(
         pos_x:   x coordinates of elements in wavelengths, shape (Nr,).
         el_rad:  candidate elevation angle in radians.
         n_pts:   number of azimuth scan points (default 361 → 0.5° steps).
+        pos_z:   z coordinates of elements in wavelengths, shape (Nr,).
+                 None or zero array gives the 2D planar result.
 
     Returns:
         np.ndarray: real pseudospectrum, shape (n_pts,). NOT in dB.
@@ -342,9 +381,13 @@ def music_spectrum_arb(
     az_scan = np.linspace(-np.pi / 2, np.pi / 2, n_pts)
     cos_el  = np.cos(el_rad)
     spec    = np.zeros(n_pts)
+    use_z   = pos_z is not None
     for i, az in enumerate(az_scan):
-        a_x     = np.exp(1j * 2.0 * np.pi * pos_x * np.sin(az) * cos_el)
-        denom   = np.real(a_x.conj() @ C_comp @ a_x)
+        phase = pos_x * np.sin(az)
+        if use_z:
+            phase = phase + pos_z * np.cos(az)
+        a       = np.exp(1j * 2.0 * np.pi * phase * cos_el)
+        denom   = np.real(a.conj() @ C_comp @ a)
         spec[i] = 1.0 / max(abs(denom), 1e-12)
     return spec
 
@@ -425,13 +468,20 @@ def decoupled_doa_estimate(
     pos   = geo.pos
     x     = pos[:, 0]
     y     = pos[:, 1]
+    z     = pos[:, 2]
     Nr    = len(x)
     n_src = max(1, min(n_sources, Nr - 1))
 
-    # Precompute y-difference matrix (Nr × Nr): dy[i,j] = y_i - y_j
+    # Difference matrices (Nr × Nr)
     dy = y[:, None] - y[None, :]
+    dx = x[:, None] - x[None, :]
+    dz = z[:, None] - z[None, :]
 
     # ---- Coarse elevation scan -----------------------------------------
+    # Remove y-contribution at each candidate el (compensates the y·sin(el)
+    # phase term).  After compensation the remaining phase is:
+    #   cos(el) · [(x_i−x_j) sin(az) + (z_i−z_j) cos(az)]
+    # so the azimuth steering must include both x and z.
     el_scan_rad = np.linspace(-np.pi / 2, np.pi / 2, n_el_scan)
     el_scores   = np.zeros(n_el_scan)
     el_results  = []   # store (R_comp, E_n, C) per el for the winner
@@ -440,7 +490,8 @@ def decoupled_doa_estimate(
         R_comp    = _compensate_elevation(R, dy, el)
         E_n, _    = noise_subspace(R_comp, n_src)
         C_comp    = noise_projector(E_n)
-        spec_az   = music_spectrum_arb(C_comp, x, el, n_pts=45)   # coarse az
+        spec_az   = music_spectrum_arb(
+            C_comp, x, el, n_pts=45, pos_z=z)   # coarse az
         el_scores[ki] = spec_az.max()
         el_results.append((R_comp, E_n, C_comp))
 
@@ -449,21 +500,24 @@ def decoupled_doa_estimate(
     best_el_rad              = el_scan_rad[best_el_idx]
     R_comp_best, _, C_best   = el_results[best_el_idx]
 
-    spec_az_fine  = music_spectrum_arb(C_best, x, best_el_rad, n_pts=n_az_fine)
-    az_scan_rad   = np.linspace(-np.pi / 2, np.pi / 2, n_az_fine)
+    spec_az_fine = music_spectrum_arb(
+        C_best, x, best_el_rad, n_pts=n_az_fine, pos_z=z)
+    az_scan_rad  = np.linspace(-np.pi / 2, np.pi / 2, n_az_fine)
 
     # Extract the top n_src azimuth peaks
     az_doa_rad = _peak_angles(spec_az_fine, az_scan_rad, n_src)
 
     # ---- Elevation refinement: fix az*, scan y-only -------------------
-    dx = x[:, None] - x[None, :]
+    # Compensate both x and z contributions at the estimated azimuth so
+    # the remaining phase is purely y·sin(el), enabling clean y-only
+    # elevation steering.
     best_az_rad = az_doa_rad[0] if not np.isnan(az_doa_rad[0]) else 0.0
 
     el_spec_fine = np.zeros(n_el_scan)
     for ki, el in enumerate(el_scan_rad):
-        # Compensate x-contribution at the estimated azimuth
-        R_el_comp = R * np.exp(-1j * 2.0 * np.pi * dx
-                               * np.sin(best_az_rad) * np.cos(el))
+        phase_xz  = (dx * np.sin(best_az_rad)
+                     + dz * np.cos(best_az_rad)) * np.cos(el)
+        R_el_comp = R * np.exp(-1j * 2.0 * np.pi * phase_xz)
         R_el_comp = (R_el_comp + R_el_comp.conj().T) / 2.0
         E_n_el, _ = noise_subspace(R_el_comp, n_src)
         C_el      = noise_projector(E_n_el)
@@ -601,7 +655,9 @@ def music_spectrum_2d(
     Scans an (n_az × n_el) angular grid. The steering vector uses the
     actual element positions — no Kronecker factorisation assumed:
 
-        a(az, el)[i] = exp(j 2π (x_i sin(az) cos(el) + y_i sin(el)))
+        a(az, el)[i] = exp(j 2π (x_i sin(az) cos(el)
+                                 + y_i sin(el)
+                                 + z_i cos(az) cos(el)))
 
     Args:
         C_full: full noise projector, shape (Nr, Nr).
@@ -617,6 +673,7 @@ def music_spectrum_2d(
     """
     x      = geo.pos[:, 0]
     y      = geo.pos[:, 1]
+    z      = geo.pos[:, 2]
     az_deg = np.linspace(-90.0, 90.0, n_az)
     el_deg = np.linspace(-90.0, 90.0, n_el)
     az_rad = np.deg2rad(az_deg)
@@ -627,8 +684,9 @@ def music_spectrum_2d(
         y_phase = 2.0 * np.pi * y * np.sin(el)
         cos_el  = np.cos(el)
         for ai, az in enumerate(az_rad):
-            phase        = y_phase + 2.0 * np.pi * x * np.sin(az) * cos_el
-            a            = np.exp(1j * phase)
+            xz_phase     = 2.0 * np.pi * (
+                x * np.sin(az) + z * np.cos(az)) * cos_el
+            a            = np.exp(1j * (y_phase + xz_phase))
             denom        = np.real(a.conj() @ C_full @ a)
             spec[ei, ai] = 1.0 / max(abs(denom), 1e-12)
 
@@ -839,17 +897,17 @@ def calibrate_array_geometry(
         min_{pos}  Σ_k || P_noise · a(az_k, el_k, pos) ||²
 
     Initial DoA estimates az_k, el_k are obtained from decoupled
-    MUSIC using init_geo (or a rectangular grid if not supplied).
+    MUSIC using init_geo (or a random geometry if not supplied).
     The noise projector P_noise is computed once from the full
     covariance R and held fixed during optimisation.
 
     Args:
         v_all (np.ndarray): (n_sc, nr, nc) complex CBF snapshots.
         n_sources (int): Number of sources.
-        init_geo (ArrayGeometry): Starting geometry. Built from
-            n_rows/n_cols when None.
-        n_rows (int): Rows for rectangular initial geometry.
-        n_cols (int): Cols for rectangular initial geometry.
+        init_geo (ArrayGeometry): Starting geometry. When None, a random
+            geometry with max element distance of 1 wavelength is used.
+        n_rows (int): Unused; kept for API compatibility.
+        n_cols (int): Unused; kept for API compatibility.
         max_iter (int): Optimiser iteration limit.
     Returns:
         ArrayGeometry: Calibrated element positions.
@@ -863,7 +921,7 @@ def calibrate_array_geometry(
     P_n     = noise_projector(E_n)
 
     if init_geo is None:
-        init_geo = build_geometry(n_rows=n_rows, n_cols=n_cols)
+        init_geo = build_random_geometry(nr)
 
     # Initial DoA estimates
     res0   = decoupled_doa_estimate(R, init_geo, n_src)
@@ -874,26 +932,27 @@ def calibrate_array_geometry(
     el_rad = el_rad[valid]
 
     def _residual(free_pos_flat: np.ndarray) -> float:
-        # Element 0 fixed at origin; optimise elements 1..nr-1.
-        pos = np.zeros((nr, 2))
-        pos[1:] = free_pos_flat.reshape(nr - 1, 2)
+        # Element 0 fixed at origin; optimise elements 1..nr-1 in 3D.
+        pos = np.zeros((nr, 3))
+        pos[1:] = free_pos_flat.reshape(nr - 1, 3)
         total   = 0.0
         for az, el in zip(az_rad, el_rad):
             phase = (
                 pos[:, 0] * np.sin(az) * np.cos(el)
                 + pos[:, 1] * np.sin(el)
+                + pos[:, 2] * np.cos(az) * np.cos(el)
             )
             a     = np.exp(1j * 2.0 * np.pi * phase)
             proj  = P_n @ a
             total += float(np.real(proj.conj() @ proj))
         return total
 
-    x0  = init_geo.pos[1:].ravel()
+    x0  = init_geo.pos[1:].ravel()   # (nr-1)*3 values
     opt = minimize(
         _residual, x0, method='L-BFGS-B',
         options={'maxiter': max_iter, 'ftol': 1e-10})
 
-    pos_cal       = np.zeros((nr, 2))
-    pos_cal[1:]   = opt.x.reshape(nr - 1, 2)
+    pos_cal       = np.zeros((nr, 3))
+    pos_cal[1:]   = opt.x.reshape(nr - 1, 3)
     return ArrayGeometry(
         pos=pos_cal, d_x=init_geo.d_x, d_y=init_geo.d_y)

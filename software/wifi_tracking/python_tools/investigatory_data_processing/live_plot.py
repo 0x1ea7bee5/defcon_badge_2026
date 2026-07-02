@@ -61,10 +61,11 @@ def _load_config(path: str = _CONFIG_PATH) -> dict:
         dict: Configuration values.
     """
     defaults = {
-        'apply_smooth_filter': True,
-        'apply_antialias':     True,
-        'plot_window':         200,
-        'denom_ratio':         0.01,
+        'apply_smooth_filter':        True,
+        'apply_antialias':            True,
+        'apply_cubic_spline_upsample': True,
+        'plot_window':                200,
+        'denom_ratio':                0.01,
     }
     try:
         with open(path) as fh:
@@ -77,10 +78,11 @@ def _load_config(path: str = _CONFIG_PATH) -> dict:
 
 _cfg = _load_config()
 
-SMOOTH    = bool(_cfg['apply_smooth_filter'])
-ANTIALIAS = bool(_cfg['apply_antialias'])
-WINDOW    = int(_cfg['plot_window'])
-DENOM_LIM = float(_cfg['denom_ratio'])
+SMOOTH         = bool(_cfg['apply_smooth_filter'])
+ANTIALIAS      = bool(_cfg['apply_antialias'])
+CUBIC_SPLINE   = bool(_cfg['apply_cubic_spline_upsample'])
+WINDOW         = int(_cfg['plot_window'])
+DENOM_LIM      = float(_cfg['denom_ratio'])
 
 
 # ------------------------------------------------------------------
@@ -262,6 +264,7 @@ _BTN_DEFS = [
     ('VVH Ratio SS Waterfall', 'VVH_ratio_ss_waterfall'),
     ('VVH Ratio SS Cplx',      'VVH_ratio_ss_cplx'),
     ('Array + AoA',            'est_array_plot'),
+    ('Array Cal Accuracy',     'array_cal_accuracy'),
 ]
 
 _N_COLS = 3
@@ -378,6 +381,7 @@ def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
                     window=WINDOW,
                     denoise=SMOOTH,
                     antialias=ANTIALIAS,
+                    cubic_spline_upsample=CUBIC_SPLINE,
                     denom_lim=DENOM_LIM,
                     mac=_get_selected_mac(),
                 )
