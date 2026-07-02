@@ -64,9 +64,9 @@ Base plot characteristics:
     - All plots should have a sliding window that plots the last N samples. Let N=200 and be configurable.
     - The plot title should include the mac address that is currently being displayed.
 plot_types/waterfalls.py
-    This type of plot will plot phase and magnitude waterfalls over subcarriers for a given mac address. There must be a slider to switch between different mac addresses. This plot type should support multiple subplots with multiple columns/rows. This plot also needs to have a labeled color bar.
+    This type of plot will plot phase and magnitude waterfalls over subcarriers for a given mac address. This plot type should support multiple subplots with multiple columns/rows. This plot also needs to have a labeled color bar.
 plot_types/complex_plane.py
-    This type of plot will plot the provided data in the complex plane over time. Newer data points should be more opaque than older data points. Data from different "antenna" columns should be plotted as separate legend items, and should be plotted with different shapes (stars,circles,diamonds,etc). Each new point should be connected to older points with a half opacity dashed line. This plot should have a checkbox labeled "plot all subcarriers". When this box is checked, all subcarriers should be plotted simultaneously, with each subcarrier given a unique color corresponding to a continuous color map. When this box is unchecked, only a single subcarrier should be plotted at a time. There should be a subcarrier slider that selects the subcarrier to plot when the "plot all subcarriers" box is unchecked. This slider should do nothing when the box is checked. This plot type should support multiple subplots with multiple rows/columns. The complex plots should autoscale.
+    This type of plot will plot the provided data in the complex plane over time. Newer data points should be more opaque than older data points. Data from different "antenna" columns should be plotted as separate legend items, and should be plotted with different shapes (stars,circles,diamonds,etc). Each new point should be connected to older points with a half opacity dashed line. This plot should have a checkbox labeled "plot all subcarriers". When this box is checked, all subcarriers should be plotted simultaneously, with each subcarrier given a unique color corresponding to a continuous color map. When this box is unchecked, only a single subcarrier should be plotted at a time. There should be a subcarrier slider that selects the subcarrier to plot when the "plot all subcarriers" box is unchecked. When the box is checked, there should be two sliders-- one for the lower range of subcarriers to plot, and one for the upper range of subcarriers to plot. This plot type should support multiple subplots with multiple rows/columns. The complex plots should autoscale. There should also be a time slider that goes from one to the max window size in the config yaml that allows the user to adjust the time window size.
 plot_types/time_series.py
     This will be a simple time series plot that plots the provided data over time with a nice time-dependent color map. This plot type should support multiple subplots with multiple rows/columns.
 plot_types/histograms.py
@@ -76,7 +76,7 @@ plot_types/histograms.py
 The following files will contain more specific types of plots. These specific plot types should be contained within the special_plots.py file. These plot files / functions should be flexible enough to be used with the static file plotter notebook, as well as the live plotter.
 - VV* waterfall (VVH_waterfall) - from VV*,  use the waterfall.py plot type. Each waterfall subplot should be the lower diagonal of the VV* matrix
 - VV* complex plane plot (VVH_cplx) - from VV*, use the complex_plane plot type for VV*. Each subplot should be the lower diagonal of the VV* matrix
-- vv* spatial stream waterfall (VVH_ss_waterfall) - from the individual collection of spatial stream v_nv_n*,  use the waterfall.py plot type. Each waterfall subplot should be the lower diagonal of the v_nv_n* matrix. There should be a spatial stream slider.
+- vv* spatial stream waterfall (VVH_ss_waterfall) - from the individual collection of spatial stream v_nv_n*,  use the waterfall.py plot type. Each waterfall subplot should be the lower ual sdiagonal of the v_nv_n* matrix. There should be a spatial stream slider.
 - vv* spatial stream complex plane plot (VVH_ss_cplx) - from the individual collection of spatial stream v_nv_n*, use the complex_plane plot type for v_nv_n*. Each subplot should be the lower diagonal of the v_nv_n* matrix. There should be a spatial stream slider.
 - VV* ratio waterfall (VVH_ratio_waterfall) - should be similar to VVH_waterfall, but should instead plot from vv_star_ratio
 - VV* ratio complex plane plot (VVH_ratio_cplx) - should be similar to VVH_cplx, but should instead plot from vv_star_ratio.
@@ -87,7 +87,15 @@ The VVH and VVH ratio + spatial stream variants should have subplot formats that
 
 
 ## Live plot file (live_plot.py)
-This file needs to create an interactive applet with a bunch of buttons. Each button needs to correspond to each of the unique specific plot file types. When these buttons are pressed, a window the specific plot should pop up, and begin live plotting. There needs to be an additional "save data" button that, when pressed, generates csvs with the format <timestamp>_CSI_INFO.csv and <timestamp>_CBF_INFO.csv, and saves them to the database/collected_data folder. Please refer to archive/plot_telemetry.py for the format of these csvs. Add necessary helper functions to handle the combination of DSP and plotting.
+This file needs to create an interactive applet with a bunch of buttons. Each button needs to correspond to each of the unique specific plot file types. When these buttons are pressed, a window the specific plot should pop up, and begin live plotting. There needs to be an additional "save data" button that, when pressed, generates csvs with the format <timestamp>_CSI_INFO.csv and <timestamp>_CBF_INFO.csv, and saves them to the database/collected_data folder. Please refer to archive/plot_telemetry.py for the format of these csvs. Add necessary helper functions to handle the combination of DSP and plotting. There should be an additional drop down list that allows for the user to select a valid mac address (based on whether or not a cbf was received), for which the next plotting button clicked will open the plot for that mac address.
 
 ## saved plot file (plot_existing_data.ipynb)
 This file needs to be an interactive jupyter notebook that can read the files saved from the live plot "save data" button, and plot all of the specific plot files. This notebook should maintain parity with the live plotter. There should be a time slider that allows for the user to mimic behavior over time.
+
+
+
+
+
+
+## Edits that I needed to ask claude to make:
+- Please consolidate the ratio functions defined in the dsp file and the ratio functions defined in the special plots file. The ratio computation functions should be located in the dsp file.

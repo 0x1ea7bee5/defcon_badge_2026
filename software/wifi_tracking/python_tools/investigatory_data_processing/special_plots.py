@@ -25,11 +25,13 @@ Public plot functions:
   est_array_plot
 
 DSP helpers (also importable):
-  get_vvh(store, mac)           -> R_all (n_frames, n_sc, nr, nr)
-  get_vvh_ss(store, mac, s)     -> R_ss  (n_frames, n_sc, nr, nr)
-  get_ratio(R_all, denom_lim)   -> dict {(i,j): (n_frames, n_sc)}
-  get_ratio_ss(R_ss, denom_lim) -> dict {(i,j): (n_frames, n_sc)}
+  get_vvh(store, mac)       -> R_all (n_frames, n_sc, nr, nr)
+  get_vvh_ss(store, mac, s) -> R_ss  (n_frames, n_sc, nr, nr)
+
+Ratio computation is delegated to dsp.vv_star_ratio / dsp.vv_star_ratio_ss.
 """
+
+import threading
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -156,43 +158,6 @@ def get_vvh_ss(store, mac: str, stream_idx: int) -> np.ndarray:
     v_c = v4d[:, :, :, s]   # (n_frames, n_sc, nr)
     return np.einsum('fki,fkj->fkij', v_c, v_c.conj())
 
-
-def get_ratio(
-    R_all: np.ndarray, denom_lim: float = DENOM_LIM
-) -> dict:
-    """Lower-triangular ratio dict from VV* history.
-
-    ratio[(i,j)] = R_all[:, :, i, j] / R_all[:, :, j, j].real
-    Values where |diag| < denom_lim are set to NaN.
-
-    Args:
-        R_all (np.ndarray): (n_frames, n_sc, nr, nr) complex.
-        denom_lim (float): Minimum diagonal threshold.
-    Returns:
-        dict: {(i, j): (n_frames, n_sc) complex}.
-    """
-    _, _, nr, _ = R_all.shape
-    result = {}
-    for i, j in _lower_tri(nr):
-        diag = R_all[:, :, j, j].real
-        mask = np.abs(diag) < denom_lim
-        result[(i, j)] = np.where(
-            mask, np.nan + 0j, R_all[:, :, i, j] / diag)
-    return result
-
-
-def get_ratio_ss(
-    R_ss: np.ndarray, denom_lim: float = DENOM_LIM
-) -> dict:
-    """Lower-triangular ratio dict from per-stream VV* history.
-
-    Args:
-        R_ss (np.ndarray): (n_frames, n_sc, nr, nr) complex.
-        denom_lim (float): Minimum diagonal threshold.
-    Returns:
-        dict: {(i, j): (n_frames, n_sc) complex}.
-    """
-    return get_ratio(R_ss, denom_lim)
 
 
 # ------------------------------------------------------------------
@@ -376,6 +341,7 @@ def VVH_waterfall(
     window:    int  = WINDOW_LEN,
     denoise:   bool = True,
     antialias: bool = True,
+    mac:       str  = '',
     **_kw,
 ):
     """VV* lower-triangular magnitude + phase waterfall.
@@ -386,18 +352,16 @@ def VVH_waterfall(
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
+    mac = mac or _first_mac(store)
     nr  = _meta(store, mac).get('nr', 2)
-    wf  = _make_wf(nr, 'VVH Waterfall', window)
-    wf.set_mac_list(_all_macs(store) or [''])
+    wf  = _make_wf(nr, f'VVH Waterfall  [{mac}]', window)
 
     def _update(_f):
-        wf.set_mac_list(_all_macs(store))
-        mac_  = wf.get_mac()
-        R_all = get_vvh(store, mac_)
+        R_all = get_vvh(store, mac)
         if R_all is None:
             return
         wf.draw(_wf_data(R_all, denoise=denoise, antialias=antialias))
@@ -417,6 +381,7 @@ def VVH_cplx(
     window:    int  = WINDOW_LEN,
     denoise:   bool = True,
     antialias: bool = True,
+    mac:       str  = '',
     **_kw,
 ):
     """VV* lower-triangular complex-plane plot.
@@ -427,15 +392,16 @@ def VVH_cplx(
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
+    mac = mac or _first_mac(store)
     nr  = _meta(store, mac).get('nr', 2)
-    cpx = _make_cpx(nr, 'VVH Complex Plane', window)
+    cpx = _make_cpx(nr, f'VVH Complex Plane  [{mac}]', window)
 
     def _update(_f):
-        R_all = get_vvh(store, _first_mac(store))
+        R_all = get_vvh(store, mac)
         if R_all is None:
             return
         cpx.set_n_sc(R_all.shape[1])
@@ -457,6 +423,7 @@ def VVH_ss_waterfall(
     window:    int  = WINDOW_LEN,
     denoise:   bool = True,
     antialias: bool = True,
+    mac:       str  = '',
     **_kw,
 ):
     """Per-stream VV* waterfall with spatial-stream slider.
@@ -467,27 +434,25 @@ def VVH_ss_waterfall(
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    m   = _meta(store, mac)
+    mac    = mac or _first_mac(store)
+    m      = _meta(store, mac)
     nr, nc = m.get('nr', 2), m.get('nc', 1)
-    wf  = _make_wf(nr, 'VVH SS Waterfall', window)
-    wf.set_mac_list(_all_macs(store) or [''])
+    wf     = _make_wf(nr, f'VVH SS Waterfall  [{mac}]', window)
 
     ax_ss = wf.fig.add_axes([0.1, 0.005, 0.8, 0.018])
     ss_sl = Slider(ax_ss, 'Stream', 0, max(nc - 1, 1),
                    valinit=0, valstep=1, color='mediumseagreen')
 
     def _update(_f):
-        wf.set_mac_list(_all_macs(store))
-        mac_  = wf.get_mac()
-        s     = int(round(ss_sl.val))
-        R_ss  = get_vvh_ss(store, mac_, s)
+        s    = int(round(ss_sl.val))
+        R_ss = get_vvh_ss(store, mac, s)
         if R_ss is None:
             return
-        nc_ = _meta(store, mac_).get('nc', 1)
+        nc_ = _meta(store, mac).get('nc', 1)
         ss_sl.valmax = max(nc_ - 1, 1)
         wf.draw(_wf_data(R_ss, denoise=denoise, antialias=antialias))
 
@@ -506,6 +471,7 @@ def VVH_ss_cplx(
     window:    int  = WINDOW_LEN,
     denoise:   bool = True,
     antialias: bool = True,
+    mac:       str  = '',
     **_kw,
 ):
     """Per-stream VV* complex-plane plot with stream slider.
@@ -516,13 +482,14 @@ def VVH_ss_cplx(
         window (int): Rolling window depth.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    m   = _meta(store, mac)
+    mac    = mac or _first_mac(store)
+    m      = _meta(store, mac)
     nr, nc = m.get('nr', 2), m.get('nc', 1)
-    cpx = _make_cpx(nr, 'VVH SS Complex Plane', window)
+    cpx    = _make_cpx(nr, f'VVH SS Complex Plane  [{mac}]', window)
 
     ax_ss = cpx.fig.add_axes([0.1, 0.005, 0.8, 0.018])
     ss_sl = Slider(ax_ss, 'Stream', 0, max(nc - 1, 1),
@@ -530,11 +497,10 @@ def VVH_ss_cplx(
 
     def _update(_f):
         s    = int(round(ss_sl.val))
-        mac_ = _first_mac(store)
-        R_ss = get_vvh_ss(store, mac_, s)
+        R_ss = get_vvh_ss(store, mac, s)
         if R_ss is None:
             return
-        nc_  = _meta(store, mac_).get('nc', 1)
+        nc_  = _meta(store, mac).get('nc', 1)
         ss_sl.valmax = max(nc_ - 1, 1)
         cpx.set_n_sc(R_ss.shape[1])
         cpx.draw(_cpx_data(
@@ -556,6 +522,7 @@ def VVH_ratio_waterfall(
     denom_lim: float = DENOM_LIM,
     denoise:   bool  = True,
     antialias: bool  = True,
+    mac:       str   = '',
 ):
     """VV* ratio waterfall (lower-tri / diagonal).
 
@@ -566,27 +533,25 @@ def VVH_ratio_waterfall(
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    nr  = _meta(store, mac).get('nr', 2)
-
+    mac    = mac or _first_mac(store)
+    nr     = _meta(store, mac).get('nr', 2)
     pairs  = _lower_tri(nr)
     titles = {(i, j): f'[{i},{j}]/[{j},{j}]' for i, j in pairs}
     wf = WaterfallFigure(
         n_rows_grid=nr, n_cols_grid=nr,
         active_positions=pairs, titles=titles,
-        window=window, fig_title='VVH Ratio Waterfall')
-    wf.set_mac_list(_all_macs(store) or [''])
+        window=window,
+        fig_title=f'VVH Ratio Waterfall  [{mac}]')
 
     def _update(_f):
-        wf.set_mac_list(_all_macs(store))
-        mac_  = wf.get_mac()
-        R_all = get_vvh(store, mac_)
+        R_all = get_vvh(store, mac)
         if R_all is None:
             return
-        ratio = get_ratio(R_all, denom_lim)
+        ratio = dsp.vv_star_ratio(R_all, denom_lim)
         wf.draw(_ratio_wf_data(
             ratio, denoise=denoise, antialias=antialias))
 
@@ -606,6 +571,7 @@ def VVH_ratio_cplx(
     denom_lim: float = DENOM_LIM,
     denoise:   bool  = True,
     antialias: bool  = True,
+    mac:       str   = '',
 ):
     """VV* ratio complex-plane plot.
 
@@ -616,25 +582,27 @@ def VVH_ratio_cplx(
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    nr  = _meta(store, mac).get('nr', 2)
+    mac    = mac or _first_mac(store)
+    nr     = _meta(store, mac).get('nr', 2)
     pairs  = _lower_tri(nr)
     titles = {(i, j): f'[{i},{j}]/[{j},{j}]' for i, j in pairs}
     cpx = ComplexPlaneFigure(
         n_rows_grid=nr, n_cols_grid=nr,
         active_positions=pairs, titles=titles,
         series_labels=['Ratio'],
-        window=window, fig_title='VVH Ratio Complex Plane')
+        window=window,
+        fig_title=f'VVH Ratio Complex Plane  [{mac}]')
 
     def _update(_f):
-        R_all = get_vvh(store, _first_mac(store))
+        R_all = get_vvh(store, mac)
         if R_all is None:
             return
         cpx.set_n_sc(R_all.shape[1])
-        ratio = get_ratio(R_all, denom_lim)
+        ratio = dsp.vv_star_ratio(R_all, denom_lim)
         cpx.draw(_ratio_cpx_data(
             ratio, denoise=denoise, antialias=antialias))
 
@@ -654,6 +622,7 @@ def VVH_ratio_ss_waterfall(
     denom_lim: float = DENOM_LIM,
     denoise:   bool  = True,
     antialias: bool  = True,
+    mac:       str   = '',
 ):
     """Per-stream VV* ratio waterfall with stream slider.
 
@@ -664,34 +633,33 @@ def VVH_ratio_ss_waterfall(
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    m   = _meta(store, mac)
+    mac    = mac or _first_mac(store)
+    m      = _meta(store, mac)
     nr, nc = m.get('nr', 2), m.get('nc', 1)
     pairs  = _lower_tri(nr)
     titles = {(i, j): f'[{i},{j}]/[{j},{j}]' for i, j in pairs}
     wf = WaterfallFigure(
         n_rows_grid=nr, n_cols_grid=nr,
         active_positions=pairs, titles=titles,
-        window=window, fig_title='VVH Ratio SS Waterfall')
-    wf.set_mac_list(_all_macs(store) or [''])
+        window=window,
+        fig_title=f'VVH Ratio SS Waterfall  [{mac}]')
 
     ax_ss = wf.fig.add_axes([0.1, 0.005, 0.8, 0.018])
     ss_sl = Slider(ax_ss, 'Stream', 0, max(nc - 1, 1),
                    valinit=0, valstep=1, color='mediumseagreen')
 
     def _update(_f):
-        wf.set_mac_list(_all_macs(store))
-        mac_  = wf.get_mac()
-        s     = int(round(ss_sl.val))
-        R_ss  = get_vvh_ss(store, mac_, s)
+        s    = int(round(ss_sl.val))
+        R_ss = get_vvh_ss(store, mac, s)
         if R_ss is None:
             return
-        nc_   = _meta(store, mac_).get('nc', 1)
+        nc_  = _meta(store, mac).get('nc', 1)
         ss_sl.valmax = max(nc_ - 1, 1)
-        ratio = get_ratio_ss(R_ss, denom_lim)
+        ratio = dsp.vv_star_ratio(R_ss, denom_lim)
         wf.draw(_ratio_wf_data(
             ratio, denoise=denoise, antialias=antialias))
 
@@ -711,6 +679,7 @@ def VVH_ratio_ss_cplx(
     denom_lim: float = DENOM_LIM,
     denoise:   bool  = True,
     antialias: bool  = True,
+    mac:       str   = '',
 ):
     """Per-stream VV* ratio complex-plane plot with stream slider.
 
@@ -721,11 +690,12 @@ def VVH_ratio_ss_cplx(
         denom_lim (float): Minimum diagonal magnitude.
         denoise (bool): Apply subcarrier denoising.
         antialias (bool): Apply frame-axis antialiasing.
+        mac (str): MAC address to display; defaults to first seen.
     Returns:
         tuple: (fig, FuncAnimation).
     """
-    mac = _first_mac(store)
-    m   = _meta(store, mac)
+    mac    = mac or _first_mac(store)
+    m      = _meta(store, mac)
     nr, nc = m.get('nr', 2), m.get('nc', 1)
     pairs  = _lower_tri(nr)
     titles = {(i, j): f'[{i},{j}]/[{j},{j}]' for i, j in pairs}
@@ -733,7 +703,8 @@ def VVH_ratio_ss_cplx(
         n_rows_grid=nr, n_cols_grid=nr,
         active_positions=pairs, titles=titles,
         series_labels=['Ratio'],
-        window=window, fig_title='VVH Ratio SS Complex Plane')
+        window=window,
+        fig_title=f'VVH Ratio SS Complex Plane  [{mac}]')
 
     ax_ss = cpx.fig.add_axes([0.1, 0.005, 0.8, 0.018])
     ss_sl = Slider(ax_ss, 'Stream', 0, max(nc - 1, 1),
@@ -741,14 +712,13 @@ def VVH_ratio_ss_cplx(
 
     def _update(_f):
         s    = int(round(ss_sl.val))
-        mac_ = _first_mac(store)
-        R_ss = get_vvh_ss(store, mac_, s)
+        R_ss = get_vvh_ss(store, mac, s)
         if R_ss is None:
             return
-        nc_  = _meta(store, mac_).get('nc', 1)
+        nc_  = _meta(store, mac).get('nc', 1)
         ss_sl.valmax = max(nc_ - 1, 1)
         cpx.set_n_sc(R_ss.shape[1])
-        ratio = get_ratio_ss(R_ss, denom_lim)
+        ratio = dsp.vv_star_ratio(R_ss, denom_lim)
         cpx.draw(_ratio_cpx_data(
             ratio, denoise=denoise, antialias=antialias))
 
@@ -766,7 +736,7 @@ def est_array_plot(
     interval:    int   = INTERVAL,
     window:      int   = WINDOW_LEN,
     array_shape: tuple = ARRAY_SHAPE,
-    cal_every:   int   = 20,
+    cal_every:   int   = 1,
     **_kw,
 ):
     """Calibrated array geometry + AoA over time.
@@ -802,7 +772,26 @@ def est_array_plot(
         ax.set_ylim(-90, 90)
         ax.grid(True, lw=0.3, alpha=0.3)
 
-    state = {'geo': None, 'az': [], 'el': [], 'frame': 0}
+    state = {
+        'geo':         None,
+        'az':          [],
+        'el':          [],
+        'frame':       0,
+        'cal_running': False,
+    }
+
+    def _nominal_geo(n_r, n_c):
+        return rare_est.build_geometry(n_rows=n_r, n_cols=n_c)
+
+    def _run_calibration(v_mean, init_g):
+        """Background calibration — updates state['geo'] when done."""
+        try:
+            state['geo'] = rare_est.calibrate_array_geometry(
+                v_mean, n_sources=1, init_geo=init_g)
+        except Exception:
+            pass
+        finally:
+            state['cal_running'] = False
 
     def _update(_f):
         mac  = _first_mac(store)
@@ -814,26 +803,44 @@ def est_array_plot(
         v4d = np.stack([f['v_all'] for f in frames], axis=0)
         nf, n_sc, nr, nc = v4d.shape
 
-        # Re-calibrate periodically
-        if state['geo'] is None or state['frame'] % cal_every == 0:
+        # Build a geometry consistent with the actual array size.
+        # array_shape is a hint; if its element count != nr, fall back
+        # to a 1×nr ULA so geometry always matches the data.
+        n_r, n_c = array_shape
+        if n_r * n_c != nr:
+            n_r, n_c = 1, nr
+
+        # First calibration: synchronous so we have a geometry ready.
+        # Subsequent calibrations: background thread, starting from the
+        # previously calibrated geometry so positions evolve over time.
+        if state['geo'] is None:
             try:
-                n_r, n_c = array_shape
-                init_g   = rare_est.build_geometry(
-                    n_rows=n_r, n_cols=n_c)
-                v_mean   = v4d.mean(axis=0)[np.newaxis]
+                init_g = _nominal_geo(n_r, n_c)
+                v_mean = v4d.mean(axis=0)
                 state['geo'] = rare_est.calibrate_array_geometry(
                     v_mean, n_sources=1, init_geo=init_g)
             except Exception:
-                if state['geo'] is None:
-                    n_r, n_c = array_shape
-                    state['geo'] = rare_est.build_geometry(
-                        n_rows=n_r, n_cols=n_c)
+                state['geo'] = _nominal_geo(n_r, n_c)
+
+        elif (state['frame'] % cal_every == 0
+              and not state['cal_running']):
+            state['cal_running'] = True
+            # Use current calibration as starting point so geometry
+            # can improve incrementally rather than resetting each time.
+            init_g = state['geo']
+            v_mean = v4d.mean(axis=0)
+            t = threading.Thread(
+                target=_run_calibration,
+                args=(v_mean, init_g),
+                daemon=True)
+            t.start()
 
         geo = state['geo']
 
-        # RARE-L on latest frame with calibrated geometry
+        # RARE-L on latest frame with calibrated geometry.
+        # v4d[-1] → (n_sc, nr, nc) as required by rare_l_estimate.
         try:
-            v_lat  = v4d[-1:, :, :, 0]
+            v_lat  = v4d[-1]
             result = rare_est.rare_l_estimate(
                 v_lat, n_sources=1, geometry=geo)
             az = float(result['az']['doa'][0])

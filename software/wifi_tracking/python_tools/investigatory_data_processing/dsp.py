@@ -188,23 +188,27 @@ def vv_star_ratio(
 ) -> dict:
     """Compute lower-triangular VV* ratios normalised by diagonal.
 
-    For each pair (i, j) with i > j:
-        ratio[k] = R[k, i, j] / R[k, j, j].real
+    Accepts any leading dimensions, e.g.:
+        (n_sc, nr, nr)           -> {(i,j): (n_sc,) complex}
+        (n_frames, n_sc, nr, nr) -> {(i,j): (n_frames, n_sc) complex}
 
-    Values where |R[k, j, j].real| < denom_lim are set to NaN via
-    remove_singularity().
+    For each pair (i, j) with i > j:
+        ratio[..., i, j] = R[..., i, j] / R[..., j, j].real
+
+    Values where |R[..., j, j].real| < denom_lim are set to NaN
+    via remove_singularity().
 
     Args:
-        R_all (np.ndarray): (n_sc, nr, nr) complex, from compute_vv_star.
+        R_all (np.ndarray): (..., nr, nr) complex VV* matrices.
         denom_lim (float): Minimum diagonal magnitude to include.
     Returns:
-        dict: {(i, j): np.ndarray shape (n_sc,) complex}.
+        dict: {(i, j): np.ndarray shape (...) complex}.
     """
-    n_sc, nr, _ = R_all.shape
+    nr = R_all.shape[-1]
     result = {}
     for i, j in _lower_tri_pairs(nr):
-        diag  = R_all[:, j, j].real
-        ratio = R_all[:, i, j] / np.where(
+        diag  = R_all[..., j, j].real
+        ratio = R_all[..., i, j] / np.where(
             np.abs(diag) < denom_lim, 1.0, diag)
         result[(i, j)] = remove_singularity(ratio, diag, denom_lim)
     return result
@@ -215,18 +219,23 @@ def vv_star_ratio_ss(
 ) -> dict:
     """Per-stream VV* ratios normalised by diagonal.
 
+    Accepts any leading dimensions after the stream axis, e.g.:
+        (nc, n_sc, nr, nr)           -> {(s,i,j): (n_sc,) complex}
+        (nc, n_frames, n_sc, nr, nr) -> {(s,i,j): (n_frames, n_sc)}
+
     Args:
-        R_ss (np.ndarray): (nc, n_sc, nr, nr) from compute_vv_star_ss.
+        R_ss (np.ndarray): (nc, ..., nr, nr) from compute_vv_star_ss.
         denom_lim (float): Minimum diagonal magnitude to include.
     Returns:
-        dict: {(stream, i, j): np.ndarray shape (n_sc,) complex}.
+        dict: {(stream, i, j): np.ndarray shape (...) complex}.
     """
-    nc, n_sc, nr, _ = R_ss.shape
+    nc = R_ss.shape[0]
+    nr = R_ss.shape[-1]
     result = {}
     for c in range(nc):
         for i, j in _lower_tri_pairs(nr):
-            diag  = R_ss[c, :, j, j].real
-            ratio = R_ss[c, :, i, j] / np.where(
+            diag  = R_ss[c, ..., j, j].real
+            ratio = R_ss[c, ..., i, j] / np.where(
                 np.abs(diag) < denom_lim, 1.0, diag)
             result[(c, i, j)] = remove_singularity(
                 ratio, diag, denom_lim)

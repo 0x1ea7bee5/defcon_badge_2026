@@ -7,8 +7,12 @@ Usage:
     python3 live_plot.py /dev/ttyACM0 --baud 115200
 
 Opens a control-panel window with buttons for each plot type.
-Each button spawns a new animated figure.
+Each button spawns a new animated figure for the selected MAC.
 The "Save Data" button starts logging CSV files.
+
+A MAC selector (slider + label) at the bottom of the control panel
+lets the user choose which MAC address the next plot button will
+open.  The selector updates automatically as new CBF packets arrive.
 
 CSV output:
     <timestamp>_CSI_INFO.csv
@@ -28,7 +32,8 @@ import yaml
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
+from matplotlib.animation import FuncAnimation
+from matplotlib.widgets import Button, Slider
 
 import rx_data
 import special_plots as sp
@@ -265,7 +270,9 @@ _N_COLS = 3
 def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
     """Build and return the control-panel matplotlib figure.
 
-    Buttons open new animated plot windows.
+    Buttons open new animated plot windows for the selected MAC.
+    The MAC selector (slider + label) at the bottom lets the user
+    choose which MAC address the next button click will display.
     The "Save Data" button starts CSV logging.
 
     Args:
@@ -275,13 +282,84 @@ def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
     """
     n_btns   = len(_BTN_DEFS) + 1   # +1 for Save Data
     n_rows   = (n_btns + _N_COLS - 1) // _N_COLS
+
+    # Extra height for the MAC selector area below the buttons.
     fig_ctrl = plt.figure('Live Plot Control',
-                           figsize=(_N_COLS * 2.8, n_rows * 1.0 + 0.6))
+                           figsize=(_N_COLS * 2.8, n_rows * 1.0 + 1.2))
     fig_ctrl.suptitle('Live Plot Control', fontsize=11)
 
     pad   = 0.04
+
+    # Buttons occupy normalized y range [0.20, 0.92].
+    # This leaves [0.00, 0.19] for the MAC selector.
     w_btn = (1.0 - (_N_COLS + 1) * pad) / _N_COLS
-    h_btn = (0.85 - (n_rows + 1) * pad) / n_rows
+    h_btn = (0.72 - n_rows * pad) / n_rows
+
+    # ------------------------------------------------------------------
+    # MAC selector state and helpers
+    # ------------------------------------------------------------------
+
+    mac_state = {'list': [], 'idx': 0}
+
+    # Label showing the currently selected MAC string
+    ax_mac_lbl = fig_ctrl.add_axes([0.02, 0.005, 0.96, 0.05])
+    ax_mac_lbl.set_axis_off()
+    mac_text = ax_mac_lbl.text(
+        0.5, 0.5, 'MAC: (waiting for data...)',
+        transform=ax_mac_lbl.transAxes,
+        fontsize=8, va='center', ha='center')
+
+    # Slider to select MAC index
+    ax_mac_sl = fig_ctrl.add_axes([0.12, 0.085, 0.76, 0.025])
+    mac_sl = Slider(
+        ax_mac_sl, 'MAC', 0, 1,
+        valinit=0, valstep=1, color='darkorange')
+
+    def _update_mac_label():
+        macs = mac_state['list']
+        if not macs:
+            mac_text.set_text('MAC: (waiting for data...)')
+        else:
+            idx = min(mac_state['idx'], len(macs) - 1)
+            mac_text.set_text(f'MAC: {macs[idx]}')
+        fig_ctrl.canvas.draw_idle()
+
+    def _on_mac_sl(val):
+        mac_state['idx'] = int(round(val))
+        _update_mac_label()
+
+    mac_sl.on_changed(_on_mac_sl)
+
+    def _get_selected_mac() -> str:
+        """Return the MAC address currently selected in the control panel.
+
+        Returns:
+            str: MAC address, or '' if no data has arrived yet.
+        """
+        macs = mac_state['list']
+        if not macs:
+            return ''
+        return macs[min(mac_state['idx'], len(macs) - 1)]
+
+    def _refresh_mac_list(_f=None):
+        with store.lock:
+            macs = list(store.cbf_order)
+        if macs == mac_state['list']:
+            return
+        mac_state['list'] = macs
+        n = len(macs) - 1
+        mac_sl.valmax = max(n, 1)
+        mac_sl.ax.set_xlim(0, max(n, 1))
+        mac_sl.set_val(min(mac_state['idx'], max(n, 0)))
+        _update_mac_label()
+
+    # Animate MAC list refresh every 1 s
+    mac_ani = FuncAnimation(
+        fig_ctrl, _refresh_mac_list, interval=1000, blit=False)
+
+    # ------------------------------------------------------------------
+    # Plot buttons
+    # ------------------------------------------------------------------
 
     open_anis = []   # keep references to prevent GC
     open_figs = []
@@ -301,6 +379,7 @@ def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
                     denoise=SMOOTH,
                     antialias=ANTIALIAS,
                     denom_lim=DENOM_LIM,
+                    mac=_get_selected_mac(),
                 )
                 open_figs.append(fig)
                 open_anis.append(ani)
@@ -326,7 +405,7 @@ def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
         row = idx // _N_COLS
         col = idx %  _N_COLS
         x   = pad + col * (w_btn + pad)
-        y   = 0.88 - (row + 1) * (h_btn + pad)
+        y   = 0.92 - (row + 1) * (h_btn + pad)
         ax  = fig_ctrl.add_axes([x, y, w_btn, h_btn])
         btn_axes.append(ax)
 
@@ -341,10 +420,12 @@ def _build_control_panel(store: rx_data.DataStore) -> plt.Figure:
             b.on_clicked(_make_plot_cb(fn_name))
         btns.append(b)
 
-    # Keep button references alive
+    # Keep references alive to prevent garbage collection
     fig_ctrl._btns     = btns
     fig_ctrl._anis_ref = open_anis
     fig_ctrl._figs_ref = open_figs
+    fig_ctrl._mac_ani  = mac_ani
+    fig_ctrl._mac_sl   = mac_sl
 
     return fig_ctrl
 

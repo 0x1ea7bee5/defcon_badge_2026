@@ -3,8 +3,7 @@ plot_types/waterfalls.py — Generic magnitude + phase waterfall.
 
 Supports a configurable n_rows_grid × n_cols_grid subplot grid.
 Only positions listed in active_positions are populated; all other
-grid cells are left empty.  A MAC address slider lets the user
-switch between different sources.
+grid cells are left empty.
 
 Legend items support click-to-hide via add_clickable_legend().
 
@@ -16,7 +15,8 @@ draw() API:
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from matplotlib.widgets import Slider
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
 
 WINDOW_LEN = 200
 _DB_MIN    = -40.0
@@ -58,9 +58,6 @@ class WaterfallFigure:
                   for r in range(n_rows_grid)
                   for c in range(n_cols_grid)])
 
-        self._mac_list = []
-        self._mac_idx  = 0
-
         fw = max(6.0, n_cols_grid * 4.0)
         fh = max(3.0, n_rows_grid * 2.5 + 0.8)
         self.fig = plt.figure(fig_title, figsize=(fw, fh))
@@ -91,41 +88,24 @@ class WaterfallFigure:
             self._im_mag[(r, c)]   = None
             self._im_phase[(r, c)] = None
 
-        # MAC slider below the plot area
-        self.fig.subplots_adjust(bottom=0.12, top=0.92)
-        ax_sl = self.fig.add_axes([0.1, 0.02, 0.8, 0.025])
-        self._mac_slider = Slider(
-            ax_sl, 'MAC', 0, max(1, 1),
-            valinit=0, valstep=1, color='darkorange')
-        self._mac_slider.on_changed(self._on_mac_change)
+        # Leave right margin for colorbars.
+        self.fig.subplots_adjust(top=0.92, right=0.84)
 
-    def _on_mac_change(self, val):
-        self._mac_idx = int(round(val))
+        # Shared magnitude colorbar (dB)
+        ax_cb_m = self.fig.add_axes([0.86, 0.12, 0.015, 0.80])
+        sm_mag  = cm.ScalarMappable(
+            cmap='inferno', norm=Normalize(_DB_MIN, _DB_MAX))
+        sm_mag.set_array([])
+        cb_m = self.fig.colorbar(sm_mag, cax=ax_cb_m)
+        cb_m.set_label('dB', fontsize=8)
 
-    def set_mac_list(self, mac_list: list):
-        """Update the available MAC addresses and slider range.
-
-        Args:
-            mac_list (list[str]): MAC address strings.
-        """
-        if not mac_list:
-            return
-        self._mac_list = mac_list
-        n = len(mac_list) - 1
-        self._mac_slider.valmax = max(n, 1)
-        self._mac_slider.ax.set_xlim(0, max(n, 1))
-        self._mac_slider.set_val(min(self._mac_idx, n))
-
-    def get_mac(self) -> str:
-        """Return currently selected MAC address.
-
-        Returns:
-            str: MAC address, or '' if none available.
-        """
-        if not self._mac_list:
-            return ''
-        idx = min(self._mac_idx, len(self._mac_list) - 1)
-        return self._mac_list[idx]
+        # Shared phase colorbar (rad)
+        ax_cb_p = self.fig.add_axes([0.93, 0.12, 0.015, 0.80])
+        sm_ph   = cm.ScalarMappable(
+            cmap='twilight', norm=Normalize(-np.pi, np.pi))
+        sm_ph.set_array([])
+        cb_p = self.fig.colorbar(sm_ph, cax=ax_cb_p)
+        cb_p.set_label('rad', fontsize=8)
 
     def draw(self, data_dict: dict):
         """Update all active waterfall subplots.

@@ -8,9 +8,12 @@ Features per subplot:
   - Fading opacity: newer points more opaque than older.
   - Per-series distinct markers; click legend entry to hide.
   - Half-opacity dashed line connecting consecutive points.
-  - "All SCs" checkbox: all subcarriers simultaneously, each
-    coloured by a continuous colormap.
-  - Subcarrier slider: active only when "All SCs" is unchecked.
+  - "All SCs" checkbox: all subcarriers (in selected range) shown
+    simultaneously, each coloured by a continuous colormap.
+  - Subcarrier slider: single-SC selector, shown when unchecked.
+  - SC Lo / SC Hi sliders: lower and upper range bounds, shown when
+    "All SCs" is checked.
+  - Time Window slider: trims visible frames from 1 to max window.
 
 draw() API:
     data_dict: {(row, col): [series_array, ...]}
@@ -71,22 +74,25 @@ class ComplexPlaneFigure:
         fig_title:        str  = 'Complex Plane',
         cmap_name:        str  = 'plasma',
     ):
-        self._nr     = n_rows_grid
-        self._nc     = n_cols_grid
-        self._win    = window
-        self._labels = series_labels or ['Value']
-        self._titles = titles or {}
-        self._cmap   = get_cmap(cmap_name)
+        self._nr        = n_rows_grid
+        self._nc        = n_cols_grid
+        self._win       = window
+        self._labels    = series_labels or ['Value']
+        self._titles    = titles or {}
+        self._fig_title = fig_title
+        self._cmap      = get_cmap(cmap_name)
         self._active = (
             active_positions if active_positions is not None
             else [(r, c)
                   for r in range(n_rows_grid)
                   for c in range(n_cols_grid)])
 
-        self._all_sc = False
-        self._sc_idx = 0
-        self._n_sc   = 1
-        self._hidden = set()   # hidden series indices
+        self._all_sc   = False
+        self._sc_idx   = 0
+        self._n_sc     = 1
+        self._sc_range = (0, 0)    # (lo, hi) subcarrier range for all-SC mode
+        self._time_win = window    # visible frame count (1 … window)
+        self._hidden   = set()     # hidden series indices
 
         fw = max(4.0, n_cols_grid * 2.5)
         fh = max(3.0, n_rows_grid * 2.5 + 0.8)
@@ -109,31 +115,66 @@ class ComplexPlaneFigure:
             ax.set_ylabel('Imag', fontsize=6)
             self._ax[(r, c)] = ax
 
-        self.fig.subplots_adjust(bottom=0.12, top=0.92)
+        self.fig.subplots_adjust(bottom=0.17, top=0.92)
 
         # "All SCs" checkbox
-        ax_chk = self.fig.add_axes([0.05, 0.01, 0.15, 0.06])
+        ax_chk = self.fig.add_axes([0.05, 0.01, 0.15, 0.065])
         ax_chk.set_axis_off()
         self._chk = CheckButtons(ax_chk, ['All SCs'], [False])
         self._chk.on_clicked(self._on_check)
 
-        # Subcarrier slider
+        # Single-subcarrier slider (shown when All SCs is unchecked)
         ax_sl = self.fig.add_axes([0.25, 0.02, 0.65, 0.025])
         self._sc_slider = Slider(
             ax_sl, 'Subcarrier', 0, 1,
             valinit=0, valstep=1, color='steelblue')
         self._sc_slider.on_changed(self._on_sc_change)
 
+        # SC Lo / SC Hi sliders (shown when All SCs is checked)
+        ax_lo = self.fig.add_axes([0.25, 0.02, 0.65, 0.025])
+        ax_lo.set_visible(False)
+        self._sc_lo_slider = Slider(
+            ax_lo, 'SC Lo', 0, 1,
+            valinit=0, valstep=1, color='steelblue')
+        self._sc_lo_slider.on_changed(self._on_sc_lo_change)
+
+        ax_hi = self.fig.add_axes([0.25, 0.055, 0.65, 0.025])
+        ax_hi.set_visible(False)
+        self._sc_hi_slider = Slider(
+            ax_hi, 'SC Hi', 0, 1,
+            valinit=1, valstep=1, color='cornflowerblue')
+        self._sc_hi_slider.on_changed(self._on_sc_hi_change)
+
+        # Time-window slider — controls how many recent frames to show
+        ax_tw = self.fig.add_axes([0.25, 0.09, 0.65, 0.025])
+        self._time_slider = Slider(
+            ax_tw, 'Window', 1, max(window, 2),
+            valinit=window, valstep=1, color='mediumpurple')
+        self._time_slider.on_changed(self._on_time_change)
+
     def _on_check(self, _label):
         self._all_sc = not self._all_sc
         self._sc_slider.ax.set_visible(not self._all_sc)
+        self._sc_lo_slider.ax.set_visible(self._all_sc)
+        self._sc_hi_slider.ax.set_visible(self._all_sc)
         self.fig.canvas.draw_idle()
 
     def _on_sc_change(self, val):
         self._sc_idx = int(round(val))
 
+    def _on_sc_lo_change(self, val):
+        self._sc_range = (int(round(val)), self._sc_range[1])
+
+    def _on_sc_hi_change(self, val):
+        self._sc_range = (self._sc_range[0], int(round(val)))
+
+    def _on_time_change(self, val):
+        self._time_win = max(1, int(round(val)))
+
     def set_n_sc(self, n_sc: int):
         """Update subcarrier slider range.
+
+        Updates both the single-SC slider and the range slider.
 
         Args:
             n_sc (int): Number of subcarriers.
@@ -141,9 +182,20 @@ class ComplexPlaneFigure:
         if n_sc < 1 or n_sc == self._n_sc:
             return
         self._n_sc = n_sc
+        # Single-SC slider
         self._sc_slider.valmax = n_sc - 1
         self._sc_slider.ax.set_xlim(0, n_sc - 1)
         self._sc_slider.set_val(min(self._sc_idx, n_sc - 1))
+        # SC Lo / SC Hi sliders — expand hi to full range on first update
+        lo, hi = self._sc_range
+        new_hi = min(hi, n_sc - 1) if hi > 0 else n_sc - 1
+        new_lo = min(lo, new_hi)
+        for sl in (self._sc_lo_slider, self._sc_hi_slider):
+            sl.valmax = n_sc - 1
+            sl.ax.set_xlim(0, n_sc - 1)
+        self._sc_lo_slider.set_val(new_lo)
+        self._sc_hi_slider.set_val(new_hi)
+        self._sc_range = (new_lo, new_hi)
 
     def draw(self, data_dict: dict):
         """Redraw all active complex-plane subplots.
@@ -170,6 +222,9 @@ class ComplexPlaneFigure:
             for s_idx, series in enumerate(series_list):
                 if series is None or series.size == 0:
                     continue
+                # Apply time-window trim along the frame axis.
+                n_show = min(self._time_win, series.shape[0])
+                series = series[-n_show:]
                 label  = (self._labels[s_idx]
                           if s_idx < len(self._labels)
                           else f'S{s_idx}')
@@ -232,7 +287,11 @@ class ComplexPlaneFigure:
                       linestyle='--', label=label, markersize=5)
 
     def _draw_all_sc(self, ax, series, s_idx, marker, hidden):
-        """Plot all subcarriers simultaneously with per-SC colour.
+        """Plot subcarriers in the selected range with per-SC colour.
+
+        When the range slider is at full range, all subcarriers are
+        shown.  The colour mapping always spans the full n_sc range so
+        colours are consistent as the range is adjusted.
 
         Args:
             ax: Matplotlib axes.
@@ -243,7 +302,9 @@ class ComplexPlaneFigure:
         """
         n_frames, n_sc = series.shape
         scale = 0.2 if hidden else 1.0
-        for sc in range(n_sc):
+        lo = max(0, min(self._sc_range))
+        hi = min(n_sc - 1, max(self._sc_range))
+        for sc in range(lo, hi + 1):
             color  = self._cmap(sc / max(n_sc - 1, 1))
             pts    = series[:, sc]
             n      = len(pts)
